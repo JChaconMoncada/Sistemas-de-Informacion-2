@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SistemaContableZulay.UI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d673b95b4e979382dd17eec9a50a53b9f91e879")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab7963b452eb94603776f9c34e3522343d4a1d4e")]
 [assembly: System.Reflection.AssemblyProductAttribute("SistemaContableZulay.UI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SistemaContableZulay.UI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

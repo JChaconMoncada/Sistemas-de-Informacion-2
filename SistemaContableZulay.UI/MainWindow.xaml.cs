@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using SistemaContableZulay.UI.Infrastructure;
 using SistemaContableZulay.UI.Services;
 using SistemaContableZulay.UI.ViewModels;
