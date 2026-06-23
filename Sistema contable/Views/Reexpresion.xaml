@@ -1,0 +1,109 @@
+<Page x:Class="Sistema_contable.Views.Reexpresion"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Reexpresion">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Reexpresión Monetaria (Ajuste por Inflación)" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="1" Text="Asistente para ajustar los valores contables según el Índice de Precios al Consumidor (IPC) del BCV" 
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+        <GroupBox Grid.Row="2" Header="Parámetros de Reexpresión" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Fecha Origen:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="1" />
+
+                <Label Grid.Row="0" Grid.Column="3" Content="Fecha Destino:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="4" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="IPC Origen:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="1,250.50" Margin="0,8,0,0" />
+
+                <Label Grid.Row="1" Grid.Column="3" Content="IPC Destino:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="4" Text="1,580.75" Margin="0,8,0,0" />
+
+                <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="6" 
+                        Background="{StaticResource AccentLightBrush}" 
+                        BorderBrush="{StaticResource AccentBrush}" 
+                        BorderThickness="1" Padding="12" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Factor de Reexpresión Calculado:" FontWeight="SemiBold" />
+                        <TextBlock Text="1.2642" FontSize="24" FontWeight="Bold" 
+                                   Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0" />
+                        <TextBlock Text="(IPC Destino / IPC Origen)" FontSize="11" 
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3" Header="Partidas a Reexpresar" Margin="0,0,0,12">
+            <DataGrid AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Aplicar" Width="60" />
+                    <DataGridTextColumn Header="Código" Width="100" Binding="{Binding Codigo}" />
+                    <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding Nombre}" />
+                    <DataGridTextColumn Header="Tipo" Width="100" Binding="{Binding Tipo}" />
+                    <DataGridTextColumn Header="Valor Original" Width="130" Binding="{Binding ValorOriginal, StringFormat=N2}" />
+                    <DataGridTextColumn Header="Factor" Width="80" Binding="{Binding Factor, StringFormat=N4}" />
+                    <DataGridTextColumn Header="Valor Ajustado" Width="130" Binding="{Binding ValorAjustado, StringFormat=N2}" />
+                    <DataGridTextColumn Header="Diferencia" Width="130" Binding="{Binding Diferencia, StringFormat=N2}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <Border Grid.Row="4" Background="{StaticResource AccentLightBrush}" 
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" 
+                Padding="12" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="Partidas seleccionadas: " FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Text="15" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="4,0,0,0" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="Ajuste Total:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="Bs. 45,280.50" FontWeight="Bold" FontSize="16" 
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" TextAlignment="Right" />
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Vista Previa Asiento" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Aplicar Reexpresión" Style="{StaticResource AccentButton}" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cancelar" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Page>

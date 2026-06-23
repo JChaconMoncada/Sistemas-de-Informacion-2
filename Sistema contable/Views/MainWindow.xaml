@@ -1,0 +1,126 @@
+<Window x:Class="Sistema_contable.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Oficina Contable Zulay Angola - Sistema Contable ERP" 
+        Height="800" Width="1400"
+        WindowState="Maximized">
+    
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}" Padding="4">
+            <MenuItem Header="_Archivo">
+                <MenuItem Header="Realizar Backup" />
+                <MenuItem Header="Restaurar Backup" />
+                <Separator />
+                <MenuItem Header="Salir" />
+            </MenuItem>
+            <MenuItem Header="_Empresas">
+                <MenuItem Header="Nueva Empresa" />
+                <MenuItem Header="Editar Empresa" />
+                <MenuItem Header="Eliminar Empresa" />
+            </MenuItem>
+            <MenuItem Header="_Contabilidad">
+                <MenuItem Header="Nuevo Comprobante" />
+                <MenuItem Header="Plan de Cuentas" />
+                <MenuItem Header="Libro Diario" />
+                <MenuItem Header="Libro Mayor" />
+            </MenuItem>
+            <MenuItem Header="_Reportes">
+                <MenuItem Header="Balance General" />
+                <MenuItem Header="Estado de Resultados" />
+                <MenuItem Header="Flujo de Efectivo" />
+            </MenuItem>
+            <MenuItem Header="_Herramientas">
+                <MenuItem Header="Reexpresión Monetaria" />
+                <MenuItem Header="Importar PDF Bancario" />
+                <MenuItem Header="Configuración" />
+            </MenuItem>
+            <MenuItem Header="A_yuda">
+                <MenuItem Header="Manual de Usuario" />
+                <MenuItem Header="Acerca de" />
+            </MenuItem>
+        </Menu>
+
+        <ToolBarTray DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}"/>
+
+        <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource HeaderBackgroundBrush}" Padding="8,4">
+            <StatusBarItem>
+                <TextBlock Text="Empresa: Sin empresa seleccionada" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="Backup: No realizado" Foreground="{StaticResource TextSecondaryBrush}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{StaticResource WindowBackgroundBrush}" 
+                    BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="{StaticResource DataGridHeaderBackgroundBrush}" 
+                            Padding="12,8" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="EMPRESAS" FontWeight="SemiBold" FontSize="14" 
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                    </Border>
+                    
+                    <TreeView x:Name="TreeEmpresas" BorderThickness="0" Padding="8">
+                        <TreeViewItem Header="Empresa Demo 1" IsExpanded="True">
+                            <TreeViewItem Header="RIF: J-12345678-9" />
+                        </TreeViewItem>
+                        <TreeViewItem Header="Empresa Demo 2">
+                            <TreeViewItem Header="RIF: J-98765432-1" />
+                        </TreeViewItem>
+                    </TreeView>
+                </DockPanel>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" 
+                          Background="{StaticResource ControlBorderBrush}" />
+
+            <TabControl x:Name="MainTabControl" Grid.Column="2" Margin="0">
+                <TabItem Header="Dashboard">
+                    <Frame x:Name="FrameDashboard" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Comprobantes">
+                    <Frame x:Name="FrameComprobantes" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Empresas">
+                    <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Plan de Cuentas">
+                    <Frame x:Name="FramePlanCuentas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Libros">
+                    <TabControl>
+                        <TabItem Header="Libro Diario">
+                            <Frame x:Name="FrameLibroDiario" NavigationUIVisibility="Hidden" />
+                        </TabItem>
+                        <TabItem Header="Libro Mayor">
+                            <Frame x:Name="FrameLibroMayor" NavigationUIVisibility="Hidden" />
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="Informes">
+                    <Frame x:Name="FrameInformes" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Cobranza">
+                    <Frame x:Name="FrameCobranza" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Documentos">
+                    <Frame x:Name="FrameDocumentos" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Configuración">
+                    <Frame x:Name="FrameConfiguracion" NavigationUIVisibility="Hidden" />
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>

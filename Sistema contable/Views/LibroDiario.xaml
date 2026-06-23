@@ -1,0 +1,104 @@
+<Page x:Class="Sistema_contable.Views.LibroDiario"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="LibroDiario">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Libro Diario" Style="{StaticResource TitleTextBlock}" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button Content="Ver Detalle" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <Button Content="Exportar PDF" Margin="0,0,6,0" />
+            <Button Content="Exportar Excel" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="Imprimir" />
+        </StackPanel>
+
+        <GroupBox Grid.Row="2" Header="Filtros de Periodo" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Content="Desde:" VerticalAlignment="Center" />
+                <DatePicker Grid.Column="1" />
+
+                <Label Grid.Column="3" Content="Hasta:" VerticalAlignment="Center" />
+                <DatePicker Grid.Column="4" />
+
+                <Label Grid.Column="6" Content="Tipo:" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="7">
+                    <ComboBoxItem Content="Todos" IsSelected="True" />
+                    <ComboBoxItem Content="Manual" />
+                    <ComboBoxItem Content="Apertura" />
+                    <ComboBoxItem Content="Cierre" />
+                    <ComboBoxItem Content="Ajuste" />
+                </ComboBox>
+
+                <Button Grid.Column="9" Content="Aplicar" />
+            </Grid>
+        </GroupBox>
+
+        <DataGrid Grid.Row="3" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,12">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Fecha" Width="100" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy}" />
+                <DataGridTextColumn Header="Nº Asiento" Width="80" Binding="{Binding Numero}" />
+                <DataGridTextColumn Header="Código Cuenta" Width="120" Binding="{Binding CodigoCuenta}" />
+                <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding NombreCuenta}" />
+                <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />
+                <DataGridTextColumn Header="Debe" Width="120" Binding="{Binding Debe, StringFormat=N2}" />
+                <DataGridTextColumn Header="Haber" Width="120" Binding="{Binding Haber, StringFormat=N2}" />
+                <DataGridTemplateColumn Header="Acciones" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Ver" Width="60" Height="24" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="4" Background="{StaticResource AccentLightBrush}" 
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Text="Total Debe:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="Bs. 0.00" FontWeight="Bold" FontSize="14" 
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" TextAlignment="Right" />
+
+                <TextBlock Grid.Column="4" Text="Total Haber:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="5" Text="Bs. 0.00" FontWeight="Bold" FontSize="14" 
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" TextAlignment="Right" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

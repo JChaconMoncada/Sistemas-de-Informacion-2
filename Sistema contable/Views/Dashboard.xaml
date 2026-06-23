@@ -1,0 +1,121 @@
+<Page x:Class="Sistema_contable.Views.Dashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Dashboard">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Dashboard" Style="{StaticResource TitleTextBlock}" />
+
+            <UniformGrid Grid.Row="1" Rows="1" Columns="4" Margin="0,0,0,16">
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Saldo Total" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Bs. 125,450.00" Style="{StaticResource PositiveBalanceTextBlock}" Margin="0,8,0,0" />
+                        <TextBlock Text="↑ 12% vs mes anterior" FontSize="11" Foreground="#4CAF50" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Ingresos del Mes" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Bs. 85,200.00" FontSize="24" FontWeight="Bold" 
+                                   Foreground="{StaticResource AccentBrush}" Margin="0,8,0,0" />
+                        <TextBlock Text="15 transacciones" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Gastos del Mes" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Bs. 42,350.00" FontSize="24" FontWeight="Bold" 
+                                   Foreground="#F44336" Margin="0,8,0,0" />
+                        <TextBlock Text="23 transacciones" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Alertas Pendientes" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="3" FontSize="24" FontWeight="Bold" 
+                                   Foreground="#FF9800" Margin="0,8,0,0" />
+                        <TextBlock Text="Requieren atención" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <GroupBox Grid.Column="0" Header="Ingresos vs Gastos (Últimos 6 Meses)" Margin="0,0,8,0">
+                    <Border Height="250" Background="{StaticResource WindowBackgroundBrush}">
+                        <TextBlock Text="[Gráfico de barras aquí]" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
+                    </Border>
+                </GroupBox>
+
+                <GroupBox Grid.Column="1" Header="Distribución de Gastos" Margin="8,0,0,0">
+                    <Border Height="250" Background="{StaticResource WindowBackgroundBrush}">
+                        <TextBlock Text="[Gráfico de torta aquí]" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
+                    </Border>
+                </GroupBox>
+            </Grid>
+
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="300" />
+                </Grid.ColumnDefinitions>
+
+                <GroupBox Grid.Column="0" Header="Alertas Recientes" Margin="0,0,8,0">
+                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tipo" Width="120" />
+                            <DataGridTextColumn Header="Descripción" Width="*" />
+                            <DataGridTextColumn Header="Fecha" Width="100" />
+                            <DataGridTemplateColumn Header="Estado" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource StatusBadgeWarning}" Padding="6,2">
+                                            <TextBlock Text="Pendiente" FontSize="11" Foreground="#FF9800" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <GroupBox Grid.Column="1" Header="Acciones Rápidas" Margin="8,0,0,0">
+                    <StackPanel Margin="8">
+                        <Button Content="Nuevo Comprobante" Style="{StaticResource AccentButton}" 
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <Button Content="Registrar Pago" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <Button Content="Ver Libro Diario" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <Button Content="Generar Reporte" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <Separator Margin="0,8" />
+                        <Button Content="Realizar Backup" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <Button Content="Importar PDF Bancario" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

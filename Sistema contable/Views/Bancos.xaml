@@ -1,0 +1,103 @@
+<Page x:Class="Sistema_contable.Views.Bancos"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Bancos">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Importación de Estados de Cuenta Bancarios (PDF)" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="1" Text="Extrae automáticamente las transacciones de archivos PDF y permite mapearlas a cuentas contables" 
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+        <GroupBox Grid.Row="2" Header="Seleccionar Archivo PDF" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" IsReadOnly="True" Margin="0,0,8,0">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                                <VisualBrush.Visual>
+                                                    <TextBlock Text="Ningún archivo seleccionado..." 
+                                                               Foreground="{StaticResource TextPlaceholderBrush}" 
+                                                               Margin="8,0,0,0" />
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <Button Grid.Column="1" Content="Seleccionar PDF" Style="{StaticResource AccentButton}" />
+            </Grid>
+        </GroupBox>
+
+        <Border Grid.Row="3" Background="{StaticResource AccentLightBrush}" 
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" 
+                Padding="12" Margin="0,0,0,12" Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Procesando archivo..." FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <ProgressBar Grid.Column="1" Value="65" Maximum="100" Height="20" />
+            </Grid>
+        </Border>
+
+        <GroupBox Grid.Row="4" Header="Transacciones Extraídas - Mapeo a Cuentas Contables" Margin="0,0,0,12">
+            <DataGrid AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Importar" Width="70" />
+                    <DataGridTextColumn Header="Fecha" Width="100" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTextColumn Header="Referencia" Width="120" Binding="{Binding Referencia}" />
+                    <DataGridTextColumn Header="Descripción" Width="*" Binding="{Binding Descripcion}" />
+                    <DataGridTextColumn Header="Débito" Width="120" Binding="{Binding Debito, StringFormat=N2}" />
+                    <DataGridTextColumn Header="Crédito" Width="120" Binding="{Binding Credito, StringFormat=N2}" />
+                    <DataGridTemplateColumn Header="Cuenta Contable" Width="250">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox>
+                                    <ComboBoxItem Content="1.1.1.02 - Bancos" IsSelected="True" />
+                                    <ComboBoxItem Content="1.1.2.01 - Clientes" />
+                                    <ComboBoxItem Content="2.1.1.01 - Proveedores" />
+                                    <ComboBoxItem Content="4.1.1.01 - Ventas" />
+                                    <ComboBoxItem Content="5.1.1.01 - Gastos Operativos" />
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="Transacciones seleccionadas: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+            <TextBlock Text="0" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+            <Button Content="Importar Transacciones" Style="{StaticResource AccentButton}" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cancelar" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Page>

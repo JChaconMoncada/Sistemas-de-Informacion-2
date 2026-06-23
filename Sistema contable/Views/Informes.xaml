@@ -1,0 +1,177 @@
+<Page x:Class="Sistema_contable.Views.Informes"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Informes">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Estados Financieros e Informes" Style="{StaticResource TitleTextBlock}" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button Content="Generar Reporte" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <Button Content="Exportar PDF" Margin="0,0,6,0" />
+            <Button Content="Exportar Excel" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="Imprimir" />
+        </StackPanel>
+
+        <GroupBox Grid.Row="2" Header="Parámetros del Reporte" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Tipo de Reporte:" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="0" Grid.Column="1">
+                    <ComboBoxItem Content="Balance General" IsSelected="True" />
+                    <ComboBoxItem Content="Estado de Resultados" />
+                    <ComboBoxItem Content="Flujo de Efectivo" />
+                    <ComboBoxItem Content="Estado de Cambios en el Patrimonio" />
+                </ComboBox>
+
+                <Label Grid.Row="0" Grid.Column="3" Content="Desde:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="4" />
+
+                <Label Grid.Row="0" Grid.Column="6" Content="Hasta:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="7" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Ejercicio:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0">
+                    <ComboBoxItem Content="2026" IsSelected="True" />
+                    <ComboBoxItem Content="2025" />
+                    <ComboBoxItem Content="2024" />
+                </ComboBox>
+
+                <Label Grid.Row="1" Grid.Column="3" Content="Formato:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <ComboBox Grid.Row="1" Grid.Column="4" Margin="0,8,0,0">
+                    <ComboBoxItem Content="Detallado" IsSelected="True" />
+                    <ComboBoxItem Content="Resumido" />
+                    <ComboBoxItem Content="Comparativo" />
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+
+        <TabControl Grid.Row="3">
+            <TabItem Header="Vista Previa">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Border Background="{StaticResource WindowBackgroundBrush}" Padding="16" Margin="8">
+                        <StackPanel>
+                            <TextBlock Text="BALANCE GENERAL" FontSize="18" FontWeight="Bold" 
+                                       HorizontalAlignment="Center" Margin="0,0,0,4" />
+                            <TextBlock Text="Al 31 de Diciembre de 2026" FontSize="14" 
+                                       HorizontalAlignment="Center" Margin="0,0,0,16" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+
+                            <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="150" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ACTIVO" FontWeight="Bold" FontSize="14" />
+                                </Grid>
+                            </Border>
+
+                            <Grid Margin="16,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Activo Corriente" FontWeight="SemiBold" />
+                            </Grid>
+
+                            <Grid Margin="32,0,0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Caja" />
+                                <TextBlock Grid.Column="1" Text="Bs. 15,000.00" TextAlignment="Right" />
+                            </Grid>
+
+                            <Grid Margin="32,0,0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Bancos" />
+                                <TextBlock Grid.Column="1" Text="Bs. 85,450.00" TextAlignment="Right" />
+                            </Grid>
+
+                            <Grid Margin="32,0,0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Clientes" />
+                                <TextBlock Grid.Column="1" Text="Bs. 25,000.00" TextAlignment="Right" />
+                            </Grid>
+
+                            <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,1,0,0" Padding="0,4,0,0" Margin="16,8,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="150" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Total Activo Corriente" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Column="1" Text="Bs. 125,450.00" TextAlignment="Right" FontWeight="SemiBold" />
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="[Vista previa del reporte completo]" 
+                                       Margin="0,16,0,0" FontStyle="Italic" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Gráficos">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="{StaticResource WindowBackgroundBrush}" 
+                            BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" 
+                            Margin="0,0,0,8" Padding="16">
+                        <TextBlock Text="[Gráfico de evolución patrimonial]" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
+                    </Border>
+
+                    <Border Grid.Row="1" Background="{StaticResource WindowBackgroundBrush}" 
+                            BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" 
+                            Margin="0,8,0,0" Padding="16">
+                        <TextBlock Text="[Gráfico comparativo de periodos]" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>
