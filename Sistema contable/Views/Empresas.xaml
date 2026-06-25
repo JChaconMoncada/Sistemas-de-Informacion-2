@@ -1,0 +1,86 @@
+<Page x:Class="Sistema_contable.Views.Empresas"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Empresas">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Gestión de Empresas" Style="{StaticResource TitleTextBlock}" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button Content="Nueva Empresa" Command="{Binding NuevaEmpresaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <Button Content="Guardar" Command="{Binding GuardarCommand}" Margin="0,0,6,0" />
+            <Button Content="Eliminar Seleccionada" Command="{Binding EliminarCommand}" CommandParameter="{Binding SelectedItem, ElementName=GridEmpresas}" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="Exportar" />
+        </StackPanel>
+
+        <GroupBox Grid.Row="2" Header="Filtros" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="250" Text="" Margin="0,0,8,0">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                                <VisualBrush.Visual>
+                                                    <TextBlock Text="Buscar por nombre o RIF..." 
+                                                               Foreground="{StaticResource TextPlaceholderBrush}" 
+                                                               Margin="8,0,0,0" />
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <ComboBox Width="150" Margin="0,0,8,0">
+                    <ComboBoxItem Content="Todas" IsSelected="True" />
+                    <ComboBoxItem Content="Activas" />
+                    <ComboBoxItem Content="Inactivas" />
+                </ComboBox>
+                <Button Content="Aplicar Filtros" />
+            </StackPanel>
+        </GroupBox>
+
+        <DataGrid x:Name="GridEmpresas" Grid.Row="3" AutoGenerateColumns="False" CanUserAddRows="False" 
+                  SelectionUnit="FullRow"
+                  ItemsSource="{Binding Empresas}" SelectedItem="{Binding EmpresaSeleccionada}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Width="60" Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Nombre" Width="*" Binding="{Binding NombreEmpresa}" />
+                <DataGridTextColumn Header="RIF" Width="150" Binding="{Binding Rif}" />
+                <DataGridTextColumn Header="Teléfono" Width="120" Binding="{Binding Telefono}" />
+                <DataGridTextColumn Header="Email" Width="200" Binding="{Binding Email}" />
+                <DataGridTextColumn Header="Razón Social" Width="180" Binding="{Binding RazonSocial}" />
+                <DataGridTemplateColumn Header="Acciones" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="✏" Width="28" Height="28" Margin="2" ToolTip="Editar" Foreground="#1976D2" Background="Transparent" BorderThickness="0" FontWeight="Bold" FontSize="14"
+                                        Command="DataGrid.BeginEditCommand" />
+                                <Button Content="🗑" Width="28" Height="28" Margin="2" ToolTip="Eliminar" Foreground="#D32F2F" Background="Transparent" BorderThickness="0" FontWeight="Bold" FontSize="14"
+                                        Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

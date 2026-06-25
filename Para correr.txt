@@ -1,4 +1,0 @@
-
-Para poder correr el codigo usa lo siguiente en el terminal
-
-dotnet run --project "SistemaContableZulay.UI\SistemaContableZulay.UI.csproj"

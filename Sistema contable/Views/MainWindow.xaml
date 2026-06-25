@@ -1,0 +1,150 @@
+<Window x:Class="Sistema_contable.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Oficina Contable Zulay Angola - Sistema Contable ERP" 
+        Height="800" Width="1400"
+        WindowState="Maximized">
+    
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}" Padding="4">
+            <MenuItem Header="_Archivo">
+                <MenuItem Header="Realizar Backup" Click="MenuBackup_Click" />
+                <MenuItem Header="Restaurar Backup" Click="MenuRestore_Click" />
+                <Separator />
+                <MenuItem Header="Salir" Click="MenuSalir_Click" />
+            </MenuItem>
+            <MenuItem Header="_Empresas">
+                <MenuItem Header="Nueva Empresa" Click="MenuNuevaEmpresa_Click" />
+                <MenuItem Header="Editar Empresa" Click="MenuEmpresas_Click" />
+                <MenuItem Header="Eliminar Empresa" Click="MenuEmpresas_Click" />
+            </MenuItem>
+            <MenuItem Header="_Contabilidad">
+                <MenuItem Header="Nuevo Comprobante" Click="MenuComprobante_Click" />
+                <MenuItem Header="Plan de Cuentas" Click="MenuPlanCuentas_Click" />
+                <MenuItem Header="Libro Diario" Click="MenuLibroDiario_Click" />
+                <MenuItem Header="Libro Mayor" Click="MenuLibroMayor_Click" />
+            </MenuItem>
+            <MenuItem Header="_Reportes">
+                <MenuItem Header="Balance General" Click="MenuInformes_Click" />
+                <MenuItem Header="Estado de Resultados" Click="MenuInformes_Click" />
+                <MenuItem Header="Flujo de Efectivo" Click="MenuInformes_Click" />
+            </MenuItem>
+            <MenuItem Header="_Herramientas">
+                <MenuItem Header="Reexpresión Monetaria" Click="MenuReexpresion_Click" />
+                <MenuItem Header="Importar PDF Bancario" Click="MenuBancos_Click" />
+                <MenuItem Header="Configuración" Click="MenuConfiguracion_Click" />
+            </MenuItem>
+            <MenuItem Header="A_yuda">
+                <MenuItem Header="Manual de Usuario" Click="MenuAyuda_Click" />
+                <MenuItem Header="Acerca de" Click="MenuAcercaDe_Click" />
+            </MenuItem>
+        </Menu>
+
+        <ToolBarTray DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}">
+            <ToolBar Background="Transparent" Band="0" BandIndex="0">
+                <Button Content="📊 Dashboard" Click="BtnDashboard_Click" Margin="2" Padding="8,4" />
+                <Button Content="🏢 Empresas" Click="BtnEmpresas_Click" Margin="2" Padding="8,4" />
+                <Button Content="📝 Comprobantes" Click="BtnComprobantes_Click" Margin="2" Padding="8,4" />
+                <Button Content="📂 Plan de Cuentas" Click="BtnPlanCuentas_Click" Margin="2" Padding="8,4" />
+                <Button Content="📖 Libros" Click="BtnLibros_Click" Margin="2" Padding="8,4" />
+                <Button Content="📈 Informes" Click="BtnInformes_Click" Margin="2" Padding="8,4" />
+                <Button Content="💰 Cobranza" Click="BtnCobranza_Click" Margin="2" Padding="8,4" />
+                <Button Content="📄 Documentos" Click="BtnDocumentos_Click" Margin="2" Padding="8,4" />
+                <Button Content="⚖ Reexpresión" Click="BtnReexpresion_Click" Margin="2" Padding="8,4" />
+                <Button Content="🏦 Bancos" Click="BtnBancos_Click" Margin="2" Padding="8,4" />
+                <Button Content="⚙ Configuración" Click="BtnConfiguracion_Click" Margin="2" Padding="8,4" />
+            </ToolBar>
+        </ToolBarTray>
+
+        <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource HeaderBackgroundBrush}" Padding="8,4">
+            <StatusBarItem>
+                <TextBlock Text="{Binding TextoEstado}" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="Backup: No realizado" Foreground="{StaticResource TextSecondaryBrush}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{StaticResource WindowBackgroundBrush}" 
+                    BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="{StaticResource DataGridHeaderBackgroundBrush}" 
+                            Padding="12,8" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="EMPRESAS" FontWeight="SemiBold" FontSize="14" 
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                    </Border>
+                    
+                    <ListBox x:Name="ListEmpresas" BorderThickness="0" Padding="8" Background="Transparent"
+                             ItemsSource="{Binding Empresas}"
+                             SelectedItem="{Binding EmpresaSeleccionada, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,4">
+                                    <TextBlock Text="{Binding NombreEmpresa}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding Rif, StringFormat='RIF: {0}'}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" 
+                          Background="{StaticResource ControlBorderBrush}" />
+
+            <TabControl x:Name="MainTabControl" Grid.Column="2" Margin="0">
+                <TabItem Header="Dashboard">
+                    <Frame x:Name="FrameDashboard" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Comprobantes">
+                    <Frame x:Name="FrameComprobantes" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Empresas">
+                    <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Plan de Cuentas">
+                    <Frame x:Name="FramePlanCuentas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Libros">
+                    <TabControl x:Name="LibrosTabControl">
+                        <TabItem Header="Libro Diario">
+                            <Frame x:Name="FrameLibroDiario" NavigationUIVisibility="Hidden" />
+                        </TabItem>
+                        <TabItem Header="Libro Mayor">
+                            <Frame x:Name="FrameLibroMayor" NavigationUIVisibility="Hidden" />
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="Informes">
+                    <Frame x:Name="FrameInformes" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Cobranza">
+                    <Frame x:Name="FrameCobranza" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Documentos">
+                    <Frame x:Name="FrameDocumentos" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Reexpresión">
+                    <Frame x:Name="FrameReexpresion" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Bancos">
+                    <Frame x:Name="FrameBancos" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Configuración">
+                    <Frame x:Name="FrameConfiguracion" NavigationUIVisibility="Hidden" />
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>
