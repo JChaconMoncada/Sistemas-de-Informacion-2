@@ -43,22 +43,6 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}">
-            <ToolBar Background="Transparent" Band="0" BandIndex="0">
-                <Button Content="📊 Dashboard" Click="BtnDashboard_Click" Margin="2" Padding="8,4" />
-                <Button Content="🏢 Empresas" Click="BtnEmpresas_Click" Margin="2" Padding="8,4" />
-                <Button Content="📝 Comprobantes" Click="BtnComprobantes_Click" Margin="2" Padding="8,4" />
-                <Button Content="📂 Plan de Cuentas" Click="BtnPlanCuentas_Click" Margin="2" Padding="8,4" />
-                <Button Content="📖 Libros" Click="BtnLibros_Click" Margin="2" Padding="8,4" />
-                <Button Content="📈 Informes" Click="BtnInformes_Click" Margin="2" Padding="8,4" />
-                <Button Content="💰 Cobranza" Click="BtnCobranza_Click" Margin="2" Padding="8,4" />
-                <Button Content="📄 Documentos" Click="BtnDocumentos_Click" Margin="2" Padding="8,4" />
-                <Button Content="⚖ Reexpresión" Click="BtnReexpresion_Click" Margin="2" Padding="8,4" />
-                <Button Content="🏦 Bancos" Click="BtnBancos_Click" Margin="2" Padding="8,4" />
-                <Button Content="⚙ Configuración" Click="BtnConfiguracion_Click" Margin="2" Padding="8,4" />
-            </ToolBar>
-        </ToolBarTray>
-
         <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource HeaderBackgroundBrush}" Padding="8,4">
             <StatusBarItem>
                 <TextBlock Text="{Binding TextoEstado}" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -112,6 +96,9 @@
                 </TabItem>
                 <TabItem Header="Empresas">
                     <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Movimientos">
+                    <Frame x:Name="FrameMovimientos" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Plan de Cuentas">
                     <Frame x:Name="FramePlanCuentas" NavigationUIVisibility="Hidden" />

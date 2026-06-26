@@ -11,6 +11,9 @@ public class ComprobanteContable
     public string TipoComprobante { get; set; } = string.Empty;
     public int IdEmpresa { get; set; }
     public string Estado { get; set; } = "Pendiente de Validación";
+    public decimal MontoTotal { get; set; }
+    public string Moneda { get; set; } = "Bs";
+    public string CuentaAsociada { get; set; } = string.Empty; // Added to easily show in DataGrid
     public List<AsientoLinea> Lineas { get; set; } = new();
 
     public void ValidarComprobante()

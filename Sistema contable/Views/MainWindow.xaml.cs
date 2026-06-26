@@ -17,6 +17,7 @@ namespace Sistema_contable.Views
             FrameDashboard.Navigate(new Dashboard());
             FrameComprobantes.Navigate(new Comprobantes());
             FrameEmpresas.Navigate(new Empresas());
+            FrameMovimientos.Navigate(new Movimientos());
             FramePlanCuentas.Navigate(new PlanCuentas());
             FrameLibroDiario.Navigate(new LibroDiario());
             FrameLibroMayor.Navigate(new LibroMayor());
@@ -43,44 +44,49 @@ namespace Sistema_contable.Views
             MainTabControl.SelectedIndex = 2;
         }
 
-        private void BtnPlanCuentas_Click(object sender, RoutedEventArgs e)
+        private void BtnMovimientos_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 3;
         }
 
-        private void BtnLibros_Click(object sender, RoutedEventArgs e)
+        private void BtnPlanCuentas_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 4;
         }
 
-        private void BtnInformes_Click(object sender, RoutedEventArgs e)
+        private void BtnLibros_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 5;
         }
 
-        private void BtnCobranza_Click(object sender, RoutedEventArgs e)
+        private void BtnInformes_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 6;
         }
 
-        private void BtnDocumentos_Click(object sender, RoutedEventArgs e)
+        private void BtnCobranza_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 7;
         }
 
-        private void BtnReexpresion_Click(object sender, RoutedEventArgs e)
+        private void BtnDocumentos_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 8;
         }
 
-        private void BtnBancos_Click(object sender, RoutedEventArgs e)
+        private void BtnReexpresion_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 9;
         }
 
-        private void BtnConfiguracion_Click(object sender, RoutedEventArgs e)
+        private void BtnBancos_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 10;
+        }
+
+        private void BtnConfiguracion_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 11;
         }
 
         // Menu Handlers

@@ -3,12 +3,12 @@ using Sistema_contable.ViewModels;
 
 namespace Sistema_contable.Views
 {
-    public partial class Reexpresion : Page
+    public partial class Movimientos : Page
     {
-        public Reexpresion()
+        public Movimientos()
         {
             InitializeComponent();
-            DataContext = new ReexpresionViewModel();
+            DataContext = new MovimientosViewModel();
         }
     }
 }
