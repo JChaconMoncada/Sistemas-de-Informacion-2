@@ -3,9 +3,14 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:conv="clr-namespace:Sistema_contable.Converters"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1000"
+      d:DesignHeight="700" d:DesignWidth="1100"
       Title="Cobranza">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -14,93 +19,99 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Gestión de Cobranza" Style="{StaticResource TitleTextBlock}" />
+        <!-- Título + botón Nueva -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Gestión de Cobranza" Style="{StaticResource TitleTextBlock}" />
+            <Button Grid.Column="1" Content="+ Nueva Factura"
+                    Command="{Binding NuevaFacturaCommand}"
+                    Style="{StaticResource AccentButton}" Padding="14,6" />
+        </Grid>
 
-        <UniformGrid Grid.Row="1" Rows="1" Columns="3" Margin="0,0,0,16">
+        <!-- Tarjetas resumen -->
+        <UniformGrid Grid.Row="1" Rows="1" Columns="3" Margin="0,0,0,14">
             <Border Style="{StaticResource SummaryCard}">
                 <StackPanel>
-                    <TextBlock Text="Facturas Pendientes" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock Text="{Binding Pendientes}" FontSize="24" FontWeight="Bold" 
-                               Foreground="#FF9800" Margin="0,8,0,0" />
-                    <TextBlock Text="{Binding MontoPendientes, StringFormat=C}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    <TextBlock Text="Facturas Pendientes" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding Pendientes}" FontSize="26" FontWeight="Bold" Foreground="#FF9800" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding MontoPendientes, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
                 </StackPanel>
             </Border>
-
             <Border Style="{StaticResource SummaryCard}">
                 <StackPanel>
-                    <TextBlock Text="Facturas Vencidas" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock Text="{Binding Vencidas}" FontSize="24" FontWeight="Bold" 
-                               Foreground="#F44336" Margin="0,8,0,0" />
-                    <TextBlock Text="{Binding MontoVencidas, StringFormat=C}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    <TextBlock Text="Facturas Vencidas" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding Vencidas}" FontSize="26" FontWeight="Bold" Foreground="#F44336" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding MontoVencidas, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
                 </StackPanel>
             </Border>
-
             <Border Style="{StaticResource SummaryCard}">
                 <StackPanel>
-                    <TextBlock Text="Cobrado este Mes" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock Text="{Binding Cobradas}" FontSize="24" FontWeight="Bold" 
-                               Foreground="#4CAF50" Margin="0,8,0,0" />
-                    <TextBlock Text="{Binding MontoCobradas, StringFormat=C}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                    <TextBlock Text="Cobrado (total)" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="{Binding Cobradas}" FontSize="26" FontWeight="Bold" Foreground="#4CAF50" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding MontoCobradas, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
                 </StackPanel>
             </Border>
         </UniformGrid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="Nueva Factura" Command="{Binding NuevaFacturaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
-            <Button Content="Marcar como Pagada" Command="{Binding MarcarPagadaCommand}" Margin="0,0,6,0" />
-            <Button Content="Enviar Recordatorio" Command="{Binding EnviarRecordatorioCommand}" Margin="0,0,6,0" />
-            <Separator Width="1" Margin="8,0" />
-            <Button Content="Exportar" Command="{Binding ExportarCommand}" />
-        </StackPanel>
-
-        <GroupBox Grid.Row="3" Header="Filtros" Margin="0,0,0,12">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="200" Margin="0,0,8,0">
-                    <TextBox.Style>
-                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="">
-                                    <Setter Property="Background">
-                                        <Setter.Value>
-                                            <VisualBrush Stretch="None" AlignmentX="Left">
-                                                <VisualBrush.Visual>
-                                                    <TextBlock Text="Buscar cliente..." 
-                                                               Foreground="{StaticResource TextPlaceholderBrush}" 
-                                                               Margin="8,0,0,0" />
-                                                </VisualBrush.Visual>
-                                            </VisualBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
-                <ComboBox Width="150" Margin="0,0,8,0">
+        <!-- Filtros -->
+        <GroupBox Grid.Row="2" Header="Filtros" Margin="0,0,0,10">
+            <Grid Margin="6,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="160" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="{Binding FiltroCliente, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Buscar cliente o N° factura..." />
+                <ComboBox Grid.Column="2" SelectedValue="{Binding FiltroEstado}" SelectedValuePath="Content">
                     <ComboBoxItem Content="Todos los estados" IsSelected="True" />
                     <ComboBoxItem Content="Pendiente" />
-                    <ComboBoxItem Content="Pagada" />
                     <ComboBoxItem Content="Vencida" />
+                    <ComboBoxItem Content="Pagada" />
                     <ComboBoxItem Content="Anulada" />
                 </ComboBox>
-                <Label Content="Desde:" VerticalAlignment="Center" />
-                <DatePicker Width="120" Margin="0,0,8,0" />
-                <Label Content="Hasta:" VerticalAlignment="Center" />
-                <DatePicker Width="120" Margin="0,0,8,0" />
-                <Button Content="Aplicar" />
-            </StackPanel>
+                <Label Grid.Column="4" Content="Desde:" VerticalAlignment="Center" Padding="0,0,4,0" />
+                <DatePicker Grid.Column="5" SelectedDate="{Binding FiltroDesde}" />
+                <Label Grid.Column="7" Content="Hasta:" VerticalAlignment="Center" Padding="0,0,4,0" />
+                <DatePicker Grid.Column="8" SelectedDate="{Binding FiltroHasta}" />
+                <Button Grid.Column="10" Content="Aplicar"
+                        Command="{Binding AplicarFiltrosCommand}"
+                        Style="{StaticResource AccentButton}" Padding="12,4" />
+                <Button Grid.Column="12" Content="Limpiar"
+                        Command="{Binding LimpiarFiltrosCommand}"
+                        Padding="12,4" />
+            </Grid>
         </GroupBox>
 
-        <DataGrid Grid.Row="4" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Facturas}" SelectedItem="{Binding SelectedFactura, Mode=TwoWay}">
+        <!-- DataGrid (solo lectura) -->
+        <DataGrid Grid.Row="4" AutoGenerateColumns="False" CanUserAddRows="False"
+                  IsReadOnly="True" SelectionUnit="FullRow"
+                  ItemsSource="{Binding Facturas}"
+                  SelectedItem="{Binding FacturaSeleccionada, Mode=TwoWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Nº Factura" Width="100" Binding="{Binding NumeroFactura}" />
-                <DataGridTextColumn Header="Cliente" Width="*" Binding="{Binding NombreCliente}" />
-                <DataGridTextColumn Header="Fecha Emisión" Width="110" Binding="{Binding FechaEmision, StringFormat=dd/MM/yyyy}" />
-                <DataGridTextColumn Header="Vencimiento" Width="110" Binding="{Binding FechaVencimiento, StringFormat=dd/MM/yyyy}" />
-                <DataGridTextColumn Header="Monto" Width="120" Binding="{Binding Monto, StringFormat=N2}" />
-                <DataGridTemplateColumn Header="Estado" Width="100">
+                <DataGridTextColumn Header="Nº Factura"     Width="130" Binding="{Binding NumeroFactura}" />
+                <DataGridTextColumn Header="Cliente"        Width="*"   Binding="{Binding NombreCliente}" />
+                <DataGridTextColumn Header="Descripción"    Width="180" Binding="{Binding Descripcion}" />
+                <DataGridTextColumn Header="Emisión"        Width="95"  Binding="{Binding FechaEmision,    StringFormat=dd/MM/yyyy}" />
+                <DataGridTextColumn Header="Vencimiento"    Width="95"  Binding="{Binding FechaVencimiento,StringFormat=dd/MM/yyyy}" />
+                <DataGridTextColumn Header="Monto"          Width="110" Binding="{Binding Monto, StringFormat=N2}" />
+                <DataGridTemplateColumn Header="Estado" Width="90">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource StatusBadge}" Padding="6,2">
@@ -109,19 +120,103 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Días Vencido" Width="100" Binding="{Binding DiasVencido}" />
-                <DataGridTemplateColumn Header="Acciones" Width="120">
+                <DataGridTextColumn Header="Días Vencido"   Width="90"  Binding="{Binding DiasVencido}" />
+                <DataGridTemplateColumn Header="Acciones" Width="210">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="✓" Command="{Binding DataContext.MarcarPagadaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Width="28" Height="28" Margin="2" ToolTip="Marcar Pagada" />
-                                <Button Content="✉" Command="{Binding DataContext.EnviarRecordatorioCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Width="28" Height="28" Margin="2" ToolTip="Enviar Recordatorio" />
-                                <Button Content="👁" Command="{Binding DataContext.VerDetalleCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Width="28" Height="28" Margin="2" ToolTip="Ver Detalle" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="2,2">
+                                <Button Content="✔ Cobrar"
+                                        Height="26" Padding="8,0" Margin="0,0,4,0"
+                                        FontSize="11" FontWeight="SemiBold"
+                                        Foreground="White" Background="#388E3C"
+                                        BorderThickness="0" Cursor="Hand"
+                                        ToolTip="Marcar factura como Pagada"
+                                        Command="{Binding DataContext.MarcarPagadaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                                <Button Content="✏ Editar"
+                                        Height="26" Padding="8,0" Margin="0,0,4,0"
+                                        FontSize="11"
+                                        Foreground="White" Background="#1976D2"
+                                        BorderThickness="0" Cursor="Hand"
+                                        ToolTip="Editar datos de la factura"
+                                        Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                                <Button Content="✕ Anular"
+                                        Height="26" Padding="8,0"
+                                        FontSize="11"
+                                        Foreground="White" Background="#D32F2F"
+                                        BorderThickness="0" Cursor="Hand"
+                                        ToolTip="Anular esta factura"
+                                        Command="{Binding DataContext.AnularCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Panel formulario (nueva/editar factura) -->
+        <Border Grid.Row="5"
+                Visibility="{Binding EstaEnModoEdicion, Converter={StaticResource BoolToVis}}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,2,0,0"
+                Background="{StaticResource WindowBackgroundBrush}"
+                Padding="0,12,0,0" Margin="0,8,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="{Binding TituloFormulario}"
+                           FontSize="15" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentBrush}"
+                           Margin="0,0,0,10" />
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Cliente *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditCliente, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Descripción / Concepto" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditDescripcion, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="Monto *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditMonto, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding MontoEditable}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="6">
+                        <TextBlock Text="Fecha Vencimiento *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <DatePicker SelectedDate="{Binding EditFechaVencimiento}" />
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="💾  Guardar Factura"
+                            Command="{Binding GuardarCommand}"
+                            Style="{StaticResource AccentButton}"
+                            Padding="16,6" Margin="0,0,8,0" />
+                    <Button Content="✕  Cancelar"
+                            Command="{Binding CancelarEdicionCommand}"
+                            Padding="16,6" />
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

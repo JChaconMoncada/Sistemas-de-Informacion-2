@@ -27,6 +27,24 @@
                 <MenuItem Header="Libro Diario" Click="MenuLibroDiario_Click" />
                 <MenuItem Header="Libro Mayor" Click="MenuLibroMayor_Click" />
             </MenuItem>
+            <MenuItem Header="_Procesos">
+                <MenuItem Header="Actualizar Comprobantes" Click="MenuActualizarComprobantes_Click" />
+                <MenuItem Header="Reversar Comprobante" Click="MenuReversarComprobante_Click" />
+                <Separator />
+                <MenuItem Header="Importar de Excel">
+                    <MenuItem Header="Comprobantes" Click="MenuImportarExcelComprobantes_Click" />
+                    <MenuItem Header="Plan de Cuentas" Click="MenuImportarExcelPlanCuentas_Click" />
+                </MenuItem>
+                <MenuItem Header="Planillas">
+                    <MenuItem Header="Sueldos y Salarios" Click="MenuPlanillasSueldos_Click" />
+                    <MenuItem Header="Impuestos y Retenciones" Click="MenuPlanillasImpuestos_Click" />
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Cerrar Ejercicio" Click="MenuCerrarEjercicio_Click" />
+                <Separator />
+                <MenuItem Header="Reexpresión por Inflación (IPC)" Click="MenuReexpresion_Click" />
+                <MenuItem Header="Reconversión Monetaria 2021" Click="MenuReconversion2021_Click" />
+            </MenuItem>
             <MenuItem Header="_Reportes">
                 <MenuItem Header="Balance General" Click="MenuInformes_Click" />
                 <MenuItem Header="Estado de Resultados" Click="MenuInformes_Click" />
@@ -43,21 +61,7 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}">
-            <ToolBar Background="Transparent" Band="0" BandIndex="0">
-                <Button Content="📊 Dashboard" Click="BtnDashboard_Click" Margin="2" Padding="8,4" />
-                <Button Content="🏢 Empresas" Click="BtnEmpresas_Click" Margin="2" Padding="8,4" />
-                <Button Content="📝 Comprobantes" Click="BtnComprobantes_Click" Margin="2" Padding="8,4" />
-                <Button Content="📂 Plan de Cuentas" Click="BtnPlanCuentas_Click" Margin="2" Padding="8,4" />
-                <Button Content="📖 Libros" Click="BtnLibros_Click" Margin="2" Padding="8,4" />
-                <Button Content="📈 Informes" Click="BtnInformes_Click" Margin="2" Padding="8,4" />
-                <Button Content="💰 Cobranza" Click="BtnCobranza_Click" Margin="2" Padding="8,4" />
-                <Button Content="📄 Documentos" Click="BtnDocumentos_Click" Margin="2" Padding="8,4" />
-                <Button Content="⚖ Reexpresión" Click="BtnReexpresion_Click" Margin="2" Padding="8,4" />
-                <Button Content="🏦 Bancos" Click="BtnBancos_Click" Margin="2" Padding="8,4" />
-                <Button Content="⚙ Configuración" Click="BtnConfiguracion_Click" Margin="2" Padding="8,4" />
-            </ToolBar>
-        </ToolBarTray>
+
 
         <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource HeaderBackgroundBrush}" Padding="8,4">
             <StatusBarItem>
@@ -81,8 +85,17 @@
                 <DockPanel>
                     <Border DockPanel.Dock="Top" Background="{StaticResource DataGridHeaderBackgroundBrush}" 
                             Padding="12,8" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1">
-                        <TextBlock Text="EMPRESAS" FontWeight="SemiBold" FontSize="14" 
-                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="EMPRESAS" FontWeight="SemiBold" FontSize="14"
+                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="+ Gestionar" Padding="8,3"
+                                    Style="{StaticResource AccentButton}" FontSize="11"
+                                    Click="BtnGestionarEmpresas_Click" ToolTip="Crear o gestionar empresas" />
+                        </Grid>
                     </Border>
                     
                     <ListBox x:Name="ListEmpresas" BorderThickness="0" Padding="8" Background="Transparent"
@@ -109,9 +122,6 @@
                 </TabItem>
                 <TabItem Header="Comprobantes">
                     <Frame x:Name="FrameComprobantes" NavigationUIVisibility="Hidden" />
-                </TabItem>
-                <TabItem Header="Empresas">
-                    <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Plan de Cuentas">
                     <Frame x:Name="FramePlanCuentas" NavigationUIVisibility="Hidden" />

@@ -1,0 +1,223 @@
+<Window x:Class="Sistema_contable.Views.ImportarExcel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Importar desde Excel"
+        Height="620" Width="920"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Grid.Row="0" Text="Importar desde Excel" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="1" Text="Seleccione un archivo Excel y configure el mapeo de columnas para importar datos al sistema."
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+        <!-- Parámetros -->
+        <GroupBox Grid.Row="2" Header="Configuración de Importación" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Archivo Excel:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TxtArchivoExcel" IsReadOnly="True"
+                         Text="Ningún archivo seleccionado" Foreground="{StaticResource TextSecondaryBrush}" />
+                <Button Grid.Row="0" Grid.Column="2" Content="Examinar..." Margin="6,0,0,0"
+                        Click="BtnExaminar_Click" Padding="12,5" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Tipo de Importación:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbTipoImportacion" Margin="0,8,0,0"
+                          SelectionChanged="CmbTipoImportacion_SelectionChanged">
+                    <ComboBoxItem Content="Comprobantes Contables" IsSelected="True" />
+                    <ComboBoxItem Content="Plan de Cuentas" />
+                </ComboBox>
+
+                <Label Grid.Row="1" Grid.Column="4" Content="Hoja Excel:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <ComboBox Grid.Row="1" Grid.Column="5" x:Name="CmbHoja" Margin="0,8,0,0">
+                    <ComboBoxItem Content="Hoja1" IsSelected="True" />
+                    <ComboBoxItem Content="Hoja2" />
+                    <ComboBoxItem Content="Hoja3" />
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+
+        <!-- Vista Previa con TabControl -->
+        <TabControl Grid.Row="3" Margin="0,0,0,12">
+            <TabItem Header="Vista Previa de Datos">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="{StaticResource AccentLightBrush}"
+                            BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                            Padding="8,6" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Filas encontradas: " FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtFilasEncontradas" Text="0" FontWeight="Bold"
+                                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="4,0,20,0" />
+                            <TextBlock Text="Filas válidas: " FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtFilasValidas" Text="0" FontWeight="Bold"
+                                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="4,0,20,0" />
+                            <TextBlock Text="Filas con error: " FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtFilasError" Text="0" FontWeight="Bold"
+                                       Foreground="#E53935" VerticalAlignment="Center" Margin="4,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid Grid.Row="1" x:Name="GridVistaPrevia" AutoGenerateColumns="False"
+                              CanUserAddRows="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Fila" Width="50" Binding="{Binding Fila}" />
+                            <DataGridTextColumn Header="Fecha" Width="100" Binding="{Binding Fecha}" />
+                            <DataGridTextColumn Header="Código Cuenta" Width="120" Binding="{Binding CodigoCuenta}" />
+                            <DataGridTextColumn Header="Descripción" Width="*" Binding="{Binding Descripcion}" />
+                            <DataGridTextColumn Header="Debe" Width="110" Binding="{Binding Debe}" />
+                            <DataGridTextColumn Header="Haber" Width="110" Binding="{Binding Haber}" />
+                            <DataGridTemplateColumn Header="Estado" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="4,2" HorizontalAlignment="Center">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#E2EFDA" />
+                                                    <Setter Property="BorderBrush" Value="#217346" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Estado}" Value="Error">
+                                                            <Setter Property="Background" Value="#FDE8E8" />
+                                                            <Setter Property="BorderBrush" Value="#E53935" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Estado}" FontSize="11" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#217346" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Estado}" Value="Error">
+                                                                <Setter Property="Foreground" Value="#E53935" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Mapeo de Columnas">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="200" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
+                               Text="Configure qué columna del Excel corresponde a cada campo del sistema:"
+                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Content="Columna Fecha →" VerticalAlignment="Center" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0">
+                        <ComboBoxItem Content="Columna A" />
+                        <ComboBoxItem Content="Columna B" />
+                        <ComboBoxItem Content="Columna C" />
+                        <ComboBoxItem Content="Columna D" />
+                    </ComboBox>
+
+                    <Label Grid.Row="1" Grid.Column="3" Content="Columna Código Cuenta →" VerticalAlignment="Center" />
+                    <ComboBox Grid.Row="1" Grid.Column="4" SelectedIndex="1">
+                        <ComboBoxItem Content="Columna A" />
+                        <ComboBoxItem Content="Columna B" />
+                        <ComboBoxItem Content="Columna C" />
+                        <ComboBoxItem Content="Columna D" />
+                    </ComboBox>
+
+                    <Label Grid.Row="2" Grid.Column="0" Content="Columna Descripción →" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="2" Margin="0,8,0,0">
+                        <ComboBoxItem Content="Columna A" />
+                        <ComboBoxItem Content="Columna B" />
+                        <ComboBoxItem Content="Columna C" />
+                        <ComboBoxItem Content="Columna D" />
+                    </ComboBox>
+
+                    <Label Grid.Row="2" Grid.Column="3" Content="Columna Debe →" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="2" Grid.Column="4" SelectedIndex="3" Margin="0,8,0,0">
+                        <ComboBoxItem Content="Columna A" />
+                        <ComboBoxItem Content="Columna B" />
+                        <ComboBoxItem Content="Columna C" />
+                        <ComboBoxItem Content="Columna D" />
+                    </ComboBox>
+
+                    <Label Grid.Row="3" Grid.Column="0" Content="Columna Haber →" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" Margin="0,8,0,0">
+                        <ComboBoxItem Content="Columna A" />
+                        <ComboBoxItem Content="Columna B" />
+                        <ComboBoxItem Content="Columna C" />
+                        <ComboBoxItem Content="Columna D" />
+                        <ComboBoxItem Content="Columna E" />
+                    </ComboBox>
+
+                    <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+                              Content="La primera fila contiene encabezados de columna"
+                              IsChecked="True" Margin="0,16,0,0" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Barra de progreso -->
+        <Border Grid.Row="4" x:Name="PanelProgreso" Visibility="Collapsed"
+                Background="{StaticResource AccentLightBrush}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                Padding="12,8" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock x:Name="TxtProgreso" Text="Procesando..." FontWeight="SemiBold" Margin="0,0,0,4" />
+                <ProgressBar x:Name="BarraProgreso" Height="16" Minimum="0" Maximum="100" Value="0" />
+            </StackPanel>
+        </Border>
+
+        <!-- Botones -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cargar Archivo" Click="BtnCargar_Click" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Importar Datos" Click="BtnImportar_Click"
+                    Style="{StaticResource AccentButton}" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cerrar" Click="BtnCerrar_Click" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Window>

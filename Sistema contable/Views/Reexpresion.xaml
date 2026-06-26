@@ -17,11 +17,37 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Reexpresión Monetaria (Ajuste por Inflación)" Style="{StaticResource TitleTextBlock}" />
-        <TextBlock Grid.Row="1" Text="Asistente para ajustar los valores contables según el Índice de Precios al Consumidor (IPC) del BCV" 
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" x:Name="TxtTitulo" Text="Reexpresión Monetaria (Ajuste por Inflación)" Style="{StaticResource TitleTextBlock}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Modo: " FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <ComboBox x:Name="CmbModo" Width="220" SelectionChanged="CmbModo_SelectionChanged">
+                    <ComboBoxItem Content="Reexpresión por Inflación (IPC)" IsSelected="True" />
+                    <ComboBoxItem Content="Reconversión Monetaria 2021" />
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+        <TextBlock Grid.Row="1" x:Name="TxtSubtitulo" Text="Asistente para ajustar los valores contables según el Índice de Precios al Consumidor (IPC) del BCV" 
                    Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
 
-        <GroupBox Grid.Row="2" Header="Parámetros de Reexpresión" Margin="0,0,0,12">
+        <!-- Aviso Reconversión 2021 -->
+        <Border Grid.Row="2" x:Name="PanelAviso2021" Visibility="Collapsed"
+                Background="#E3F2FD" BorderBrush="#1565C0" BorderThickness="1"
+                Padding="12,10" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="ℹ" FontSize="16" Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBlock TextWrapping="Wrap" Foreground="#0D47A1" VerticalAlignment="Center">
+                    <Run FontWeight="Bold" Text="Reconversión Monetaria 2021: " />
+                    <Run Text="Los parámetros han sido preconfigurados según el Decreto N° 4.553 del BCV. Factor: 1.000.000 Bs. S → 1 Bs. D. Fecha de corte: 01/10/2021." />
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <GroupBox Grid.Row="2" x:Name="GrpParametros" Header="Parámetros de Reexpresión" Margin="0,0,0,12">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -38,28 +64,36 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Content="Fecha Origen:" VerticalAlignment="Center" />
-                <DatePicker Grid.Row="0" Grid.Column="1" />
+                <DatePicker Grid.Row="0" Grid.Column="1" x:Name="DtpFechaOrigen" />
 
                 <Label Grid.Row="0" Grid.Column="3" Content="Fecha Destino:" VerticalAlignment="Center" />
-                <DatePicker Grid.Row="0" Grid.Column="4" />
+                <DatePicker Grid.Row="0" Grid.Column="4" x:Name="DtpFechaDestino" />
 
                 <Label Grid.Row="1" Grid.Column="0" Content="IPC Origen:" VerticalAlignment="Center" Margin="0,8,0,0" />
-                <TextBox Grid.Row="1" Grid.Column="1" Text="1,250.50" Margin="0,8,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="TxtIpcOrigen" Text="1,250.50" Margin="0,8,0,0" />
 
                 <Label Grid.Row="1" Grid.Column="3" Content="IPC Destino:" VerticalAlignment="Center" Margin="0,8,0,0" />
-                <TextBox Grid.Row="1" Grid.Column="4" Text="1,580.75" Margin="0,8,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="4" x:Name="TxtIpcDestino" Text="1,580.75" Margin="0,8,0,0" />
 
                 <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="6" 
                         Background="{StaticResource AccentLightBrush}" 
                         BorderBrush="{StaticResource AccentBrush}" 
                         BorderThickness="1" Padding="12" Margin="0,12,0,0">
-                    <StackPanel>
-                        <TextBlock Text="Factor de Reexpresión Calculado:" FontWeight="SemiBold" />
-                        <TextBlock Text="1.2642" FontSize="24" FontWeight="Bold" 
-                                   Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0" />
-                        <TextBlock Text="(IPC Destino / IPC Origen)" FontSize="11" 
-                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock x:Name="TxtLabelFactor" Text="Factor de Reexpresión Calculado:" FontWeight="SemiBold" />
+                            <TextBlock x:Name="TxtFactor" Text="1.2642" FontSize="24" FontWeight="Bold" 
+                                       Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0" />
+                            <TextBlock x:Name="TxtFormula" Text="(IPC Destino / IPC Origen)" FontSize="11" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Calcular Factor" Click="BtnCalcularFactor_Click"
+                                VerticalAlignment="Center" Padding="12,6" />
+                    </Grid>
                 </Border>
             </Grid>
         </GroupBox>

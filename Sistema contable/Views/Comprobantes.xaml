@@ -62,6 +62,9 @@
             <Button Content="- Eliminar Línea" Command="{Binding EliminarLineaCommand}" Margin="0,0,6,0" />
             <Separator Width="1" Margin="8,0" />
             <Button Content="Seleccionar Cuenta" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="⟳ Actualizar Comprobantes" Click="BtnActualizarComprobantes_Click" Margin="0,0,6,0" />
+            <Button Content="↩ Reversar Comprobante" Click="BtnReversarComprobante_Click" Margin="0,0,6,0" />
         </StackPanel>
 
         <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,12">

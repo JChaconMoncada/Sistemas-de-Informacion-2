@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaContableZulay.UI.Domain;
 
@@ -28,6 +29,9 @@ public class ComprobanteContable
 
         Estado = "Registrado";
     }
+
+    public decimal TotalDebe => Lineas.Sum(l => l.Debe);
+    public decimal TotalHaber => Lineas.Sum(l => l.Haber);
 
     public void ActualizarComprobante() { }
 

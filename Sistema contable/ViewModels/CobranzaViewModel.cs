@@ -1,213 +1,306 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
-using Sistema_contable.Models;
+using SistemaContableZulay.UI.Domain;
 using SistemaContableZulay.UI.Services;
 
 namespace Sistema_contable.ViewModels
 {
-    public class FacturaCobranza : ViewModelBase
-    {
-        private string _numeroFactura = string.Empty;
-        private string _nombreCliente = string.Empty;
-        private DateTime _fechaEmision;
-        private DateTime _fechaVencimiento;
-        private decimal _monto;
-        private string _estado = string.Empty;
-
-        public string NumeroFactura { get => _numeroFactura; set => SetProperty(ref _numeroFactura, value); }
-        public string NombreCliente { get => _nombreCliente; set => SetProperty(ref _nombreCliente, value); }
-        public DateTime FechaEmision { get => _fechaEmision; set => SetProperty(ref _fechaEmision, value); }
-        public DateTime FechaVencimiento { get => _fechaVencimiento; set => SetProperty(ref _fechaVencimiento, value); }
-        public decimal Monto { get => _monto; set => SetProperty(ref _monto, value); }
-        public string Estado { get => _estado; set => SetProperty(ref _estado, value); }
-        public int DiasVencido => (DateTime.Now - FechaVencimiento).Days > 0 ? (DateTime.Now - FechaVencimiento).Days : 0;
-    }
-
     public class CobranzaViewModel : ViewModelBase
     {
-        private readonly ContabilidadService _contabilidadService;
-        private ObservableCollection<FacturaCobranza> _facturas;
-        private FacturaCobranza _selectedFactura;
-        
-        private int _pendientes;
-        private int _vencidas;
-        private int _cobradas;
-        private decimal _montoPendientes;
-        private decimal _montoVencidas;
-        private decimal _montoCobradas;
+        private readonly ContabilidadService _svc;
+        private List<FacturaCobranza> _todasLasFacturas = new();
 
+        // ─── Lista visible ────────────────────────────────────────────────────────
+        private ObservableCollection<FacturaCobranza> _facturas = new();
         public ObservableCollection<FacturaCobranza> Facturas
         {
             get => _facturas;
             set => SetProperty(ref _facturas, value);
         }
 
-        public FacturaCobranza SelectedFactura
+        private FacturaCobranza? _facturaSeleccionada;
+        public FacturaCobranza? FacturaSeleccionada
         {
-            get => _selectedFactura;
-            set => SetProperty(ref _selectedFactura, value);
+            get => _facturaSeleccionada;
+            set => SetProperty(ref _facturaSeleccionada, value);
         }
 
-        public int Pendientes
+        // ─── Tarjetas resumen ─────────────────────────────────────────────────────
+        private int _pendientes;    public int Pendientes    { get => _pendientes;    set => SetProperty(ref _pendientes, value); }
+        private int _vencidas;      public int Vencidas      { get => _vencidas;      set => SetProperty(ref _vencidas, value); }
+        private int _cobradas;      public int Cobradas      { get => _cobradas;      set => SetProperty(ref _cobradas, value); }
+        private decimal _montoPendientes; public decimal MontoPendientes { get => _montoPendientes; set => SetProperty(ref _montoPendientes, value); }
+        private decimal _montoVencidas;   public decimal MontoVencidas   { get => _montoVencidas;   set => SetProperty(ref _montoVencidas, value); }
+        private decimal _montoCobradas;   public decimal MontoCobradas   { get => _montoCobradas;   set => SetProperty(ref _montoCobradas, value); }
+
+        // ─── Filtros ──────────────────────────────────────────────────────────────
+        private string _filtroCliente = string.Empty;
+        public string FiltroCliente { get => _filtroCliente; set => SetProperty(ref _filtroCliente, value); }
+
+        private string _filtroEstado = "Todos los estados";
+        public string FiltroEstado { get => _filtroEstado; set => SetProperty(ref _filtroEstado, value); }
+
+        private DateTime? _filtroDesde;
+        public DateTime? FiltroDesde { get => _filtroDesde; set => SetProperty(ref _filtroDesde, value); }
+
+        private DateTime? _filtroHasta;
+        public DateTime? FiltroHasta { get => _filtroHasta; set => SetProperty(ref _filtroHasta, value); }
+
+        // ─── Modo edición / formulario ────────────────────────────────────────────
+        private bool _estaEnModoEdicion;
+        public bool EstaEnModoEdicion
         {
-            get => _pendientes;
-            set => SetProperty(ref _pendientes, value);
+            get => _estaEnModoEdicion;
+            set => SetProperty(ref _estaEnModoEdicion, value);
         }
 
-        public int Vencidas
+        private bool _esNuevaFactura;
+        public bool EsNuevaFactura
         {
-            get => _vencidas;
-            set => SetProperty(ref _vencidas, value);
+            get => _esNuevaFactura;
+            set { if (SetProperty(ref _esNuevaFactura, value)) OnPropertyChanged(nameof(TituloFormulario)); }
         }
 
-        public int Cobradas
-        {
-            get => _cobradas;
-            set => SetProperty(ref _cobradas, value);
-        }
+        public string TituloFormulario => EsNuevaFactura ? "Nueva Factura" : "Editar Factura";
 
-        public decimal MontoPendientes
-        {
-            get => _montoPendientes;
-            set => SetProperty(ref _montoPendientes, value);
-        }
+        private int _editandoId;
 
-        public decimal MontoVencidas
-        {
-            get => _montoVencidas;
-            set => SetProperty(ref _montoVencidas, value);
-        }
+        private string _editCliente = string.Empty;
+        public string EditCliente { get => _editCliente; set => SetProperty(ref _editCliente, value); }
 
-        public decimal MontoCobradas
-        {
-            get => _montoCobradas;
-            set => SetProperty(ref _montoCobradas, value);
-        }
+        private string _editDescripcion = string.Empty;
+        public string EditDescripcion { get => _editDescripcion; set => SetProperty(ref _editDescripcion, value); }
 
-        public ICommand NuevaFacturaCommand { get; }
-        public ICommand MarcarPagadaCommand { get; }
-        public ICommand EnviarRecordatorioCommand { get; }
-        public ICommand ExportarCommand { get; }
-        public ICommand VerDetalleCommand { get; }
+        private decimal _editMonto;
+        public decimal EditMonto { get => _editMonto; set => SetProperty(ref _editMonto, value); }
+
+        private DateTime _editFechaVencimiento = DateTime.Now.AddDays(30);
+        public DateTime EditFechaVencimiento { get => _editFechaVencimiento; set => SetProperty(ref _editFechaVencimiento, value); }
+
+        private bool _montoEditable = true;
+        public bool MontoEditable { get => _montoEditable; set => SetProperty(ref _montoEditable, value); }
+
+        // ─── Comandos ─────────────────────────────────────────────────────────────
+        public ICommand NuevaFacturaCommand    { get; }
+        public ICommand EditarCommand          { get; }
+        public ICommand GuardarCommand         { get; }
+        public ICommand CancelarEdicionCommand { get; }
+        public ICommand MarcarPagadaCommand    { get; }
+        public ICommand AnularCommand          { get; }
+        public ICommand AplicarFiltrosCommand  { get; }
+        public ICommand LimpiarFiltrosCommand  { get; }
 
         public CobranzaViewModel()
         {
-            _contabilidadService = ContabilidadService.Instance;
-            Facturas = new ObservableCollection<FacturaCobranza>();
-            
-            NuevaFacturaCommand = new RelayCommand(() => NuevaFactura());
-            MarcarPagadaCommand = new RelayCommand<object>((p) => MarcarPagada(p), (p) => SelectedFactura != null || p != null);
-            EnviarRecordatorioCommand = new RelayCommand<object>((p) => EnviarRecordatorio(p), (p) => SelectedFactura != null || p != null);
-            ExportarCommand = new RelayCommand(() => System.Windows.MessageBox.Show("Exportando cobranza...", "Exportar", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
-            VerDetalleCommand = new RelayCommand<object>((p) => VerDetalle(p), (p) => SelectedFactura != null || p != null);
+            _svc = ContabilidadService.Instance;
 
-            _contabilidadService.OnEmpresaCambiada += CargarDatos;
+            NuevaFacturaCommand    = new RelayCommand(() => AbrirFormularioNuevo());
+            EditarCommand          = new RelayCommand<FacturaCobranza>(f => AbrirFormularioEditar(f));
+            GuardarCommand         = new RelayCommand(() => GuardarFactura(), () => EstaEnModoEdicion);
+            CancelarEdicionCommand = new RelayCommand(() => CerrarFormulario());
+            MarcarPagadaCommand    = new RelayCommand<FacturaCobranza>(f => EjecutarMarcarPagada(f));
+            AnularCommand          = new RelayCommand<FacturaCobranza>(f => EjecutarAnular(f));
+            AplicarFiltrosCommand  = new RelayCommand(() => AplicarFiltros());
+            LimpiarFiltrosCommand  = new RelayCommand(() => LimpiarFiltros());
+
+            _svc.OnEmpresaCambiada += CargarDatos;
             CargarDatos();
         }
 
+        // ─── Carga y filtrado ─────────────────────────────────────────────────────
         private void CargarDatos()
         {
-            Facturas.Clear();
-            
-            // Add some mock invoices to make the view beautiful and alive
-            Facturas.Add(new FacturaCobranza
-            {
-                NumeroFactura = "F-0001",
-                NombreCliente = "Distribuidora Polar C.A.",
-                FechaEmision = DateTime.Now.AddDays(-30),
-                FechaVencimiento = DateTime.Now.AddDays(-5),
-                Monto = 1500.00m,
-                Estado = "Vencida"
-            });
+            _todasLasFacturas = _svc.ObtenerFacturas();
+            AplicarFiltros();
+        }
 
-            Facturas.Add(new FacturaCobranza
-            {
-                NumeroFactura = "F-0002",
-                NombreCliente = "Corporación Venezolana de Comercio",
-                FechaEmision = DateTime.Now.AddDays(-15),
-                FechaVencimiento = DateTime.Now.AddDays(15),
-                Monto = 2450.50m,
-                Estado = "Pendiente"
-            });
+        private void AplicarFiltros()
+        {
+            var resultado = _todasLasFacturas.AsEnumerable();
 
-            Facturas.Add(new FacturaCobranza
-            {
-                NumeroFactura = "F-0003",
-                NombreCliente = "Comercializadora del Sur",
-                FechaEmision = DateTime.Now.AddDays(-10),
-                FechaVencimiento = DateTime.Now.AddDays(20),
-                Monto = 3100.00m,
-                Estado = "Pendiente"
-            });
+            if (!string.IsNullOrWhiteSpace(FiltroCliente))
+                resultado = resultado.Where(f =>
+                    f.NombreCliente.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase) ||
+                    f.NumeroFactura.Contains(FiltroCliente, StringComparison.OrdinalIgnoreCase));
 
-            Facturas.Add(new FacturaCobranza
-            {
-                NumeroFactura = "F-0004",
-                NombreCliente = "Inversiones Zulay S.A.",
-                FechaEmision = DateTime.Now.AddDays(-40),
-                FechaVencimiento = DateTime.Now.AddDays(-10),
-                Monto = 980.00m,
-                Estado = "Pagada"
-            });
+            if (FiltroEstado != "Todos los estados" && !string.IsNullOrEmpty(FiltroEstado))
+                resultado = resultado.Where(f => f.Estado == FiltroEstado);
 
+            if (FiltroDesde.HasValue)
+                resultado = resultado.Where(f => f.FechaEmision.Date >= FiltroDesde.Value.Date);
+
+            if (FiltroHasta.HasValue)
+                resultado = resultado.Where(f => f.FechaEmision.Date <= FiltroHasta.Value.Date);
+
+            Facturas = new ObservableCollection<FacturaCobranza>(resultado.ToList());
             ActualizarTotales();
+        }
+
+        private void LimpiarFiltros()
+        {
+            FiltroCliente = string.Empty;
+            FiltroEstado  = "Todos los estados";
+            FiltroDesde   = null;
+            FiltroHasta   = null;
+            AplicarFiltros();
         }
 
         private void ActualizarTotales()
         {
-            Pendientes = Facturas.Count(f => f.Estado == "Pendiente");
-            Vencidas = Facturas.Count(f => f.Estado == "Vencida");
-            Cobradas = Facturas.Count(f => f.Estado == "Pagada");
-
-            MontoPendientes = Facturas.Where(f => f.Estado == "Pendiente").Sum(f => f.Monto);
-            MontoVencidas = Facturas.Where(f => f.Estado == "Vencida").Sum(f => f.Monto);
-            MontoCobradas = Facturas.Where(f => f.Estado == "Pagada").Sum(f => f.Monto);
+            var base_ = _todasLasFacturas;
+            Pendientes      = base_.Count(f => f.Estado == "Pendiente");
+            Vencidas        = base_.Count(f => f.Estado == "Vencida");
+            Cobradas        = base_.Count(f => f.Estado == "Pagada");
+            MontoPendientes = base_.Where(f => f.Estado == "Pendiente").Sum(f => f.Monto);
+            MontoVencidas   = base_.Where(f => f.Estado == "Vencida").Sum(f => f.Monto);
+            MontoCobradas   = base_.Where(f => f.Estado == "Pagada").Sum(f => f.Monto);
         }
 
-        private void NuevaFactura()
+        // ─── Formulario ───────────────────────────────────────────────────────────
+        private void AbrirFormularioNuevo()
         {
-            var nueva = new FacturaCobranza
+            if (_svc.EmpresaActivaId == null)
             {
-                NumeroFactura = $"F-000{Facturas.Count + 1}",
-                NombreCliente = "Nuevo Cliente S.A.",
-                FechaEmision = DateTime.Now,
-                FechaVencimiento = DateTime.Now.AddDays(30),
-                Monto = 1000.00m,
-                Estado = "Pendiente"
-            };
-            Facturas.Add(nueva);
-            SelectedFactura = nueva;
-            ActualizarTotales();
+                MessageBox.Show("Seleccione una empresa activa antes de crear facturas.", "Sin empresa", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            _editandoId          = 0;
+            EsNuevaFactura       = true;
+            EditCliente          = string.Empty;
+            EditDescripcion      = string.Empty;
+            EditMonto            = 0;
+            EditFechaVencimiento = DateTime.Now.AddDays(30);
+            MontoEditable        = true;
+            EstaEnModoEdicion    = true;
         }
 
-        private void MarcarPagada(object? param = null)
+        private void AbrirFormularioEditar(FacturaCobranza? f)
         {
-            var fact = (param as FacturaCobranza) ?? SelectedFactura;
-            if (fact != null)
+            var target = f ?? FacturaSeleccionada;
+            if (target == null) return;
+            if (target.Estado != "Pendiente" && target.Estado != "Vencida")
             {
-                fact.Estado = "Pagada";
-                ActualizarTotales();
-                System.Windows.MessageBox.Show($"La factura {fact.NumeroFactura} ha sido marcada como Pagada.", "Éxito", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                MessageBox.Show("Solo se pueden editar facturas en estado Pendiente o Vencida.", "No editable", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            _editandoId          = target.Id;
+            EsNuevaFactura       = false;
+            EditCliente          = target.NombreCliente;
+            EditDescripcion      = target.Descripcion;
+            EditMonto            = target.Monto;
+            EditFechaVencimiento = target.FechaVencimiento;
+            MontoEditable        = false;
+            EstaEnModoEdicion    = true;
+        }
+
+        private void CerrarFormulario()
+        {
+            EstaEnModoEdicion = false;
+            EsNuevaFactura    = false;
+        }
+
+        private void GuardarFactura()
+        {
+            if (string.IsNullOrWhiteSpace(EditCliente))
+            {
+                MessageBox.Show("El nombre del cliente es obligatorio.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (EsNuevaFactura && EditMonto <= 0)
+            {
+                MessageBox.Show("El monto debe ser mayor a cero.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (EditFechaVencimiento.Date < DateTime.Now.Date && EsNuevaFactura)
+            {
+                MessageBox.Show("La fecha de vencimiento no puede ser anterior a hoy.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var factura = new FacturaCobranza
+                {
+                    Id               = _editandoId,
+                    NombreCliente    = EditCliente.Trim(),
+                    Descripcion      = EditDescripcion.Trim(),
+                    Monto            = EditMonto,
+                    FechaEmision     = _editandoId == 0 ? DateTime.Now : DateTime.Now,
+                    FechaVencimiento = EditFechaVencimiento,
+                    Estado           = "Pendiente"
+                };
+
+                if (_editandoId > 0)
+                {
+                    var original = _todasLasFacturas.FirstOrDefault(x => x.Id == _editandoId);
+                    if (original != null)
+                    {
+                        factura.FechaEmision         = original.FechaEmision;
+                        factura.Monto                = original.Monto;
+                        factura.NumeroFactura        = original.NumeroFactura;
+                        factura.IdComprobanteEmision = original.IdComprobanteEmision;
+                        factura.Estado               = original.Estado;
+                    }
+                }
+
+                _svc.GuardarFactura(factura);
+                CerrarFormulario();
+                CargarDatos();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error al guardar", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void EnviarRecordatorio(object? param = null)
+        // ─── Acciones de fila ─────────────────────────────────────────────────────
+        private void EjecutarMarcarPagada(FacturaCobranza? f)
         {
-            var fact = (param as FacturaCobranza) ?? SelectedFactura;
-            if (fact != null)
+            var target = f ?? FacturaSeleccionada;
+            if (target == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Confirmar cobro de la factura {target.NumeroFactura}?\n\nCliente: {target.NombreCliente}\nMonto:   {target.Monto:N2}\n\nSe generará el asiento contable:\n  Débito:  Caja General\n  Crédito: Clientes Nacionales",
+                "Confirmar Cobro", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            try
             {
-                System.Windows.MessageBox.Show($"Se ha enviado un correo electrónico de recordatorio de cobro al cliente '{fact.NombreCliente}' para la factura {fact.NumeroFactura}.", "Recordatorio Enviado", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                _svc.MarcarFacturaPagada(target.Id);
+                CargarDatos();
+                MessageBox.Show($"Factura {target.NumeroFactura} marcada como Pagada.\nAsiento contable generado.", "Cobro Registrado", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void VerDetalle(object? param = null)
+        private void EjecutarAnular(FacturaCobranza? f)
         {
-            var fact = (param as FacturaCobranza) ?? SelectedFactura;
-            if (fact != null)
+            var target = f ?? FacturaSeleccionada;
+            if (target == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Anular la factura {target.NumeroFactura}?\n\nCliente: {target.NombreCliente}\nMonto:   {target.Monto:N2}\n\nEsta acción generará un asiento de anulación y no se puede deshacer.",
+                "Confirmar Anulación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            try
             {
-                System.Windows.MessageBox.Show($"Detalle de Factura:\n\nNúmero: {fact.NumeroFactura}\nCliente: {fact.NombreCliente}\nEmisión: {fact.FechaEmision:dd/MM/yyyy}\nVencimiento: {fact.FechaVencimiento:dd/MM/yyyy}\nMonto: {fact.Monto:C}\nEstado: {fact.Estado}\nDías Vencido: {fact.DiasVencido}", "Información de Factura", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                _svc.AnularFactura(target.Id);
+                CargarDatos();
+                MessageBox.Show($"Factura {target.NumeroFactura} anulada. Asiento de reversión generado.", "Factura Anulada", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

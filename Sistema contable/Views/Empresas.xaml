@@ -3,77 +3,63 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:conv="clr-namespace:Sistema_contable.Converters"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1000"
+      d:DesignHeight="650" d:DesignWidth="1000"
       Title="Empresas">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Gestión de Empresas" Style="{StaticResource TitleTextBlock}" />
+        <!-- Título + botón Nueva -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Gestión de Empresas" Style="{StaticResource TitleTextBlock}" />
+            <Button Grid.Column="1" Content="+ Nueva Empresa"
+                    Command="{Binding NuevaEmpresaCommand}"
+                    Style="{StaticResource AccentButton}" Padding="14,6" />
+        </Grid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="Nueva Empresa" Command="{Binding NuevaEmpresaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
-            <Button Content="Guardar" Command="{Binding GuardarCommand}" Margin="0,0,6,0" />
-            <Button Content="Eliminar Seleccionada" Command="{Binding EliminarCommand}" CommandParameter="{Binding SelectedItem, ElementName=GridEmpresas}" Margin="0,0,6,0" />
-            <Separator Width="1" Margin="8,0" />
-            <Button Content="Exportar" />
-        </StackPanel>
-
-        <GroupBox Grid.Row="2" Header="Filtros" Margin="0,0,0,12">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="250" Text="" Margin="0,0,8,0">
-                    <TextBox.Style>
-                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="">
-                                    <Setter Property="Background">
-                                        <Setter.Value>
-                                            <VisualBrush Stretch="None" AlignmentX="Left">
-                                                <VisualBrush.Visual>
-                                                    <TextBlock Text="Buscar por nombre o RIF..." 
-                                                               Foreground="{StaticResource TextPlaceholderBrush}" 
-                                                               Margin="8,0,0,0" />
-                                                </VisualBrush.Visual>
-                                            </VisualBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
-                <ComboBox Width="150" Margin="0,0,8,0">
-                    <ComboBoxItem Content="Todas" IsSelected="True" />
-                    <ComboBoxItem Content="Activas" />
-                    <ComboBoxItem Content="Inactivas" />
-                </ComboBox>
-                <Button Content="Aplicar Filtros" />
-            </StackPanel>
-        </GroupBox>
-
-        <DataGrid x:Name="GridEmpresas" Grid.Row="3" AutoGenerateColumns="False" CanUserAddRows="False" 
-                  SelectionUnit="FullRow"
-                  ItemsSource="{Binding Empresas}" SelectedItem="{Binding EmpresaSeleccionada}">
+        <!-- Tabla de empresas (solo lectura) -->
+        <DataGrid x:Name="GridEmpresas" Grid.Row="2"
+                  AutoGenerateColumns="False" CanUserAddRows="False"
+                  IsReadOnly="True" SelectionUnit="FullRow"
+                  ItemsSource="{Binding Empresas}"
+                  SelectedItem="{Binding EmpresaSeleccionada}"
+                  Margin="0,0,0,0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Width="60" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Nombre" Width="*" Binding="{Binding NombreEmpresa}" />
-                <DataGridTextColumn Header="RIF" Width="150" Binding="{Binding Rif}" />
-                <DataGridTextColumn Header="Teléfono" Width="120" Binding="{Binding Telefono}" />
-                <DataGridTextColumn Header="Email" Width="200" Binding="{Binding Email}" />
+                <DataGridTextColumn Header="ID"          Width="55"  Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Nombre"      Width="*"   Binding="{Binding NombreEmpresa}" />
+                <DataGridTextColumn Header="RIF"         Width="140" Binding="{Binding Rif}" />
                 <DataGridTextColumn Header="Razón Social" Width="180" Binding="{Binding RazonSocial}" />
-                <DataGridTemplateColumn Header="Acciones" Width="120">
+                <DataGridTextColumn Header="Teléfono"    Width="120" Binding="{Binding Telefono}" />
+                <DataGridTextColumn Header="Email"       Width="200" Binding="{Binding Email}" />
+                <DataGridTemplateColumn Header="Acciones" Width="90">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="✏" Width="28" Height="28" Margin="2" ToolTip="Editar" Foreground="#1976D2" Background="Transparent" BorderThickness="0" FontWeight="Bold" FontSize="14"
-                                        Command="DataGrid.BeginEditCommand" />
-                                <Button Content="🗑" Width="28" Height="28" Margin="2" ToolTip="Eliminar" Foreground="#D32F2F" Background="Transparent" BorderThickness="0" FontWeight="Bold" FontSize="14"
+                                <Button Content="✏" Width="30" Height="28" Margin="2,0"
+                                        ToolTip="Editar empresa"
+                                        Foreground="#1976D2" Background="Transparent"
+                                        BorderThickness="0" FontWeight="Bold" FontSize="14"
+                                        Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                                <Button Content="🗑" Width="30" Height="28" Margin="2,0"
+                                        ToolTip="Eliminar empresa"
+                                        Foreground="#D32F2F" Background="Transparent"
+                                        BorderThickness="0" FontWeight="Bold" FontSize="14"
                                         Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
                             </StackPanel>
@@ -82,5 +68,85 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Panel de formulario (aparece al crear/editar) -->
+        <Border Grid.Row="3"
+                Visibility="{Binding EstaEnModoEdicion, Converter={StaticResource BoolToVis}}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,2,0,0"
+                Background="{StaticResource WindowBackgroundBrush}"
+                Padding="0,12,0,0" Margin="0,8,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Título del formulario -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding TituloFormulario}"
+                           FontSize="15" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentBrush}"
+                           Margin="0,0,0,10" />
+
+                <!-- Campos -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Fila 1 -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+                        <TextBlock Text="Nombre de la Empresa *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditNombre, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8">
+                        <TextBlock Text="RIF *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditRif, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="4" Margin="0,0,0,8">
+                        <TextBlock Text="Razón Social *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditRazonSocial, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <!-- Fila 2 -->
+                    <StackPanel Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Teléfono *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditTelefono, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Email *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditEmail, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="4">
+                        <TextBlock Text="Dirección" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding EditDireccion, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Botones de acción -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="💾  Guardar"
+                            Command="{Binding GuardarCommand}"
+                            Style="{StaticResource AccentButton}"
+                            Padding="16,6" Margin="0,0,8,0" />
+                    <Button Content="✕  Cancelar"
+                            Command="{Binding CancelarEdicionCommand}"
+                            Padding="16,6" />
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
