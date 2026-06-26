@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Sistema_contable.ViewModels;
 
 namespace Sistema_contable.Views
 {
@@ -10,6 +11,7 @@ namespace Sistema_contable.Views
         public Reexpresion()
         {
             InitializeComponent();
+            DataContext = new ReexpresionViewModel();
         }
 
         public void ActivarModoReconversion2021()

@@ -1,0 +1,353 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using SistemaContableZulay.UI.Domain;
+using SistemaContableZulay.UI.Services;
+
+namespace Sistema_contable.ViewModels
+{
+    public class ReexpresionViewModel : ViewModelBase
+    {
+        private DateTime _fechaOrigen = new DateTime(2023, 1, 1);
+        private DateTime _fechaDestino = DateTime.Now;
+        private decimal _ipcOrigen;
+        private decimal _ipcDestino;
+        private decimal _factorCalculado = 1m;
+        private int _partidasSeleccionadasCount;
+        private decimal _ajusteTotal;
+        private decimal _valorOriginalTotal;
+        private decimal _valorAjustadoTotal;
+        private string _monedaSeleccionada = "Bs";
+        private readonly IpcService _ipcService;
+        private readonly ContabilidadService _contabilidadService;
+
+        public DateTime FechaOrigen
+        {
+            get => _fechaOrigen;
+            set
+            {
+                if (SetProperty(ref _fechaOrigen, value))
+                {
+                    _ = ObtenerIpcOrigenAsync();
+                }
+            }
+        }
+
+        public DateTime FechaDestino
+        {
+            get => _fechaDestino;
+            set
+            {
+                if (SetProperty(ref _fechaDestino, value))
+                    _ = ObtenerIpcDestinoAsync();
+            }
+        }
+
+        public decimal IpcOrigen
+        {
+            get => _ipcOrigen;
+            set
+            {
+                if (SetProperty(ref _ipcOrigen, value))
+                    CalcularFactor();
+            }
+        }
+
+        public decimal IpcDestino
+        {
+            get => _ipcDestino;
+            set
+            {
+                if (SetProperty(ref _ipcDestino, value))
+                    CalcularFactor();
+            }
+        }
+
+        public decimal FactorCalculado
+        {
+            get => _factorCalculado;
+            set
+            {
+                if (SetProperty(ref _factorCalculado, value))
+                    RecalcularPartidas();
+            }
+        }
+
+        public int PartidasSeleccionadasCount
+        {
+            get => _partidasSeleccionadasCount;
+            private set => SetProperty(ref _partidasSeleccionadasCount, value);
+        }
+
+        public decimal AjusteTotal
+        {
+            get => _ajusteTotal;
+            private set => SetProperty(ref _ajusteTotal, value);
+        }
+
+        public decimal ValorOriginalTotal
+        {
+            get => _valorOriginalTotal;
+            private set => SetProperty(ref _valorOriginalTotal, value);
+        }
+
+        public decimal ValorAjustadoTotal
+        {
+            get => _valorAjustadoTotal;
+            private set => SetProperty(ref _valorAjustadoTotal, value);
+        }
+
+        public ObservableCollection<string> Monedas { get; } = new ObservableCollection<string> { "Bs", "$", "€", "COP" };
+
+        public string MonedaSeleccionada
+        {
+            get => _monedaSeleccionada;
+            set
+            {
+                if (SetProperty(ref _monedaSeleccionada, value))
+                {
+                    OnPropertyChanged(nameof(AjusteTotalMonedaFormato));
+                    OnPropertyChanged(nameof(ValorOriginalTotalMonedaFormato));
+                    OnPropertyChanged(nameof(ValorAjustadoTotalMonedaFormato));
+                }
+            }
+        }
+
+        public string AjusteTotalMonedaFormato => $"{MonedaSeleccionada} {AjusteTotal:N2}";
+        public string ValorOriginalTotalMonedaFormato => $"{MonedaSeleccionada} {ValorOriginalTotal:N2}";
+        public string ValorAjustadoTotalMonedaFormato => $"{MonedaSeleccionada} {ValorAjustadoTotal:N2}";
+
+        public ObservableCollection<PartidaReexpresion> Partidas { get; } = new ObservableCollection<PartidaReexpresion>();
+
+        private PartidaReexpresion _partidaSeleccionada;
+        public PartidaReexpresion PartidaSeleccionada
+        {
+            get => _partidaSeleccionada;
+            set
+            {
+                if (SetProperty(ref _partidaSeleccionada, value))
+                    CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        public ICommand AplicarReexpresionCommand { get; }
+        public ICommand CancelarCommand { get; }
+        public ICommand EliminarPartidaCommand { get; }
+        public ICommand ActualizarCommand { get; }
+
+        public ReexpresionViewModel()
+        {
+            _ipcService = IpcService.Instance;
+            _contabilidadService = ContabilidadService.Instance;
+
+            AplicarReexpresionCommand = new RelayCommand(AplicarReexpresion, () => Partidas.Any(p => p.Aplicar));
+            CancelarCommand = new RelayCommand(Cancelar);
+            EliminarPartidaCommand = new RelayCommand(ExecuteEliminarPartida, () => PartidaSeleccionada != null);
+            ActualizarCommand = new RelayCommand(CargarPartidas);
+
+            _contabilidadService.OnEmpresaCambiada += CargarPartidas;
+            CargarPartidas();
+            
+            // Cargar IPCs iniciales
+            _ = ObtenerIpcOrigenAsync();
+            _ = ObtenerIpcDestinoAsync();
+        }
+
+        private void ActualizarSaldosOrigen()
+        {
+            // Ya no se actualizan los saldos al cambiar la fecha, porque ahora
+            // se están reexpresando movimientos (transacciones) individuales, cuyo valor original es fijo.
+            RecalcularPartidas();
+        }
+
+        private void CargarPartidas()
+        {
+            Partidas.Clear();
+            var comprobantes = _contabilidadService.ObtenerComprobantesGuardados();
+            
+            // El usuario quiere ver los movimientos de Patrimonio (y Activos no monetarios)
+            var movimientosNoMonetarios = comprobantes.Where(c => c.TipoComprobante == "Patrimonio" || c.TipoComprobante == "Activo");
+            
+            foreach (var comp in movimientosNoMonetarios)
+            {
+                // Buscar la línea que NO es de efectivo (caja/bancos) para obtener la cuenta afectada
+                var lineaNoCaja = comp.Lineas.FirstOrDefault(l => !l.DescripcionCuenta.ToLower().Contains("caja") && !l.DescripcionCuenta.ToLower().Contains("banco"));
+                if (lineaNoCaja == null) lineaNoCaja = comp.Lineas.FirstOrDefault();
+                if (lineaNoCaja == null) continue;
+
+                var partida = new PartidaReexpresion
+                {
+                    Codigo = lineaNoCaja.CodigoCuenta,
+                    Nombre = $"{comp.Descripcion} (MOV-{comp.IdComprobante})",
+                    Tipo = comp.TipoComprobante,
+                    Moneda = comp.Moneda ?? "Bs",
+                    ValorOriginal = lineaNoCaja.Debe > 0 ? lineaNoCaja.Debe : lineaNoCaja.Haber
+                };
+                partida.PropertyChanged += (s, e) => ActualizarTotales();
+                Partidas.Add(partida);
+            }
+            RecalcularPartidas();
+        }
+
+        private void ActualizarTotales()
+        {
+            var seleccionadas = Partidas.Where(p => p.Aplicar).ToList();
+            
+            // Asignar moneda automáticamente basada en el primer movimiento seleccionado
+            if (seleccionadas.Any())
+            {
+                MonedaSeleccionada = seleccionadas.First().Moneda;
+            }
+
+            PartidasSeleccionadasCount = seleccionadas.Count;
+            ValorOriginalTotal = seleccionadas.Sum(p => p.ValorOriginal);
+            ValorAjustadoTotal = seleccionadas.Sum(p => p.ValorAjustado);
+            AjusteTotal = seleccionadas.Sum(p => p.Diferencia);
+            
+            OnPropertyChanged(nameof(AjusteTotalMonedaFormato));
+            OnPropertyChanged(nameof(ValorOriginalTotalMonedaFormato));
+            OnPropertyChanged(nameof(ValorAjustadoTotalMonedaFormato));
+            
+            // Notificar a los comandos (CommandManager) por si cambia CanExecute
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private async Task ObtenerIpcOrigenAsync()
+        {
+            IpcOrigen = await _ipcService.ObtenerIpcAsync(FechaOrigen);
+        }
+
+        private async Task ObtenerIpcDestinoAsync()
+        {
+            IpcDestino = await _ipcService.ObtenerIpcAsync(FechaDestino);
+        }
+
+        private void CalcularFactor()
+        {
+            if (IpcOrigen > 0)
+            {
+                FactorCalculado = IpcDestino / IpcOrigen;
+            }
+        }
+
+        private void RecalcularPartidas()
+        {
+            foreach (var partida in Partidas)
+            {
+                partida.Factor = FactorCalculado;
+            }
+            ActualizarTotales();
+        }
+
+        private void ExecuteEliminarPartida()
+        {
+            if (PartidaSeleccionada == null) return;
+            var result = MessageBox.Show($"¿Desea excluir la cuenta {PartidaSeleccionada.Codigo} - {PartidaSeleccionada.Nombre} del cálculo de reexpresión?", "Confirmar Exclusión", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                Partidas.Remove(PartidaSeleccionada);
+                ActualizarTotales();
+            }
+        }
+
+        private void AplicarReexpresion()
+        {
+            if (_contabilidadService.EmpresaActivaId == null)
+            {
+                MessageBox.Show("Debe seleccionar una empresa activa primero.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var confirmResult = MessageBox.Show(
+                "Está a punto de ejecutar la reexpresión monetaria.\nEl sistema realizará un respaldo automático antes de proceder.\n¿Desea continuar?",
+                "Confirmación", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            
+            if (confirmResult != MessageBoxResult.Yes) return;
+
+            // 1. Respaldo Automático
+            var backupPath = _contabilidadService.EjecutarRespaldoAutomatico();
+            if (string.IsNullOrEmpty(backupPath))
+            {
+                MessageBox.Show("Hubo un problema al crear el respaldo. Operación cancelada por seguridad.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // 2. Generar Asiento
+            var asiento = new ComprobanteContable
+            {
+                Fecha = this.FechaDestino, // El comprobante se registra a la fecha destino
+                Descripcion = $"Ajuste por Inflación (Reexpresión Monetaria DPC10) {FechaOrigen:MMM-yy} a {FechaDestino:MMM-yy}",
+                TipoComprobante = "Ajuste",
+                IdEmpresa = _contabilidadService.EmpresaActivaId.Value,
+                Estado = "Registrado",
+                MontoTotal = Partidas.Where(p => p.Aplicar).Sum(p => p.Diferencia),
+                Moneda = this.MonedaSeleccionada,
+                CuentaAsociada = "Múltiples (Ajuste)"
+            };
+
+            // Código de la cuenta REI definida en el sistema
+            string codigoREI = "3.2.01.00";
+            var cuentaREI = _contabilidadService.ObtenerCuentasContables().FirstOrDefault(c => c.Codigo == codigoREI);
+
+            if (cuentaREI == null)
+            {
+                MessageBox.Show("No se encontró la cuenta REI (Resultado por Exposición a la Inflación) en el sistema. Asegúrese de que exista en el Plan de Cuentas.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            foreach (var partida in Partidas.Where(p => p.Aplicar && p.Diferencia > 0))
+            {
+                // Línea 1: Aumentar la cuenta original (Activo por Debe, Patrimonio por Haber)
+                asiento.Lineas.Add(new AsientoLinea
+                {
+                    CodigoCuenta = partida.Codigo,
+                    DescripcionCuenta = partida.Nombre,
+                    Debe = partida.Tipo == "Activo" ? partida.Diferencia : 0,
+                    Haber = partida.Tipo == "Patrimonio" ? partida.Diferencia : 0
+                });
+
+                // Línea 2: Contrapartida a la cuenta REI
+                asiento.Lineas.Add(new AsientoLinea
+                {
+                    CodigoCuenta = cuentaREI.Codigo,
+                    DescripcionCuenta = cuentaREI.Nombre,
+                    Debe = partida.Tipo == "Patrimonio" ? partida.Diferencia : 0,
+                    Haber = partida.Tipo == "Activo" ? partida.Diferencia : 0
+                });
+            }
+            
+            _contabilidadService.GuardarComprobante(asiento);
+
+            // 3. Notas Revelatorias
+            string notas = GenerarNotasRevelatorias();
+            MessageBox.Show(notas, "Notas Revelatorias (DPC10/NIC29)", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            MessageBox.Show($"Proceso finalizado.\nRespaldo guardado en:\n{backupPath}", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+            
+            CargarPartidas();
+        }
+
+        private string GenerarNotasRevelatorias()
+        {
+            var totalAjuste = Partidas.Where(p => p.Aplicar).Sum(p => p.Diferencia);
+            
+            return $"NOTA X - REEXPRESIÓN MONETARIA (DPC10/NIC29)\n\n" +
+                   $"Los estados financieros han sido reexpresados para reflejar los efectos de la inflación.\n" +
+                   $"El ajuste se realizó utilizando los Índices Nacionales de Precios al Consumidor (INPC).\n\n" +
+                   $"- IPC Origen ({FechaOrigen:MMM yyyy}): {IpcOrigen:N2}\n" +
+                   $"- IPC Destino ({FechaDestino:MMM yyyy}): {IpcDestino:N2}\n" +
+                   $"- Factor de Reexpresión: {FactorCalculado:N4}\n\n" +
+                   $"El efecto neto en el patrimonio debido a la reexpresión de partidas no monetarias " +
+                   $"ascendió a {MonedaSeleccionada} {totalAjuste:N2}, el cual fue registrado en la cuenta de Resultado por Exposición a la Inflación (REI).\n\n" +
+                   $"Esta nota debe incluirse en los Estados Financieros definitivos.";
+        }
+
+        private void Cancelar()
+        {
+            // Podríamos volver al Dashboard o limpiar pantalla
+        }
+    }
+}

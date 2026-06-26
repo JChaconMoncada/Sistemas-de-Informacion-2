@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Xml.Serialization;
 using SistemaContableZulay.UI.Domain;
@@ -86,6 +87,8 @@ public class ContabilidadService
             
             new CuentaContable { Codigo = "3.0.00.00", Nombre = "Patrimonio", Tipo = "Patrimonio", Nivel = 1, AceptaMovimiento = false },
             new CuentaContable { Codigo = "3.1.00.00", Nombre = "Capital Social", Tipo = "Patrimonio", Nivel = 2, CuentaPadre = "3.0.00.00", AceptaMovimiento = true },
+            new CuentaContable { Codigo = "3.2.00.00", Nombre = "Resultados Acumulados", Tipo = "Patrimonio", Nivel = 2, CuentaPadre = "3.0.00.00", AceptaMovimiento = false },
+            new CuentaContable { Codigo = "3.2.01.00", Nombre = "Resultado por Exposición a la Inflación (REI)", Tipo = "Patrimonio", Nivel = 3, CuentaPadre = "3.2.00.00", AceptaMovimiento = true },
             
             new CuentaContable { Codigo = "4.0.00.00", Nombre = "Ingresos", Tipo = "Ingreso", Nivel = 1, AceptaMovimiento = false },
             new CuentaContable { Codigo = "4.1.00.00", Nombre = "Ingresos Operacionales", Tipo = "Ingreso", Nivel = 2, CuentaPadre = "4.0.00.00", AceptaMovimiento = false },
@@ -571,5 +574,77 @@ public class ContabilidadService
 
         factura.Estado = "Anulada";
         GuardarFacturas();
+    }
+
+    public void EliminarComprobante(int idComprobante)
+    {
+        var existente = _comprobantesGuardados.FirstOrDefault(c => c.IdComprobante == idComprobante);
+        if (existente != null)
+        {
+            _comprobantesGuardados.Remove(existente);
+            GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        }
+    }
+
+    public string EjecutarRespaldoAutomatico()
+    {
+        try
+        {
+            var backupDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
+            if (!Directory.Exists(backupDir))
+            {
+                Directory.CreateDirectory(backupDir);
+            }
+
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var backupPath = Path.Combine(backupDir, $"Respaldo_Reexpresion_{timestamp}.zip");
+
+            if (Directory.Exists(_datosPath))
+            {
+                ZipFile.CreateFromDirectory(_datosPath, backupPath);
+                return backupPath;
+            }
+            return string.Empty;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
+
+    public decimal ObtenerSaldoCuentaAFecha(string codigoCuenta, DateTime fechaCorte)
+    {
+        if (EmpresaActivaId == null) return 0m;
+
+        var cuenta = _cuentasGuardadas.FirstOrDefault(c => c.Codigo == codigoCuenta);
+        if (cuenta == null) return 0m;
+
+        var comprobantes = _comprobantesGuardados
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaCorte.Date)
+            .ToList();
+
+        decimal totalDebe = 0m;
+        decimal totalHaber = 0m;
+
+        foreach (var comp in comprobantes)
+        {
+            foreach (var linea in comp.Lineas.Where(l => l.CodigoCuenta == codigoCuenta))
+            {
+                totalDebe += linea.Debe;
+                totalHaber += linea.Haber;
+            }
+        }
+
+        if (cuenta.Tipo == "Activo" || cuenta.Tipo == "Egreso")
+        {
+            return totalDebe - totalHaber;
+        }
+        
+        if (cuenta.Tipo == "Pasivo" || cuenta.Tipo == "Patrimonio" || cuenta.Tipo == "Ingreso")
+        {
+            return totalHaber - totalDebe;
+        }
+
+        return 0m;
     }
 }

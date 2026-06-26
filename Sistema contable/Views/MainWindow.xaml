@@ -61,8 +61,6 @@
             </MenuItem>
         </Menu>
 
-
-
         <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource HeaderBackgroundBrush}" Padding="8,4">
             <StatusBarItem>
                 <TextBlock Text="{Binding TextoEstado}" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -122,6 +120,12 @@
                 </TabItem>
                 <TabItem Header="Comprobantes">
                     <Frame x:Name="FrameComprobantes" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Empresas">
+                    <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Movimientos">
+                    <Frame x:Name="FrameMovimientos" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Plan de Cuentas">
                     <Frame x:Name="FramePlanCuentas" NavigationUIVisibility="Hidden" />
