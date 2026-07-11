@@ -18,57 +18,39 @@
         <TextBlock Grid.Row="0" Text="Estados Financieros e Informes" Style="{StaticResource TitleTextBlock}" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="Generar Reporte" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
-            <Button Content="Exportar PDF" Margin="0,0,6,0" />
-            <Button Content="Exportar Excel" Margin="0,0,6,0" />
+            <Button Content="Generar Reporte" Command="{Binding GenerarReporteCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <Button Content="Exportar PDF" Command="{Binding ExportarPdfCommand}" Margin="0,0,6,0" />
+            <Button Content="Exportar Excel" Command="{Binding ExportarExcelCommand}" Margin="0,0,6,0" />
             <Separator Width="1" Margin="8,0" />
-            <Button Content="Imprimir" />
+            <Button Content="Imprimir" Command="{Binding ImprimirCommand}" />
         </StackPanel>
 
         <GroupBox Grid.Row="2" Header="Parámetros del Reporte" Margin="0,0,0,12">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="220" />
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="150" />
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="120" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Content="Tipo de Reporte:" VerticalAlignment="Center" />
-                <ComboBox Grid.Row="0" Grid.Column="1">
-                    <ComboBoxItem Content="Balance General" IsSelected="True" />
-                    <ComboBoxItem Content="Estado de Resultados" />
-                    <ComboBoxItem Content="Flujo de Efectivo" />
-                    <ComboBoxItem Content="Estado de Cambios en el Patrimonio" />
-                </ComboBox>
+                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding TiposReporte}"
+                          SelectedItem="{Binding TipoReporteSeleccionado, Mode=TwoWay}" />
 
-                <Label Grid.Row="0" Grid.Column="3" Content="Desde:" VerticalAlignment="Center" />
-                <DatePicker Grid.Row="0" Grid.Column="4" />
+                <Label Grid.Row="0" Grid.Column="3" Content="Fecha de Corte:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="4" SelectedDate="{Binding FechaCorte, Mode=TwoWay}" />
 
-                <Label Grid.Row="0" Grid.Column="6" Content="Hasta:" VerticalAlignment="Center" />
-                <DatePicker Grid.Row="0" Grid.Column="7" />
-
-                <Label Grid.Row="1" Grid.Column="0" Content="Ejercicio:" VerticalAlignment="Center" Margin="0,8,0,0" />
-                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0">
-                    <ComboBoxItem Content="2026" IsSelected="True" />
-                    <ComboBoxItem Content="2025" />
-                    <ComboBoxItem Content="2024" />
-                </ComboBox>
-
-                <Label Grid.Row="1" Grid.Column="3" Content="Formato:" VerticalAlignment="Center" Margin="0,8,0,0" />
-                <ComboBox Grid.Row="1" Grid.Column="4" Margin="0,8,0,0">
-                    <ComboBoxItem Content="Detallado" IsSelected="True" />
-                    <ComboBoxItem Content="Resumido" />
-                    <ComboBoxItem Content="Comparativo" />
-                </ComboBox>
+                <Label Grid.Row="0" Grid.Column="6" Content="Ejercicio:" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="0" Grid.Column="7" ItemsSource="{Binding EjerciciosDisponibles}"
+                          SelectedItem="{Binding EjercicioSeleccionado, Mode=TwoWay}" />
             </Grid>
         </GroupBox>
 
@@ -77,72 +59,42 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Border Background="{StaticResource WindowBackgroundBrush}" Padding="16" Margin="8">
                         <StackPanel>
-                            <TextBlock Text="BALANCE GENERAL" FontSize="18" FontWeight="Bold" 
+                            <TextBlock Text="{Binding TituloReporte}" FontSize="18" FontWeight="Bold" 
                                        HorizontalAlignment="Center" Margin="0,0,0,4" />
-                            <TextBlock Text="Al 31 de Diciembre de 2026" FontSize="14" 
+                            <TextBlock Text="{Binding SubtituloReporte}" FontSize="14" 
                                        HorizontalAlignment="Center" Margin="0,0,0,16" 
                                        Foreground="{StaticResource TextSecondaryBrush}" />
 
-                            <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="ACTIVO" FontWeight="Bold" FontSize="14" />
-                                </Grid>
-                            </Border>
+                            <ItemsControl ItemsSource="{Binding Lineas}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="160" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Codigo}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Nombre}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Monto, StringFormat='Bs. {0:N2}'}" TextAlignment="Right" />
+                                        </Grid>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding EsEncabezado}" Value="True">
+                                                <Setter Property="TextElement.FontWeight" Value="Bold" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding EsTotal}" Value="True">
+                                                <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                            <Grid Margin="16,0,0,4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="150" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Activo Corriente" FontWeight="SemiBold" />
-                            </Grid>
-
-                            <Grid Margin="32,0,0,2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="150" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Caja" />
-                                <TextBlock Grid.Column="1" Text="Bs. 15,000.00" TextAlignment="Right" />
-                            </Grid>
-
-                            <Grid Margin="32,0,0,2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="150" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Bancos" />
-                                <TextBlock Grid.Column="1" Text="Bs. 85,450.00" TextAlignment="Right" />
-                            </Grid>
-
-                            <Grid Margin="32,0,0,2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="150" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Clientes" />
-                                <TextBlock Grid.Column="1" Text="Bs. 25,000.00" TextAlignment="Right" />
-                            </Grid>
-
-                            <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,1,0,0" Padding="0,4,0,0" Margin="16,8,0,0">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="Total Activo Corriente" FontWeight="SemiBold" />
-                                    <TextBlock Grid.Column="1" Text="Bs. 125,450.00" TextAlignment="Right" FontWeight="SemiBold" />
-                                </Grid>
-                            </Border>
-
-                            <TextBlock Text="[Vista previa del reporte completo]" 
+                            <TextBlock Text="No hay datos para el reporte y filtros seleccionados." 
                                        Margin="0,16,0,0" FontStyle="Italic" 
                                        Foreground="{StaticResource TextSecondaryBrush}" 
-                                       HorizontalAlignment="Center" />
+                                       HorizontalAlignment="Center"
+                                       Visibility="{Binding SinDatosVisibility}" />
                         </StackPanel>
                     </Border>
                 </ScrollViewer>
@@ -152,23 +104,14 @@
                 <Grid Margin="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" Background="{StaticResource WindowBackgroundBrush}" 
                             BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" 
-                            Margin="0,0,0,8" Padding="16">
-                        <TextBlock Text="[Gráfico de evolución patrimonial]" 
+                            Padding="16">
+                        <TextBlock Text="Próximamente: gráficos de evolución patrimonial y comparativos entre periodos." 
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
-                    </Border>
-
-                    <Border Grid.Row="1" Background="{StaticResource WindowBackgroundBrush}" 
-                            BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" 
-                            Margin="0,8,0,0" Padding="16">
-                        <TextBlock Text="[Gráfico comparativo de periodos]" 
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" />
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic" TextWrapping="Wrap" TextAlignment="Center" />
                     </Border>
                 </Grid>
             </TabItem>

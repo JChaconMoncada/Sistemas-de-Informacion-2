@@ -42,10 +42,10 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Desde:" VerticalAlignment="Center" />
-                <DatePicker Grid.Column="1" />
+                <DatePicker Grid.Column="1" SelectedDate="{Binding FechaDesde, Mode=TwoWay}" />
 
                 <Label Grid.Column="3" Content="Hasta:" VerticalAlignment="Center" />
-                <DatePicker Grid.Column="4" />
+                <DatePicker Grid.Column="4" SelectedDate="{Binding FechaHasta, Mode=TwoWay}" />
 
                 <Label Grid.Column="6" Content="Cuenta:" VerticalAlignment="Center" />
                 <ComboBox Grid.Column="7" ItemsSource="{Binding CuentasDisponibles}"
@@ -64,7 +64,10 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <Button Grid.Column="9" Content="Aplicar" />
+                <StackPanel Grid.Column="9" Orientation="Horizontal">
+                    <Button Content="Aplicar" Command="{Binding AplicarFiltroCommand}" Style="{StaticResource AccentButton}" Margin="0,0,4,0" />
+                    <Button Content="Limpiar" Command="{Binding LimpiarFiltroCommand}" />
+                </StackPanel>
             </Grid>
         </GroupBox>
 

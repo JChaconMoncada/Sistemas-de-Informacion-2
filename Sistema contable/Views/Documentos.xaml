@@ -3,9 +3,14 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:conv="clr-namespace:Sistema_contable.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="1000"
       Title="Documentos">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -22,16 +27,12 @@
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Control Documental" Style="{StaticResource TitleTextBlock}" />
 
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="Nuevo Documento" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
-            <Button Content="Adjuntar Archivo" Margin="0,0,6,0" />
-            <Button Content="Marcar Entregado" Margin="0,0,6,0" />
-            <Separator Width="1" Margin="8,0" />
-            <Button Content="Exportar Lista" />
+            <Button Content="Nuevo Documento" Command="{Binding NuevoDocumentoCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
         </StackPanel>
 
         <GroupBox Grid.Row="2" Grid.Column="0" Header="Filtros" Margin="0,0,8,12">
             <StackPanel Orientation="Horizontal">
-                <TextBox Width="200" Margin="0,0,8,0">
+                <TextBox Width="200" Margin="0,0,8,0" Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.Style>
                         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                             <Style.Triggers>
@@ -52,86 +53,83 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <ComboBox Width="150" Margin="0,0,8,0">
-                    <ComboBoxItem Content="Todos los estados" IsSelected="True" />
-                    <ComboBoxItem Content="Recibido" />
-                    <ComboBoxItem Content="En Revisión" />
-                    <ComboBoxItem Content="Revisado" />
-                    <ComboBoxItem Content="Entregado" />
-                </ComboBox>
-                <ComboBox Width="150" Margin="0,0,8,0">
-                    <ComboBoxItem Content="Todos los tipos" IsSelected="True" />
-                    <ComboBoxItem Content="Declaración IVA" />
-                    <ComboBoxItem Content="Declaración ISLR" />
-                    <ComboBoxItem Content="Balance" />
-                    <ComboBoxItem Content="Factura" />
-                    <ComboBoxItem Content="Otro" />
-                </ComboBox>
-                <Button Content="Aplicar" />
+                <ComboBox Width="150" Margin="0,0,8,0" ItemsSource="{Binding EstadosDisponibles}"
+                          SelectedItem="{Binding FiltroEstado, Mode=TwoWay}" />
+                <ComboBox Width="150" Margin="0,0,8,0" ItemsSource="{Binding TiposDocumento}"
+                          SelectedItem="{Binding FiltroTipo, Mode=TwoWay}" />
             </StackPanel>
         </GroupBox>
 
-        <DataGrid Grid.Row="3" Grid.Column="0" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,8,0">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Empresa" Width="*" Binding="{Binding NombreEmpresa}" />
-                <DataGridTextColumn Header="Tipo" Width="150" Binding="{Binding TipoDocumento}" />
-                <DataGridTextColumn Header="Descripción" Width="200" Binding="{Binding Descripcion}" />
-                <DataGridTextColumn Header="Recepción" Width="100" Binding="{Binding FechaRecepcion, StringFormat=dd/MM/yyyy}" />
-                <DataGridTemplateColumn Header="Estado" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource StatusBadge}" Padding="6,2">
-                                <TextBlock Text="En Revisión" FontSize="11" />
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Acciones" Width="80">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Ver" Width="60" Height="24" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,8,0">
+            <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                      ItemsSource="{Binding DocumentosFiltrados}"
+                      SelectedItem="{Binding DocumentoSeleccionado, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" />
+                    <DataGridTextColumn Header="Empresa" Width="*" Binding="{Binding NombreEmpresa}" />
+                    <DataGridTextColumn Header="Tipo" Width="150" Binding="{Binding TipoDocumento}" />
+                    <DataGridTextColumn Header="Descripción" Width="200" Binding="{Binding Descripcion}" />
+                    <DataGridTextColumn Header="Recepción" Width="100" Binding="{Binding FechaRecepcion, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTemplateColumn Header="Estado" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource StatusBadge}" Padding="6,2">
+                                    <TextBlock Text="{Binding Estado}" FontSize="11" />
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Acciones" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Editar" Width="55" Height="24" Margin="0,0,4,0"
+                                            Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" />
+                                    <Button Content="🗑" Width="28" Height="24" Foreground="#D32F2F"
+                                            Command="{Binding DataContext.EliminarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
 
-        <GroupBox Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Header="Detalle del Documento" Margin="8,0,0,0">
+            <TextBlock Text="No hay documentos registrados. Use &quot;Nuevo Documento&quot; para comenzar."
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{StaticResource TextSecondaryBrush}" FontStyle="Italic"
+                       Visibility="{Binding SinDocumentosVisibility}" />
+        </Grid>
+
+        <GroupBox Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Header="Detalle del Documento" Margin="8,0,0,0"
+                  Visibility="{Binding EstaEnModoEdicion, Converter={StaticResource BoolToVis}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="8">
-                    <Label Content="Empresa:" FontWeight="SemiBold" />
-                    <ComboBox Margin="0,0,0,12">
-                    </ComboBox>
+                    <TextBlock Text="{Binding TituloFormulario}" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentBrush}" Margin="0,0,0,10" />
 
                     <Label Content="Tipo de Documento:" FontWeight="SemiBold" />
-                    <ComboBox Margin="0,0,0,12">
-                        <ComboBoxItem Content="Declaración IVA" IsSelected="True" />
-                        <ComboBoxItem Content="Declaración ISLR" />
-                        <ComboBoxItem Content="Balance" />
-                        <ComboBoxItem Content="Factura" />
-                        <ComboBoxItem Content="Otro" />
-                    </ComboBox>
+                    <ComboBox Margin="0,0,0,12" ItemsSource="{Binding TiposDocumentoEdicion}"
+                              SelectedItem="{Binding EditTipoDocumento, Mode=TwoWay}" />
 
-                    <Label Content="Descripción:" FontWeight="SemiBold" />
-                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="0,0,0,12" />
+                    <Label Content="Descripción: *" FontWeight="SemiBold" />
+                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="0,0,0,12"
+                             Text="{Binding EditDescripcion, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Content="Fecha de Recepción:" FontWeight="SemiBold" />
-                    <DatePicker Margin="0,0,0,12" />
+                    <DatePicker Margin="0,0,0,12" SelectedDate="{Binding EditFechaRecepcion, Mode=TwoWay}" />
 
                     <Label Content="Fecha de Entrega:" FontWeight="SemiBold" />
-                    <DatePicker Margin="0,0,0,12" />
+                    <DatePicker Margin="0,0,0,12" SelectedDate="{Binding EditFechaEntrega, Mode=TwoWay}" />
 
                     <Label Content="Estado:" FontWeight="SemiBold" />
-                    <ComboBox Margin="0,0,0,12">
-                        <ComboBoxItem Content="Recibido" />
-                        <ComboBoxItem Content="En Revisión" IsSelected="True" />
-                        <ComboBoxItem Content="Revisado" />
-                        <ComboBoxItem Content="Entregado" />
-                    </ComboBox>
+                    <ComboBox Margin="0,0,0,12" ItemsSource="{Binding EstadosEdicion}"
+                              SelectedItem="{Binding EditEstado, Mode=TwoWay}" />
 
                     <Label Content="Observaciones:" FontWeight="SemiBold" />
-                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,12" />
+                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,12"
+                             Text="{Binding EditObservaciones, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Separator Margin="0,8" />
 
@@ -140,18 +138,19 @@
                             BorderBrush="{StaticResource ControlBorderBrush}" 
                             BorderThickness="1" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="Ningún archivo adjunto" Margin="0,0,0,4" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="{Binding EditArchivoAdjunto}" Margin="0,0,0,4"
+                                       Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                         </StackPanel>
                     </Border>
 
-                    <Button Content="Adjuntar Archivo" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
-                    <Button Content="Ver Archivo" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                    <Button Content="Adjuntar Archivo" Command="{Binding AdjuntarArchivoCommand}" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                    <Button Content="Ver Archivo" Command="{Binding VerArchivoCommand}" Margin="0,0,0,8" HorizontalAlignment="Stretch" />
 
                     <Separator Margin="0,8" />
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                        <Button Content="Guardar" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
-                        <Button Content="Cancelar" />
+                        <Button Content="Guardar" Command="{Binding GuardarCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+                        <Button Content="Cancelar" Command="{Binding CancelarCommand}" />
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

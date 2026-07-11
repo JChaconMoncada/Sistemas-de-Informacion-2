@@ -5,6 +5,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Serialization;
 using SistemaContableZulay.UI.Domain;
+using Documento = Sistema_contable.Models.Documento;
+using ConfiguracionSistema = Sistema_contable.Models.ConfiguracionSistema;
+using BackupInfo = Sistema_contable.Models.BackupInfo;
 
 namespace SistemaContableZulay.UI.Services;
 
@@ -14,9 +17,12 @@ public class ContabilidadService
 
     public int? EmpresaActivaId { get; set; }
     public event Action OnEmpresaCambiada;
+    public event Action OnEmpresasModificadas;
 
     public void SeleccionarEmpresa(int? id)
     {
+        if (EmpresaActivaId == id) return;
+
         EmpresaActivaId = id;
         OnEmpresaCambiada?.Invoke();
     }
@@ -27,12 +33,16 @@ public class ContabilidadService
     private readonly string _empresasFile;
     private readonly string _periodosFile;
     private readonly string _facturasFile;
+    private readonly string _documentosFile;
+    private readonly string _configuracionFile;
 
     private List<ComprobanteContable> _comprobantesGuardados = new();
     private List<CuentaContable> _cuentasGuardadas = new();
     private List<EmpresaCliente> _empresasGuardadas = new();
     private List<PeriodoFiscal> _periodosFiscales = new();
     private List<FacturaCobranza> _facturasCobranza = new();
+    private List<Documento> _documentosGuardados = new();
+    private ConfiguracionSistema _configuracion = new();
 
     private ContabilidadService()
     {
@@ -47,6 +57,8 @@ public class ContabilidadService
         _empresasFile = Path.Combine(_datosPath, "empresas.xml");
         _periodosFile = Path.Combine(_datosPath, "periodos.xml");
         _facturasFile  = Path.Combine(_datosPath, "facturas.xml");
+        _documentosFile = Path.Combine(_datosPath, "documentos.xml");
+        _configuracionFile = Path.Combine(_datosPath, "configuracion.xml");
 
         CargarDatos();
     }
@@ -58,11 +70,73 @@ public class ContabilidadService
         _comprobantesGuardados = CargarLista<ComprobanteContable>(_comprobantesFile) ?? new List<ComprobanteContable>();
         _periodosFiscales = CargarLista<PeriodoFiscal>(_periodosFile) ?? new List<PeriodoFiscal>();
         _facturasCobranza = CargarLista<FacturaCobranza>(_facturasFile) ?? new List<FacturaCobranza>();
+        _documentosGuardados = CargarLista<Documento>(_documentosFile) ?? new List<Documento>();
+        _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
 
         SembrarCuentasPorDefecto();
 
         GuardarEmpresas();
         GuardarCuentas();
+    }
+
+    private ConfiguracionSistema CargarConfiguracion()
+    {
+        if (!File.Exists(_configuracionFile)) return null;
+        try
+        {
+            var serializer = new XmlSerializer(typeof(ConfiguracionSistema));
+            using var stream = new FileStream(_configuracionFile, FileMode.Open);
+            return (ConfiguracionSistema)serializer.Deserialize(stream);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public ConfiguracionSistema ObtenerConfiguracion() => _configuracion;
+
+    public void GuardarConfiguracion(ConfiguracionSistema configuracion)
+    {
+        _configuracion = configuracion;
+        var serializer = new XmlSerializer(typeof(ConfiguracionSistema));
+        using var stream = new FileStream(_configuracionFile, FileMode.Create);
+        serializer.Serialize(stream, _configuracion);
+    }
+
+    // ─── Documentos ───────────────────────────────────────────────────────────
+
+    public List<Documento> ObtenerDocumentos()
+    {
+        if (EmpresaActivaId == null) return _documentosGuardados.OrderByDescending(d => d.FechaRecepcion).ToList();
+        return _documentosGuardados
+            .Where(d => d.EmpresaId == EmpresaActivaId.Value)
+            .OrderByDescending(d => d.FechaRecepcion)
+            .ToList();
+    }
+
+    public void GuardarDocumento(Documento documento)
+    {
+        if (documento.Id == 0)
+        {
+            documento.Id = _documentosGuardados.Count > 0 ? _documentosGuardados.Max(d => d.Id) + 1 : 1;
+        }
+
+        var existente = _documentosGuardados.FirstOrDefault(d => d.Id == documento.Id);
+        if (existente != null) _documentosGuardados.Remove(existente);
+
+        _documentosGuardados.Add(documento);
+        GuardarLista(_documentosGuardados, _documentosFile);
+    }
+
+    public void EliminarDocumento(int id)
+    {
+        var existente = _documentosGuardados.FirstOrDefault(d => d.Id == id);
+        if (existente != null)
+        {
+            _documentosGuardados.Remove(existente);
+            GuardarLista(_documentosGuardados, _documentosFile);
+        }
     }
 
     private void SembrarCuentasPorDefecto()
@@ -147,7 +221,9 @@ public class ContabilidadService
         }
         _empresasGuardadas.Add(empresa);
         GuardarEmpresas();
-        
+
+        OnEmpresasModificadas?.Invoke();
+
         // Si se editó la empresa activa, disparamos el evento para que la interfaz se refresque
         if (EmpresaActivaId == empresa.Id)
         {
@@ -162,6 +238,8 @@ public class ContabilidadService
         {
             _empresasGuardadas.Remove(existente);
             GuardarEmpresas();
+
+            OnEmpresasModificadas?.Invoke();
 
             if (EmpresaActivaId == id)
             {
@@ -586,7 +664,11 @@ public class ContabilidadService
         }
     }
 
-    public string EjecutarRespaldoAutomatico()
+    public string EjecutarRespaldoAutomatico() => EjecutarBackup("Respaldo_Reexpresion");
+
+    public string EjecutarBackupManual() => EjecutarBackup("Backup");
+
+    private string EjecutarBackup(string prefijo)
     {
         try
         {
@@ -597,7 +679,7 @@ public class ContabilidadService
             }
 
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var backupPath = Path.Combine(backupDir, $"Respaldo_Reexpresion_{timestamp}.zip");
+            var backupPath = Path.Combine(backupDir, $"{prefijo}_{timestamp}.zip");
 
             if (Directory.Exists(_datosPath))
             {
@@ -609,6 +691,54 @@ public class ContabilidadService
         catch (Exception)
         {
             return string.Empty;
+        }
+    }
+
+    public string ObtenerCarpetaBackups()
+    {
+        var backupDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
+        if (!Directory.Exists(backupDir)) Directory.CreateDirectory(backupDir);
+        return backupDir;
+    }
+
+    public List<BackupInfo> ObtenerHistorialBackups()
+    {
+        var backupDir = ObtenerCarpetaBackups();
+        return Directory.GetFiles(backupDir, "*.zip")
+            .Select(f => new FileInfo(f))
+            .OrderByDescending(f => f.LastWriteTime)
+            .Select(f => new BackupInfo
+            {
+                Fecha = f.LastWriteTime,
+                NombreArchivo = f.Name,
+                RutaCompleta = f.FullName,
+                Tamaño = $"{f.Length / 1024.0:N0} KB"
+            })
+            .ToList();
+    }
+
+    public void RestaurarBackup(string rutaZip)
+    {
+        if (!File.Exists(rutaZip)) throw new InvalidOperationException("El archivo de backup no existe.");
+
+        var tempDir = Path.Combine(Path.GetTempPath(), "SistemaContable_Restore_" + Guid.NewGuid());
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            ZipFile.ExtractToDirectory(rutaZip, tempDir);
+
+            foreach (var file in Directory.GetFiles(tempDir))
+            {
+                var destino = Path.Combine(_datosPath, Path.GetFileName(file));
+                File.Copy(file, destino, overwrite: true);
+            }
+
+            CargarDatos();
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, true);
         }
     }
 

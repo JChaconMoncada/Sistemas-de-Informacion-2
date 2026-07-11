@@ -81,6 +81,7 @@
             <Border Grid.Column="0" Background="{StaticResource WindowBackgroundBrush}" 
                     BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,1,0">
                 <DockPanel>
+                    <!-- ── Encabezado Empresas ── -->
                     <Border DockPanel.Dock="Top" Background="{StaticResource DataGridHeaderBackgroundBrush}" 
                             Padding="12,8" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,0,0,1">
                         <Grid>
@@ -88,22 +89,25 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="EMPRESAS" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Grid.Column="0" Text="EMPRESAS" FontWeight="SemiBold" FontSize="13"
                                        Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="+ Gestionar" Padding="8,3"
+                            <Button Grid.Column="1" Content="+ Nueva" Padding="7,3" Margin="0,0,4,0"
                                     Style="{StaticResource AccentButton}" FontSize="11"
                                     Click="BtnGestionarEmpresas_Click" ToolTip="Crear o gestionar empresas" />
                         </Grid>
                     </Border>
-                    
+
+                    <!-- ── Lista de empresas (ocupa el espacio restante) ── -->
                     <ListBox x:Name="ListEmpresas" BorderThickness="0" Padding="8" Background="Transparent"
                              ItemsSource="{Binding Empresas}"
                              SelectedItem="{Binding EmpresaSeleccionada, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="0,4">
-                                    <TextBlock Text="{Binding NombreEmpresa}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding Rif, StringFormat='RIF: {0}'}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding NombreEmpresa}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding Rif, StringFormat='RIF: {0}'}" FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -120,9 +124,6 @@
                 </TabItem>
                 <TabItem Header="Comprobantes">
                     <Frame x:Name="FrameComprobantes" NavigationUIVisibility="Hidden" />
-                </TabItem>
-                <TabItem Header="Empresas">
-                    <Frame x:Name="FrameEmpresas" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Movimientos">
                     <Frame x:Name="FrameMovimientos" NavigationUIVisibility="Hidden" />
@@ -157,6 +158,9 @@
                 </TabItem>
                 <TabItem Header="Configuración">
                     <Frame x:Name="FrameConfiguracion" NavigationUIVisibility="Hidden" />
+                </TabItem>
+                <TabItem Header="Guía de Usuario">
+                    <Frame x:Name="FrameAyuda" NavigationUIVisibility="Hidden" />
                 </TabItem>
             </TabControl>
         </Grid>

@@ -130,26 +130,26 @@
                 <GroupBox Grid.Column="2" Header="Resumen del Período">
                     <StackPanel Margin="8,6">
 
-                        <TextBlock Text="COBRANZA" FontSize="10" FontWeight="Bold"
+                        <TextBlock Text="MOVIMIENTOS" FontSize="10" FontWeight="Bold"
                                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
 
                         <Grid Margin="0,0,0,4">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Por cobrar" FontSize="12" />
-                            <TextBlock Grid.Column="1" Text="{Binding MontoPorCobrar, StringFormat='Bs. {0:N2}'}"
-                                       FontSize="12" FontWeight="SemiBold" Foreground="#FF9800" />
+                            <TextBlock Grid.Column="0" Text="Movimientos del mes" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding MovimientosDelMes}"
+                                       FontSize="12" FontWeight="SemiBold" />
                         </Grid>
                         <Grid Margin="0,0,0,4">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Facturas pendientes" FontSize="12" />
-                            <TextBlock Grid.Column="1" Text="{Binding FacturasPendientes}"
+                            <TextBlock Grid.Column="0" Text="Total movimientos" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalMovimientos}"
                                        FontSize="12" FontWeight="SemiBold" />
                         </Grid>
                         <Grid Margin="0,0,0,12">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Facturas vencidas" FontSize="12" />
-                            <TextBlock Grid.Column="1" Text="{Binding FacturasVencidas}"
-                                       FontSize="12" FontWeight="SemiBold" Foreground="#F44336" />
+                            <TextBlock Grid.Column="0" Text="Saldo acumulado" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding SaldoAcumulado, StringFormat='Bs. {0:N2}'}"
+                                       FontSize="12" FontWeight="SemiBold" Foreground="{Binding ColorSaldo}" />
                         </Grid>
 
                         <Separator Margin="0,0,0,10" />
@@ -235,9 +235,9 @@
                                 Style="{StaticResource AccentButton}"
                                 Margin="0,0,0,8" HorizontalAlignment="Stretch"
                                 Click="BtnNuevoComprobante_Click" />
-                        <Button Content="✓  Registrar Cobro"
+                        <Button Content="🔄  Nuevo Movimiento"
                                 Margin="0,0,0,8" HorizontalAlignment="Stretch"
-                                Click="BtnRegistrarCobro_Click" />
+                                Click="BtnNuevoMovimiento_Click" />
                         <Button Content="📖  Ver Libro Diario"
                                 Margin="0,0,0,8" HorizontalAlignment="Stretch"
                                 Click="BtnVerLibroDiario_Click" />

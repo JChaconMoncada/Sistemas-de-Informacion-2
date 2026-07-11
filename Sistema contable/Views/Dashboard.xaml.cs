@@ -19,17 +19,17 @@ namespace Sistema_contable.Views
                 main.MainTabControl.SelectedIndex = 1;
         }
 
-        private void BtnRegistrarCobro_Click(object sender, RoutedEventArgs e)
+        private void BtnNuevoMovimiento_Click(object sender, RoutedEventArgs e)
         {
             if (GetMain() is MainWindow main)
-                main.MainTabControl.SelectedIndex = 5;
+                main.MainTabControl.SelectedIndex = 2;
         }
 
         private void BtnVerLibroDiario_Click(object sender, RoutedEventArgs e)
         {
             if (GetMain() is MainWindow main)
             {
-                main.MainTabControl.SelectedIndex = 3;
+                main.MainTabControl.SelectedIndex = 4;
                 main.LibrosTabControl.SelectedIndex = 0;
             }
         }
@@ -37,7 +37,7 @@ namespace Sistema_contable.Views
         private void BtnVerInformes_Click(object sender, RoutedEventArgs e)
         {
             if (GetMain() is MainWindow main)
-                main.MainTabControl.SelectedIndex = 4;
+                main.MainTabControl.SelectedIndex = 5;
         }
 
         private void BtnBackup_Click(object sender, RoutedEventArgs e)
@@ -46,7 +46,7 @@ namespace Sistema_contable.Views
         private void BtnImportarBancos_Click(object sender, RoutedEventArgs e)
         {
             if (GetMain() is MainWindow main)
-                main.MainTabControl.SelectedIndex = 8;
+                main.MainTabControl.SelectedIndex = 9;
         }
     }
 }

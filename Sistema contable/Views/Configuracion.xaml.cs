@@ -7,6 +7,7 @@ namespace Sistema_contable.Views
         public Configuracion()
         {
             InitializeComponent();
+            this.DataContext = new ViewModels.ConfiguracionViewModel();
         }
     }
 }

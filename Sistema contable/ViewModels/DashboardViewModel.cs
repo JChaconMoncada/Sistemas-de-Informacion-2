@@ -73,14 +73,14 @@ namespace Sistema_contable.ViewModels
         private int _comprobantesDelMes;
         public int ComprobantesDelMes { get => _comprobantesDelMes; set => SetProperty(ref _comprobantesDelMes, value); }
 
-        private int _facturasVencidas;
-        public int FacturasVencidas { get => _facturasVencidas; set => SetProperty(ref _facturasVencidas, value); }
+        private int _movimientosDelMes;
+        public int MovimientosDelMes { get => _movimientosDelMes; set => SetProperty(ref _movimientosDelMes, value); }
 
-        private int _facturasPendientes;
-        public int FacturasPendientes { get => _facturasPendientes; set => SetProperty(ref _facturasPendientes, value); }
+        private int _totalMovimientos;
+        public int TotalMovimientos { get => _totalMovimientos; set => SetProperty(ref _totalMovimientos, value); }
 
-        private decimal _montoPorCobrar;
-        public decimal MontoPorCobrar { get => _montoPorCobrar; set => SetProperty(ref _montoPorCobrar, value); }
+        private decimal _saldoAcumulado;
+        public decimal SaldoAcumulado { get => _saldoAcumulado; set => SetProperty(ref _saldoAcumulado, value); }
 
         private string _textoResultado = string.Empty;
         public string TextoResultado { get => _textoResultado; set => SetProperty(ref _textoResultado, value); }
@@ -123,8 +123,8 @@ namespace Sistema_contable.ViewModels
             if (empresaId == null)
             {
                 EmpresaActiva       = "Sin empresa seleccionada";
-                IngresosMes         = GastosMes = SaldoTotal = MontoPorCobrar = 0;
-                ComprobantesDelMes  = FacturasVencidas = FacturasPendientes = 0;
+                IngresosMes         = GastosMes = SaldoTotal = SaldoAcumulado = 0;
+                ComprobantesDelMes  = MovimientosDelMes = TotalMovimientos = 0;
                 AlertasPendientes   = 0;
                 SubtituloIngresos   = SubtituloGastos = "Sin datos";
                 SubtituloSaldo      = "Seleccione una empresa";
@@ -183,26 +183,13 @@ namespace Sistema_contable.ViewModels
                 SubtituloSaldo = "Resultado negativo";
             }
 
-            // ── Cobranza ──────────────────────────────────────────────────────────
-            var facturas = _svc.ObtenerFacturas();
-            FacturasVencidas   = facturas.Count(f => f.Estado == "Vencida");
-            FacturasPendientes = facturas.Count(f => f.Estado == "Pendiente");
-            MontoPorCobrar     = facturas
-                .Where(f => f.Estado == "Pendiente" || f.Estado == "Vencida")
-                .Sum(f => f.Monto);
+            // ── Movimientos ────────────────────────────────────────────────────────
+            TotalMovimientos = todosComprobantes.Count;
+            MovimientosDelMes = compsMes.Count;
+            SaldoAcumulado    = todosComprobantes.Sum(c => c.Lineas.Sum(l => l.Haber) - c.Lineas.Sum(l => l.Debe));
 
             // ── Alertas ───────────────────────────────────────────────────────────
             var alertas = new List<AlertaDashboard>();
-
-            foreach (var fv in facturas.Where(f => f.Estado == "Vencida").Take(5))
-                alertas.Add(new AlertaDashboard
-                {
-                    Icono       = "⚠",
-                    Tipo        = "Factura Vencida",
-                    Descripcion = $"{fv.NumeroFactura} – {fv.NombreCliente}  ({fv.Monto:N2})",
-                    Fecha       = fv.FechaVencimiento.ToString("dd/MM/yyyy"),
-                    Estado      = "Vencida"
-                });
 
             foreach (var comp in todosComprobantes
                 .Where(c => c.Lineas.Count > 0 &&

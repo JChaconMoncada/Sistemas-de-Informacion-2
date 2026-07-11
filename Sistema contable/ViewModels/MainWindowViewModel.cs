@@ -48,7 +48,7 @@ namespace Sistema_contable.ViewModels
             Empresas = new ObservableCollection<EmpresaCliente>();
             TextoEstado = "Empresa: Sin empresa seleccionada";
 
-            _contabilidadService.OnEmpresaCambiada += CargarEmpresas;
+            _contabilidadService.OnEmpresasModificadas += CargarEmpresas;
             CargarEmpresas();
         }
 

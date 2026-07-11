@@ -1,0 +1,133 @@
+<Page x:Class="Sistema_contable.Views.Ayuda"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1000"
+      Title="Guía de Usuario">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Guía de Usuario" Style="{StaticResource TitleTextBlock}" />
+            <TextBlock Grid.Row="1"
+                       Text="Pasos rápidos para usar el sistema. Ideal para personas nuevas en el equipo o en contabilidad."
+                       Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+            <StackPanel Grid.Row="2">
+
+                <Border Background="{StaticResource AccentLightBrush}" BorderBrush="{StaticResource AccentBrush}"
+                        BorderThickness="1" Padding="14,10" Margin="0,0,0,16">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="✔" FontSize="18" Foreground="{StaticResource AccentDarkBrush}" Margin="0,0,10,0" VerticalAlignment="Top" />
+                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">
+                            <Run FontWeight="Bold" Text="Primer paso siempre: " />
+                            <Run Text="seleccione o cree una empresa en el panel izquierdo (botón &quot;+ Nueva&quot;). Todos los módulos dependen de la empresa activa." />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Expander Header="1. Empresas — Crear y seleccionar una empresa" Margin="0,0,0,8" IsExpanded="True">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Vaya al panel izquierdo y presione <Run FontWeight="Bold" Text="+ Nueva" />. Complete nombre, RIF, razón social,
+                        teléfono y correo. Luego selecciónela en la lista para activarla; el nombre aparecerá resaltado.
+                        Puede editar o eliminar empresas desde el menú <Run FontWeight="Bold" Text="Empresas" /> en la barra superior.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="2. Plan de Cuentas — Organizar sus cuentas contables" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        En el módulo <Run FontWeight="Bold" Text="Plan de Cuentas" /> puede ver la jerarquía completa (Activo, Pasivo,
+                        Patrimonio, Ingreso, Egreso). Use <Run FontWeight="Bold" Text="Nuevo" /> para crear una cuenta y asocie una
+                        cuenta padre si aplica. Solo las cuentas marcadas como &quot;Acepta Movimiento&quot; pueden usarse en comprobantes.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="3. Comprobantes — Registrar un asiento contable" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Ingrese fecha, tipo y descripción. Agregue líneas con <Run FontWeight="Bold" Text="Agregar Línea" />, indicando
+                        cuenta, debe y haber. El sistema calculará los totales automáticamente y solo permitirá guardar cuando
+                        Debe = Haber (comprobante cuadrado). Use <Run FontWeight="Bold" Text="Movimientos" /> para registros rápidos
+                        de ingresos/egresos sin armar el asiento manualmente.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="4. Libros — Consultar Libro Diario y Libro Mayor" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        El <Run FontWeight="Bold" Text="Libro Diario" /> lista todos los movimientos en orden cronológico; filtre por
+                        fecha o tipo de comprobante. El <Run FontWeight="Bold" Text="Libro Mayor" /> muestra el detalle y saldo
+                        acumulado de una cuenta específica. Use los botones &quot;Aplicar&quot; y &quot;Limpiar&quot; para ajustar filtros.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="5. Informes — Balance General y Estado de Resultados" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Seleccione el tipo de reporte, la fecha de corte o el ejercicio fiscal y presione
+                        <Run FontWeight="Bold" Text="Generar Reporte" />. El Balance General compara Activo contra Pasivo + Patrimonio;
+                        si aparece una diferencia, generalmente es porque el ejercicio aún no se ha cerrado.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="6. Cobranza — Gestionar facturas por cobrar" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Cree facturas con cliente, monto y fecha de vencimiento. El sistema genera automáticamente el asiento de
+                        venta. Use <Run FontWeight="Bold" Text="Cobrar" /> cuando el cliente pague (genera el asiento de cobro) o
+                        <Run FontWeight="Bold" Text="Anular" /> si la factura fue un error.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="7. Documentos — Control de documentos y archivos" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Registre declaraciones, balances o facturas recibidas. Puede adjuntar el archivo original y cambiar su
+                        estado (Recibido, En Revisión, Revisado, Entregado) a medida que avanza el trámite.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="8. Bancos — Importar estados de cuenta en PDF" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Seleccione el PDF del banco; el sistema extraerá las transacciones automáticamente. Revise las filas
+                        marcadas en rojo (no reconocidas), asigne una cuenta contable a cada línea y presione
+                        <Run FontWeight="Bold" Text="Importar Transacciones" /> para generar los comprobantes.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="9. Reexpresión Monetaria — Ajuste por inflación" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Indique fecha origen/destino; el sistema busca el IPC correspondiente y calcula el factor. Revise las
+                        partidas a reexpresar, marque las que aplican y presione <Run FontWeight="Bold" Text="Aplicar Reexpresión" />
+                        para generar el asiento de ajuste.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="10. Configuración — Backups y parámetros fiscales" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Cree copias de seguridad con <Run FontWeight="Bold" Text="Crear Backup Ahora" /> y restáurelas si algo sale
+                        mal. Configure el porcentaje de IVA/ISLR, la moneda base y el ejercicio fiscal según su empresa.
+                    </TextBlock>
+                </Expander>
+
+                <Expander Header="11. Cierre de Ejercicio y Reversión de Comprobantes" Margin="0,0,0,8">
+                    <TextBlock Margin="24,8,8,12" TextWrapping="Wrap">
+                        Desde el menú <Run FontWeight="Bold" Text="Procesos" /> puede reversar un comprobante erróneo (genera un
+                        contra-asiento) o cerrar el ejercicio fiscal al final del año, lo cual traslada el resultado a Patrimonio y
+                        bloquea el período. Haga un backup antes de cerrar el ejercicio.
+                    </TextBlock>
+                </Expander>
+
+                <Border Background="{StaticResource ContentBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}"
+                        BorderThickness="1" Padding="14,10" Margin="0,16,0,0">
+                    <TextBlock TextWrapping="Wrap">
+                        <Run FontWeight="Bold" Text="¿Necesita más ayuda? " />
+                        <Run Text="Consulte con su supervisor contable o revise el archivo ANALISIS_SISTEMA_CONTABLE.md incluido en el proyecto para más detalles técnicos." />
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

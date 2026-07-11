@@ -345,9 +345,44 @@ namespace Sistema_contable.ViewModels
                    $"Esta nota debe incluirse en los Estados Financieros definitivos.";
         }
 
+        public void SetModoReconversion2021(bool activo)
+        {
+            if (activo)
+            {
+                _fechaOrigen  = new DateTime(2021, 1, 1);
+                _fechaDestino = new DateTime(2021, 10, 1);
+                _ipcOrigen    = 1_000_000m;
+                _ipcDestino   = 1m;
+                OnPropertyChanged(nameof(FechaOrigen));
+                OnPropertyChanged(nameof(FechaDestino));
+                OnPropertyChanged(nameof(IpcOrigen));
+                OnPropertyChanged(nameof(IpcDestino));
+                CalcularFactor();
+            }
+            else
+            {
+                // Restablecer fechas a valores por defecto del modo IPC
+                // para que el fetch async use periodos significativos, no los de 2021.
+                _fechaOrigen  = new DateTime(DateTime.Today.Year - 1, 1, 1);
+                _fechaDestino = DateTime.Today;
+                OnPropertyChanged(nameof(FechaOrigen));
+                OnPropertyChanged(nameof(FechaDestino));
+
+                // Resetear IPCs visualmente mientras llega el resultado async
+                _ipcOrigen  = 0m;
+                _ipcDestino = 0m;
+                OnPropertyChanged(nameof(IpcOrigen));
+                OnPropertyChanged(nameof(IpcDestino));
+
+                // Ahora buscar los IPC reales para las fechas restauradas
+                _ = ObtenerIpcOrigenAsync();
+                _ = ObtenerIpcDestinoAsync();
+            }
+        }
+
         private void Cancelar()
         {
-            // Podríamos volver al Dashboard o limpiar pantalla
+            CargarPartidas();
         }
     }
 }

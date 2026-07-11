@@ -16,7 +16,6 @@ namespace Sistema_contable.Views
         {
             FrameDashboard.Navigate(new Dashboard());
             FrameComprobantes.Navigate(new Comprobantes());
-            FrameEmpresas.Navigate(new Empresas());
             FrameMovimientos.Navigate(new Movimientos());
             FramePlanCuentas.Navigate(new PlanCuentas());
             FrameLibroDiario.Navigate(new LibroDiario());
@@ -27,16 +26,7 @@ namespace Sistema_contable.Views
             FrameReexpresion.Navigate(new Reexpresion());
             FrameBancos.Navigate(new Bancos());
             FrameConfiguracion.Navigate(new Configuracion());
-        }
-
-        private void BtnDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 0;
-        }
-
-        private void BtnComprobantes_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 1;
+            FrameAyuda.Navigate(new Ayuda());
         }
 
         private void BtnGestionarEmpresas_Click(object sender, RoutedEventArgs e)
@@ -46,65 +36,15 @@ namespace Sistema_contable.Views
             ventana.ShowDialog();
         }
 
-        private void BtnEmpresas_Click(object sender, RoutedEventArgs e)
-        {
-            BtnGestionarEmpresas_Click(sender, e);
-        }
-
-        private void BtnMovimientos_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 2;
-        }
-
-        private void BtnPlanCuentas_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 3;
-        }
-
-        private void BtnLibros_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 4;
-        }
-
-        private void BtnInformes_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 5;
-        }
-
-        private void BtnCobranza_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 6;
-        }
-
-        private void BtnDocumentos_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 7;
-        }
-
-        private void BtnReexpresion_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 8;
-        }
-
-        private void BtnBancos_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 9;
-        }
-
-        private void BtnConfiguracion_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 11;
-        }
-
         // Menu Handlers
         internal void MenuBackup_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 9;
+            MainTabControl.SelectedIndex = 10;
         }
 
         private void MenuRestore_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 9;
+            MainTabControl.SelectedIndex = 10;
         }
 
         private void MenuSalir_Click(object sender, RoutedEventArgs e)
@@ -129,39 +69,39 @@ namespace Sistema_contable.Views
 
         private void MenuPlanCuentas_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 2;
+            MainTabControl.SelectedIndex = 3;
         }
 
         private void MenuLibroDiario_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 3;
+            MainTabControl.SelectedIndex = 4;
             LibrosTabControl.SelectedIndex = 0;
         }
 
         private void MenuLibroMayor_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 3;
+            MainTabControl.SelectedIndex = 4;
             LibrosTabControl.SelectedIndex = 1;
         }
 
         private void MenuInformes_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 4;
+            MainTabControl.SelectedIndex = 5;
         }
 
         private void MenuReexpresion_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 7;
+            MainTabControl.SelectedIndex = 8;
         }
 
         private void MenuBancos_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 8;
+            MainTabControl.SelectedIndex = 9;
         }
 
         private void MenuConfiguracion_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 9;
+            MainTabControl.SelectedIndex = 10;
         }
 
         // ─── Menú Procesos ───────────────────────────────────────────────────────
@@ -218,7 +158,7 @@ namespace Sistema_contable.Views
 
         private void MenuReconversion2021_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 7;
+            MainTabControl.SelectedIndex = 8;
             if (FrameReexpresion.Content is Reexpresion page)
             {
                 page.ActivarModoReconversion2021();
@@ -228,7 +168,7 @@ namespace Sistema_contable.Views
         // ─── Ayuda ───────────────────────────────────────────────────────────────
         private void MenuAyuda_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Manual de Usuario:\n\nUse el menú superior o la barra de herramientas para navegar entre los módulos.\nSeleccione una empresa activa en el panel izquierdo para ver sus libros contables.", "Ayuda - Sistema Contable ERP", MessageBoxButton.OK, MessageBoxImage.Information);
+            MainTabControl.SelectedIndex = 11;
         }
 
         private void MenuAcercaDe_Click(object sender, RoutedEventArgs e)

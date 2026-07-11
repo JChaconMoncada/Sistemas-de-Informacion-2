@@ -79,6 +79,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
@@ -147,6 +148,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
                                 SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Margin="{TemplateBinding Padding}"
@@ -194,6 +196,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
                             SnapsToDevicePixels="True">
                         <ScrollViewer x:Name="PART_ContentHost"
                                       Margin="{TemplateBinding Padding}" />
@@ -255,6 +258,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
                             SnapsToDevicePixels="True">
                         <ScrollViewer x:Name="DG_ScrollViewer"
                                       Focusable="False"
@@ -600,6 +604,7 @@
                                 Background="{StaticResource DataGridHeaderBackgroundBrush}"
                                 BorderBrush="{StaticResource ControlBorderBrush}"
                                 BorderThickness="1,1,1,0"
+                                CornerRadius="6,6,0,0"
                                 Padding="8,3"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter ContentSource="Header"
@@ -612,6 +617,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1,0,1,1"
+                                CornerRadius="0,0,6,6"
                                 Padding="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter />
@@ -722,6 +728,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5,5,0,0"
                             Padding="{TemplateBinding Padding}"
                             Margin="0,0,2,0"
                             SnapsToDevicePixels="True">

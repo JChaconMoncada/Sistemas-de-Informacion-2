@@ -2,12 +2,11 @@ using System.Windows.Controls;
 
 namespace Sistema_contable.Views
 {
-    public partial class Informes : Page
+    public partial class Ayuda : Page
     {
-        public Informes()
+        public Ayuda()
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.InformesViewModel();
         }
     }
 }

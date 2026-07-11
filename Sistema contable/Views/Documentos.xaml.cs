@@ -7,6 +7,7 @@ namespace Sistema_contable.Views
         public Documentos()
         {
             InitializeComponent();
+            this.DataContext = new ViewModels.DocumentosViewModel();
         }
     }
 }

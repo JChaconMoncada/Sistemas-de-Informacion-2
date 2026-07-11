@@ -26,6 +26,8 @@ namespace Sistema_contable.ViewModels
         private ObservableCollection<CuentaContable> _cuentasDisponibles;
         private CuentaContable _cuentaSeleccionada;
         private decimal _saldoFinal;
+        private DateTime? _fechaDesde;
+        private DateTime? _fechaHasta;
 
         public ObservableCollection<LineaLibroMayor> Lineas
         {
@@ -57,6 +59,18 @@ namespace Sistema_contable.ViewModels
             set => SetProperty(ref _saldoFinal, value);
         }
 
+        public DateTime? FechaDesde
+        {
+            get => _fechaDesde;
+            set { if (SetProperty(ref _fechaDesde, value)) FiltrarMovimientos(); }
+        }
+
+        public DateTime? FechaHasta
+        {
+            get => _fechaHasta;
+            set { if (SetProperty(ref _fechaHasta, value)) FiltrarMovimientos(); }
+        }
+
         private LineaLibroMayor _selectedLinea;
         public LineaLibroMayor SelectedLinea
         {
@@ -68,6 +82,8 @@ namespace Sistema_contable.ViewModels
         public ICommand ExportarExcelCommand { get; }
         public ICommand ImprimirCommand { get; }
         public ICommand VerMovimientosCommand { get; }
+        public ICommand AplicarFiltroCommand { get; }
+        public ICommand LimpiarFiltroCommand { get; }
 
         public LibroMayorViewModel()
         {
@@ -78,9 +94,18 @@ namespace Sistema_contable.ViewModels
             _contabilidadService.OnEmpresaCambiada += CargarDatos;
             CargarDatos();
 
-            ExportarPdfCommand = new RelayCommand(() => System.Windows.MessageBox.Show("Exportando Libro Mayor a PDF...", "Exportación PDF", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
-            ExportarExcelCommand = new RelayCommand(() => System.Windows.MessageBox.Show("Exportando Libro Mayor a Excel...", "Exportación Excel", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
-            ImprimirCommand = new RelayCommand(() => System.Windows.MessageBox.Show("Enviando Libro Mayor a la impresora...", "Imprimir", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
+            ExportarPdfCommand = new RelayCommand(() => ExportarConValidacion("PDF"));
+            ExportarExcelCommand = new RelayCommand(() => ExportarConValidacion("Excel"));
+            ImprimirCommand = new RelayCommand(() => ExportarConValidacion("impresora"));
+            AplicarFiltroCommand = new RelayCommand(FiltrarMovimientos);
+            LimpiarFiltroCommand = new RelayCommand(() =>
+            {
+                _fechaDesde = null;
+                _fechaHasta = null;
+                OnPropertyChanged(nameof(FechaDesde));
+                OnPropertyChanged(nameof(FechaHasta));
+                CuentaSeleccionada = CuentasDisponibles.FirstOrDefault();
+            });
             VerMovimientosCommand = new RelayCommand(() => {
                 if (SelectedLinea != null)
                 {
@@ -107,6 +132,16 @@ namespace Sistema_contable.ViewModels
             FiltrarMovimientos();
         }
 
+        private void ExportarConValidacion(string destino)
+        {
+            if (Lineas == null || Lineas.Count == 0)
+            {
+                System.Windows.MessageBox.Show("No hay datos en el Libro Mayor para exportar con el filtro actual.", "Sin datos", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+            System.Windows.MessageBox.Show($"Enviando {Lineas.Count} línea(s) del Libro Mayor a {destino}...", "Exportación", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
         private void FiltrarMovimientos()
         {
             var comprobantes = _contabilidadService.ObtenerComprobantesGuardados();
@@ -115,7 +150,13 @@ namespace Sistema_contable.ViewModels
             var lineasTemp = new ObservableCollection<LineaLibroMayor>();
             decimal saldoActual = 0;
 
-            var comprobantesFiltrados = comprobantes.OrderBy(c => c.Fecha);
+            var query = comprobantes.AsEnumerable();
+            if (FechaDesde.HasValue)
+                query = query.Where(c => c.Fecha.Date >= FechaDesde.Value.Date);
+            if (FechaHasta.HasValue)
+                query = query.Where(c => c.Fecha.Date <= FechaHasta.Value.Date);
+
+            var comprobantesFiltrados = query.OrderBy(c => c.Fecha);
 
             foreach (var comp in comprobantesFiltrados)
             {
