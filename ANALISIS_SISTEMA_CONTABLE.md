@@ -11,8 +11,8 @@
 - Jesus Chacon
 
 ### Grupo 3
--Carlos Ocariz
--Miguel Urbina
+- Carlos Ocariz
+- Miguel Urbina
 
 ## 1. Tecnología y arquitectura actual
 
