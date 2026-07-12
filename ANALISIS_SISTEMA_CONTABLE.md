@@ -2,15 +2,15 @@
 
 ## GRUPOS
 
-#Grupo 1
+### Grupo 1
 - Francisco Villasmil
 - Isaac Diaz
 
-#Grupo 2
+### Grupo 2
 - Omar angola
 - Jesus Chacon
 
-#Grupo 3
+### Grupo 3
 -Carlos Ocariz
 -Miguel Urbina
 
