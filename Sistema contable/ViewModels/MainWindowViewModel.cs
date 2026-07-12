@@ -1,9 +1,11 @@
 using Sistema_contable.Models;
+using System;
 using System.Collections.ObjectModel;
 using SistemaContableZulay.UI.Services;
 using System.Linq;
 using System.Windows.Input;
 using SistemaContableZulay.UI.Domain;
+using System.Diagnostics;
 
 namespace Sistema_contable.ViewModels
 {
@@ -66,6 +68,19 @@ namespace Sistema_contable.ViewModels
             {
                 _empresaSeleccionada = Empresas.FirstOrDefault(e => e.Id == _contabilidadService.EmpresaActivaId.Value);
                 OnPropertyChanged(nameof(EmpresaSeleccionada));
+            }
+        }
+
+        public void AbrirCarpetaBackups()
+        {
+            try
+            {
+                var carpeta = _contabilidadService.ObtenerCarpetaBackups();
+                Process.Start(new ProcessStartInfo(carpeta) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"No se pudo abrir la carpeta de backups: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
     }

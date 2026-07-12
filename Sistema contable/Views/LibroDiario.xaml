@@ -64,7 +64,7 @@
                 <DataGridTextColumn Header="Nº Asiento" Width="80" Binding="{Binding Numero}" />
                 <DataGridTextColumn Header="Código Cuenta" Width="120" Binding="{Binding CodigoCuenta}" />
                 <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding NombreCuenta}" />
-                <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />
+                <DataGridTextColumn Header="Glosa (Descripción)" Width="250" Binding="{Binding Descripcion}" />
                 <DataGridTextColumn Header="Debe" Width="120" Binding="{Binding Debe, StringFormat=N2}" />
                 <DataGridTextColumn Header="Haber" Width="120" Binding="{Binding Haber, StringFormat=N2}" />
                 <DataGridTemplateColumn Header="Acciones" Width="80">

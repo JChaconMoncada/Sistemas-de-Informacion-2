@@ -47,6 +47,15 @@ namespace Sistema_contable.Views
             MainTabControl.SelectedIndex = 10;
         }
 
+        private void MenuAbrirCarpetaBackups_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as ViewModels.MainWindowViewModel;
+            if (viewModel != null)
+            {
+                viewModel.AbrirCarpetaBackups();
+            }
+        }
+
         private void MenuSalir_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();

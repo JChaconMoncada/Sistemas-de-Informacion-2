@@ -51,6 +51,10 @@
                 <MenuItem Header="Flujo de Efectivo" Click="MenuInformes_Click" />
             </MenuItem>
             <MenuItem Header="_Herramientas">
+                <MenuItem Header="Realizar Backup" Click="MenuBackup_Click" />
+                <MenuItem Header="Restaurar Backup" Click="MenuRestore_Click" />
+                <MenuItem Header="Abrir Carpeta de Backups" Click="MenuAbrirCarpetaBackups_Click" />
+                <Separator />
                 <MenuItem Header="Reexpresión Monetaria" Click="MenuReexpresion_Click" />
                 <MenuItem Header="Importar PDF Bancario" Click="MenuBancos_Click" />
                 <MenuItem Header="Configuración" Click="MenuConfiguracion_Click" />

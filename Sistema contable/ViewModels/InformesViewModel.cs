@@ -123,7 +123,50 @@ namespace Sistema_contable.ViewModels
                 System.Windows.MessageBox.Show("Genere un reporte con datos antes de exportar o imprimir.", "Sin datos", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 return;
             }
-            System.Windows.MessageBox.Show($"Enviando \"{TituloReporte}\" a {destino}...", "Exportación", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+            var exportacionService = new ExportacionService();
+            var nombreEmpresa = _contabilidadService.ObtenerEmpresas()
+                .FirstOrDefault(e => e.Id == _contabilidadService.EmpresaActivaId)?.NombreEmpresa ?? "Empresa";
+
+            try
+            {
+                var saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+                if (destino == "PDF")
+                {
+                    saveFileDialog.Filter = "Archivos PDF (*.pdf)|*.pdf";
+                    saveFileDialog.DefaultExt = "pdf";
+                    saveFileDialog.FileName = $"{TipoReporteSeleccionado}_{DateTime.Now:yyyyMMdd}";
+                }
+                else if (destino == "Excel")
+                {
+                    saveFileDialog.Filter = "Archivos Excel (*.xlsx)|*.xlsx";
+                    saveFileDialog.DefaultExt = "xlsx";
+                    saveFileDialog.FileName = $"{TipoReporteSeleccionado}_{DateTime.Now:yyyyMMdd}";
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Función de impresión no implementada aún.", "Información", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    return;
+                }
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    if (destino == "PDF")
+                    {
+                        exportacionService.ExportarInformeAPdf(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa);
+                    }
+                    else if (destino == "Excel")
+                    {
+                        exportacionService.ExportarInformeAExcel(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa);
+                    }
+
+                    System.Windows.MessageBox.Show($"Archivo exportado exitosamente a:\n{saveFileDialog.FileName}", "Exportación Exitosa", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error al exportar: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void GenerarReporte()
