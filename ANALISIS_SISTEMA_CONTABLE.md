@@ -1,5 +1,19 @@
 # Análisis del proyecto — Sistema Contable WPF/C#
 
+## GRUPOS
+
+#Grupo 1
+- Francisco Villasmil
+- Isaac Diaz
+
+#Grupo 2
+- Omar angola
+- Jesus Chacon
+
+#Grupo 3
+-Carlos Ocariz
+-Miguel Urbina
+
 ## 1. Tecnología y arquitectura actual
 
 - **Tecnología**: aplicación de escritorio WPF/C# con .NET 10 (`net10.0-windows`), patrón MVVM.
