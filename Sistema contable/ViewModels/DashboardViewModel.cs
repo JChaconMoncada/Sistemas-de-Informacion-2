@@ -216,6 +216,33 @@ namespace Sistema_contable.ViewModels
                     Estado      = "Pendiente"
                 });
 
+            // ── Alertas de Cobranza ───────────────────────────────────────────────
+            var facturasCobranza = _svc.ObtenerFacturas();
+
+            foreach (var f in facturasCobranza.Where(f => f.Estado == "Vencida").Take(5))
+                alertas.Add(new AlertaDashboard
+                {
+                    Icono       = "🔴",
+                    Tipo        = "Cobranza Vencida",
+                    Descripcion = $"{f.NumeroFactura} – {f.NombreCliente} | {f.TipoPago} | Bs. {f.Monto:N2}",
+                    Fecha       = f.FechaVencimiento.ToString("dd/MM/yyyy"),
+                    Estado      = $"Vencida ({f.DiasVencido}d)"
+                });
+
+            foreach (var f in facturasCobranza
+                .Where(f => f.Estado == "Pendiente"
+                         && f.DiasRestantes <= 5
+                         && f.DiasRestantes >= 0)
+                .Take(5))
+                alertas.Add(new AlertaDashboard
+                {
+                    Icono       = "⏰",
+                    Tipo        = "Por Vencer",
+                    Descripcion = $"{f.NumeroFactura} – {f.NombreCliente} | {f.TipoPago} | Bs. {f.Monto:N2}",
+                    Fecha       = f.FechaVencimiento.ToString("dd/MM/yyyy"),
+                    Estado      = f.DiasRestantes == 0 ? "Vence hoy" : $"Vence en {f.DiasRestantes}d"
+                });
+
             AlertasPendientes = alertas.Count;
             SubtituloAlertas  = AlertasPendientes > 0
                 ? $"{AlertasPendientes} requieren atención"
