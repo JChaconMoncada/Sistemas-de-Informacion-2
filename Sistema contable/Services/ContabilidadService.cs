@@ -74,9 +74,115 @@ public class ContabilidadService
         _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
 
         SembrarCuentasPorDefecto();
+        SembrarEmpresaDemo();
+        SembrarFacturasDemo();
 
         GuardarEmpresas();
         GuardarCuentas();
+    }
+
+    private void SembrarEmpresaDemo()
+    {
+        if (_empresasGuardadas.Count > 0) return;
+
+        _empresasGuardadas.Add(new EmpresaCliente
+        {
+            Id           = 1,
+            NombreEmpresa = "Empresa Demo S.A.",
+            Rif           = "J-12345678-9",
+            RazonSocial   = "Empresa Demo Sociedad Anónima",
+            Direccion     = "Av. Principal, Caracas",
+            Telefono      = "0212-555-0000",
+            Email         = "demo@empresa.com"
+        });
+    }
+
+    private void SembrarFacturasDemo()
+    {
+        if (_facturasCobranza.Count > 0) return;
+
+        var empresaId = _empresasGuardadas.FirstOrDefault()?.Id ?? 1;
+        var hoy       = DateTime.Now.Date;
+        var nextId    = 1;
+        var nextComp  = _comprobantesGuardados.Count > 0 ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1;
+
+        var demos = new List<(string cliente, string desc, decimal monto, DateTime venc, string tipo, string estado, DateTime? fechaPago)>
+        {
+            // Vencidas – aparecen como alertas rojas en Dashboard
+            ("Carlos Mendoza",   "Servicio contabilidad marzo",   850.00m,  hoy.AddDays(-20), "Mensualidad",   "Vencida",  null),
+            ("Inversiones López", "Honorarios asesoría fiscal",  1500.00m,  hoy.AddDays(-8),  "Pago Único",    "Vencida",  null),
+
+            // Por vencer ≤ 5 días – aparecen como alertas naranjas en Dashboard
+            ("María Torres",     "Mensualidad servicios julio",   650.00m,  hoy.AddDays(3),   "Mensualidad",   "Pendiente", null),
+            ("Almacén El Norte", "Abono cuota 2/4",               400.00m,  hoy.AddDays(1),   "Abono Parcial", "Pendiente", null),
+
+            // Pendientes normales
+            ("Distribuidora Sur", "Servicio auditoría Q3",       2200.00m,  hoy.AddDays(15),  "Servicio",      "Pendiente", null),
+            ("Pedro Castillo",   "Mensualidad servicios julio",   750.00m,  hoy.AddDays(22),  "Mensualidad",   "Pendiente", null),
+
+            // Pagadas – reflejan en la tarjeta verde "Cobrado"
+            ("Ferretería Lima",  "Venta de productos mayo",       980.00m,  hoy.AddDays(-30), "Producto",      "Pagada",    hoy.AddDays(-28)),
+            ("Ana González",     "Pago pendiente cuota única",   1100.00m,  hoy.AddDays(-10), "Pago Pendiente","Pagada",    hoy.AddDays(-9)),
+        };
+
+        foreach (var (cliente, desc, monto, venc, tipo, estado, fechaPago) in demos)
+        {
+            var factura = new FacturaCobranza
+            {
+                Id               = nextId,
+                IdEmpresa        = empresaId,
+                NumeroFactura    = $"FAC-{empresaId:D3}-{nextId:D4}",
+                NombreCliente    = cliente,
+                Descripcion      = desc,
+                Monto            = monto,
+                FechaEmision     = venc.AddDays(-30),
+                FechaVencimiento = venc,
+                TipoPago         = tipo,
+                Estado           = estado,
+                FechaPago        = fechaPago,
+                IdComprobanteEmision = nextComp
+            };
+
+            // Comprobante de emisión
+            var compEmision = new ComprobanteContable
+            {
+                IdComprobante   = nextComp,
+                IdEmpresa       = empresaId,
+                Fecha           = factura.FechaEmision,
+                Descripcion     = $"Factura {factura.NumeroFactura} – {cliente}",
+                TipoComprobante = "Ingreso",
+                Estado          = "Registrado"
+            };
+            compEmision.Lineas.Add(new AsientoLinea { CodigoCuenta = "1.1.02.01", DescripcionCuenta = "Clientes Nacionales", Debe = monto, Haber = 0 });
+            compEmision.Lineas.Add(new AsientoLinea { CodigoCuenta = "4.1.01.01", DescripcionCuenta = "Ventas de Bienes / Servicios", Debe = 0, Haber = monto });
+            _comprobantesGuardados.Add(compEmision);
+            nextComp++;
+
+            // Si está pagada, agregar comprobante de cobro
+            if (estado == "Pagada" && fechaPago.HasValue)
+            {
+                factura.IdComprobantePago = nextComp;
+                var compPago = new ComprobanteContable
+                {
+                    IdComprobante   = nextComp,
+                    IdEmpresa       = empresaId,
+                    Fecha           = fechaPago.Value,
+                    Descripcion     = $"Cobro {factura.NumeroFactura} – {cliente}",
+                    TipoComprobante = "Ingreso",
+                    Estado          = "Registrado"
+                };
+                compPago.Lineas.Add(new AsientoLinea { CodigoCuenta = "1.1.01.01", DescripcionCuenta = "Caja General", Debe = monto, Haber = 0 });
+                compPago.Lineas.Add(new AsientoLinea { CodigoCuenta = "1.1.02.01", DescripcionCuenta = "Clientes Nacionales", Debe = 0, Haber = monto });
+                _comprobantesGuardados.Add(compPago);
+                nextComp++;
+            }
+
+            _facturasCobranza.Add(factura);
+            nextId++;
+        }
+
+        GuardarFacturas();
+        GuardarLista(_comprobantesGuardados, _comprobantesFile);
     }
 
     private ConfiguracionSistema CargarConfiguracion()
