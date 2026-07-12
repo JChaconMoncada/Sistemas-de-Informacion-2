@@ -1,0 +1,260 @@
+<Page x:Class="Sistema_contable.Views.Dashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="750" d:DesignWidth="1100"
+      Title="Dashboard">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ── Encabezado ─────────────────────────────────────────────────── -->
+            <Grid Grid.Row="0" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Dashboard" Style="{StaticResource TitleTextBlock}" Margin="0" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="🏢 " FontSize="12" />
+                        <TextBlock Text="{Binding EmpresaActiva}" FontSize="12"
+                                   Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" />
+                        <TextBlock Text="   •   " FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding PeriodoActual}" FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="   •   " FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding UltimaActualizacion}" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+                <Button Grid.Column="1" Content="↻  Actualizar"
+                        Command="{Binding RefrescarCommand}"
+                        Padding="12,6" VerticalAlignment="Center" />
+            </Grid>
+
+            <!-- ── 4 Tarjetas KPI ─────────────────────────────────────────────── -->
+            <UniformGrid Grid.Row="1" Rows="1" Columns="4" Margin="0,0,0,14">
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Ingresos del Mes" FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding IngresosMes, StringFormat='Bs. {0:N2}'}"
+                                   FontSize="22" FontWeight="Bold"
+                                   Foreground="{StaticResource AccentBrush}" Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding SubtituloIngresos}" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Gastos del Mes" FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding GastosMes, StringFormat='Bs. {0:N2}'}"
+                                   FontSize="22" FontWeight="Bold"
+                                   Foreground="#F44336" Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding SubtituloGastos}" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Resultado del Período" FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding SaldoTotal, StringFormat='Bs. {0:N2}'}"
+                                   FontSize="22" FontWeight="Bold"
+                                   Foreground="{Binding ColorSaldo}" Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding TextoResultado}" FontSize="11"
+                                   Foreground="{Binding ColorSaldo}" Margin="0,3,0,0" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="Alertas Activas" FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding AlertasPendientes}"
+                                   FontSize="22" FontWeight="Bold"
+                                   Foreground="#FF9800" Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding SubtituloAlertas}" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- ── Fila 2: Últimas transacciones  +  Resumen del período ─────── -->
+            <Grid Grid.Row="2" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Últimas transacciones -->
+                <GroupBox Grid.Column="0" Header="Últimas Transacciones (empresa activa)">
+                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                              ItemsSource="{Binding UltimosMovimientos}" MaxHeight="240"
+                              SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="N°"    Width="55"  Binding="{Binding Numero}" />
+                            <DataGridTextColumn Header="Tipo"  Width="90"  Binding="{Binding Tipo}" />
+                            <DataGridTextColumn Header="Descripción" Width="*" Binding="{Binding Descripcion}" />
+                            <DataGridTextColumn Header="Fecha" Width="90"  Binding="{Binding Fecha}" />
+                            <DataGridTextColumn Header="Debe"  Width="100" Binding="{Binding TotalDebe,  StringFormat=N2}" />
+                            <DataGridTextColumn Header="Haber" Width="100" Binding="{Binding TotalHaber, StringFormat=N2}" />
+                            <DataGridTemplateColumn Header="Estado" Width="85">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource StatusBadge}" Padding="4,2">
+                                            <TextBlock Text="{Binding Estado}" FontSize="10" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <!-- Resumen del período -->
+                <GroupBox Grid.Column="2" Header="Resumen del Período">
+                    <StackPanel Margin="8,6">
+
+                        <TextBlock Text="MOVIMIENTOS" FontSize="10" FontWeight="Bold"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Movimientos del mes" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding MovimientosDelMes}"
+                                       FontSize="12" FontWeight="SemiBold" />
+                        </Grid>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Total movimientos" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalMovimientos}"
+                                       FontSize="12" FontWeight="SemiBold" />
+                        </Grid>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Saldo acumulado" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding SaldoAcumulado, StringFormat='Bs. {0:N2}'}"
+                                       FontSize="12" FontWeight="SemiBold" Foreground="{Binding ColorSaldo}" />
+                        </Grid>
+
+                        <Separator Margin="0,0,0,10" />
+
+                        <TextBlock Text="SISTEMA" FontSize="10" FontWeight="Bold"
+                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Comprobantes del mes" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding ComprobantesDelMes}"
+                                       FontSize="12" FontWeight="SemiBold" />
+                        </Grid>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Cuentas contables" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalCuentas}"
+                                       FontSize="12" FontWeight="SemiBold" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Empresas registradas" FontSize="12" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalEmpresas}"
+                                       FontSize="12" FontWeight="SemiBold" />
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+
+            <!-- ── Fila 3: Alertas  +  Acciones Rápidas ──────────────────────── -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Alertas reales -->
+                <GroupBox Grid.Column="0" Header="Alertas Activas">
+                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                              ItemsSource="{Binding Alertas}" MaxHeight="200">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header=""           Width="28"  Binding="{Binding Icono}" />
+                            <DataGridTextColumn Header="Tipo"       Width="160" Binding="{Binding Tipo}" />
+                            <DataGridTextColumn Header="Descripción" Width="*"  Binding="{Binding Descripcion}" />
+                            <DataGridTextColumn Header="Fecha"      Width="90"  Binding="{Binding Fecha}" />
+                            <DataGridTemplateColumn Header="Estado" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource StatusBadgeWarning}" Padding="5,2">
+                                            <TextBlock Text="{Binding Estado}" FontSize="10" Foreground="#FF9800" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                <Style.Triggers>
+                                    <Trigger Property="HasItems" Value="False">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="DataGrid">
+                                                    <Border Height="80" Background="{StaticResource WindowBackgroundBrush}">
+                                                        <TextBlock Text="✅  No hay alertas activas"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   Foreground="#4CAF50" FontSize="13" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Style>
+                    </DataGrid>
+                </GroupBox>
+
+                <!-- Acciones Rápidas -->
+                <GroupBox Grid.Column="2" Header="Acciones Rápidas">
+                    <StackPanel Margin="6,8">
+                        <Button Content="📄  Nuevo Comprobante"
+                                Style="{StaticResource AccentButton}"
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                Click="BtnNuevoComprobante_Click" />
+                        <Button Content="🔄  Nuevo Movimiento"
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                Click="BtnNuevoMovimiento_Click" />
+                        <Button Content="📖  Ver Libro Diario"
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                Click="BtnVerLibroDiario_Click" />
+                        <Button Content="📊  Ver Informes"
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                Click="BtnVerInformes_Click" />
+                        <Separator Margin="0,4,0,8" />
+                        <Button Content="💾  Realizar Backup"
+                                Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                Click="BtnBackup_Click" />
+                        <Button Content="🏦  Importar PDF Bancario"
+                                HorizontalAlignment="Stretch"
+                                Click="BtnImportarBancos_Click" />
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+
+        </Grid>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,142 @@
+<Page x:Class="Sistema_contable.Views.Comprobantes"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Comprobantes">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Comprobante Contable" Style="{StaticResource TitleTextBlock}" />
+
+        <GroupBox Grid.Row="1" Header="Encabezado del Asiento" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Fecha:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="1" SelectedDate="{Binding AsientoActual.Fecha, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Label Grid.Row="0" Grid.Column="3" Content="Número:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding AsientoActual.Numero}" IsReadOnly="True" />
+
+                <Label Grid.Row="0" Grid.Column="6" Content="Tipo:" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="0" Grid.Column="7" SelectedValue="{Binding AsientoActual.Tipo, Mode=TwoWay}" SelectedValuePath="Content">
+                    <ComboBoxItem Content="Manual" />
+                    <ComboBoxItem Content="Apertura" />
+                    <ComboBoxItem Content="Cierre" />
+                    <ComboBoxItem Content="Ajuste" />
+                    <ComboBoxItem Content="Reexpresión" />
+                </ComboBox>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Descripción:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="7" Text="{Binding AsientoActual.Descripcion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,8,0,0" />
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="+ Nueva Línea" Command="{Binding AgregarLineaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <Button Content="- Eliminar Línea" Command="{Binding EliminarLineaCommand}" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="Seleccionar Cuenta" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="8,0" />
+            <Button Content="⟳ Actualizar Comprobantes" Click="BtnActualizarComprobantes_Click" Margin="0,0,6,0" />
+            <Button Content="↩ Reversar Comprobante" Click="BtnReversarComprobante_Click" Margin="0,0,6,0" />
+        </StackPanel>
+
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,12">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" />
+                <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding NombreCuenta}" />
+                <DataGridTextColumn Header="Debe" Width="150" Binding="{Binding Debe, StringFormat=N2}" />
+                <DataGridTextColumn Header="Haber" Width="150" Binding="{Binding Haber, StringFormat=N2}" />
+                <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="4" Background="{StaticResource AccentLightBrush}" 
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" 
+                Padding="12" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Text="Total Debe:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding TotalDebe, StringFormat=N2}" FontWeight="Bold" FontSize="16" 
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+
+                <TextBlock Grid.Column="4" Text="Total Haber:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="5" Text="{Binding TotalHaber, StringFormat=N2}" FontWeight="Bold" FontSize="16" 
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+
+                <Border Grid.Column="7" Padding="12,4">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#E2EFDA" />
+                            <Setter Property="BorderBrush" Value="#217346" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="CornerRadius" Value="4" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding EstaCuadrado}" Value="False">
+                                    <Setter Property="Background" Value="#FDE8E8" />
+                                    <Setter Property="BorderBrush" Value="#E53935" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="✓ Cuadrado" />
+                                <Setter Property="Foreground" Value="#217346" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding EstaCuadrado}" Value="False">
+                                        <Setter Property="Text" Value="✗ Descuadrado" />
+                                        <Setter Property="Foreground" Value="#E53935" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Guardar Asiento" Command="{Binding GuardarCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Nuevo Asiento" Command="{Binding NuevoAsientoCommand}" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cancelar" Command="{Binding CancelarCommand}" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Page>

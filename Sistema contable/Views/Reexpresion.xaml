@@ -1,0 +1,211 @@
+<Page x:Class="Sistema_contable.Views.Reexpresion"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1100"
+      Title="Reexpresion">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />   <!-- 0: Encabezado + selector de modo -->
+            <RowDefinition Height="Auto" />   <!-- 1: Subtítulo -->
+            <RowDefinition Height="Auto" />   <!-- 2: Aviso Reconversión 2021 (fila propia, no solapa) -->
+            <RowDefinition Height="Auto" />   <!-- 3: Parámetros (fechas, IPC, factor) -->
+            <RowDefinition Height="*"    />   <!-- 4: Partidas a reexpresar -->
+            <RowDefinition Height="Auto" />   <!-- 5: Barra de resumen -->
+            <RowDefinition Height="Auto" />   <!-- 6: Botones de acción -->
+        </Grid.RowDefinitions>
+
+        <!-- ═══ Row 0: Encabezado ═══ -->
+        <Grid Grid.Row="0" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" x:Name="TxtTitulo"
+                       Text="Reexpresión Monetaria (Ajuste por Inflación)"
+                       Style="{StaticResource TitleTextBlock}" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Modo:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <ComboBox x:Name="CmbModo" Width="240" SelectionChanged="CmbModo_SelectionChanged">
+                    <ComboBoxItem Content="Reexpresión por Inflación (IPC)" IsSelected="True" />
+                    <ComboBoxItem Content="Reconversión Monetaria 2021" />
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- ═══ Row 1: Subtítulo ═══ -->
+        <TextBlock Grid.Row="1" x:Name="TxtSubtitulo"
+                   Text="Asistente para ajustar los valores contables según el Índice de Precios al Consumidor (IPC) del BCV"
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,8" />
+
+        <!-- ═══ Row 2: Banner Reconversión 2021 (FILA PROPIA — sin solapar GrpParametros) ═══ -->
+        <Border Grid.Row="2" x:Name="PanelAviso2021" Visibility="Collapsed"
+                Background="#E3F2FD" BorderBrush="#1565C0" BorderThickness="1"
+                CornerRadius="3" Padding="14,10" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="ℹ" FontSize="18" Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock FontWeight="Bold" Foreground="#0D47A1"
+                               Text="Reconversión Monetaria 2021 — Decreto N° 4.553 del BCV" />
+                    <TextBlock Foreground="#1565C0" FontSize="12" Margin="0,3,0,0"
+                               Text="Parámetros preconfigurados: Factor = 0,000001  (1.000.000 Bs.S → 1 Bs.D). Fecha de corte: 01/10/2021." />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ═══ Row 3: Parámetros de Reexpresión ═══ -->
+        <GroupBox Grid.Row="3" x:Name="GrpParametros" Header="Parámetros de Reexpresión" Margin="0,0,0,10">
+            <Grid Margin="12,10,12,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Izquierda: fechas e IPCs -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Fechas -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Fecha Origen:"
+                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <DatePicker Grid.Row="0" Grid.Column="1"
+                                SelectedDate="{Binding FechaOrigen, Mode=TwoWay}" />
+
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Fecha Destino:"
+                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <DatePicker Grid.Row="0" Grid.Column="4"
+                                SelectedDate="{Binding FechaDestino, Mode=TwoWay}" />
+
+                    <!-- IPCs -->
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="IPC Origen:"
+                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             Text="{Binding IpcOrigen, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="IPC Destino:"
+                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="2" Grid.Column="4"
+                             Text="{Binding IpcDestino, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+                <!-- Derecha: factor calculado destacado -->
+                <Border Grid.Column="2"
+                        Background="{StaticResource AccentLightBrush}"
+                        BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                        CornerRadius="4" Padding="16,12">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Factor de Reexpresión" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding FactorCalculado, StringFormat=N6}"
+                                   FontSize="20" FontWeight="Bold"
+                                   Foreground="{StaticResource AccentDarkBrush}"
+                                   HorizontalAlignment="Center" Margin="0,6,0,4" />
+                        <TextBlock Text="IPC Destino ÷ IPC Origen" FontSize="10"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </GroupBox>
+
+        <!-- ═══ Row 4: Partidas a Reexpresar ═══ -->
+        <GroupBox Grid.Row="4" Header="Partidas a Reexpresar" Margin="0,0,0,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,6">
+                    <Button Content="↻ Actualizar" Command="{Binding ActualizarCommand}"
+                            Margin="0,0,6,0" Padding="12,4" />
+                    <Button Content="Excluir Seleccionado" Command="{Binding EliminarPartidaCommand}"
+                            Foreground="Red" Padding="12,4" />
+                </StackPanel>
+                <DataGrid Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
+                          ItemsSource="{Binding Partidas}"
+                          SelectedItem="{Binding PartidaSeleccionada, Mode=TwoWay}"
+                          SelectionMode="Single" SelectionUnit="FullRow" MinHeight="100">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="✓" Width="46"
+                                                Binding="{Binding Aplicar, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn Header="Código"          Width="100" Binding="{Binding Codigo}" />
+                        <DataGridTextColumn Header="Cuenta / Movimiento" Width="*"  Binding="{Binding Nombre}" />
+                        <DataGridTextColumn Header="Tipo"            Width="90"  Binding="{Binding Tipo}" />
+                        <DataGridTextColumn Header="Moneda"          Width="70"  Binding="{Binding Moneda}" />
+                        <DataGridTextColumn Header="Valor Original"  Width="120" Binding="{Binding ValorOriginal, StringFormat=N2}" />
+                        <DataGridTextColumn Header="Factor"          Width="90"  Binding="{Binding Factor, StringFormat=N6}" />
+                        <DataGridTextColumn Header="Valor Ajustado"  Width="120" Binding="{Binding ValorAjustado, StringFormat=N2}" />
+                        <DataGridTextColumn Header="Diferencia"      Width="110" Binding="{Binding Diferencia, StringFormat=N2}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+
+        <!-- ═══ Row 5: Barra de resumen ═══ -->
+        <Border Grid.Row="5"
+                Background="{StaticResource AccentLightBrush}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                CornerRadius="3" Padding="16,10" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PartidasSeleccionadasCount}" FontWeight="Bold" FontSize="15"
+                               Foreground="{StaticResource AccentDarkBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text=" partida(s) seleccionadas" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,28,0" HorizontalAlignment="Right">
+                    <TextBlock Text="Valor Original Total" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding ValorOriginalTotalMonedaFormato}" FontWeight="SemiBold"
+                               HorizontalAlignment="Right" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="0,0,28,0">
+                    <TextBlock Text="Valor Ajustado Total" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding ValorAjustadoTotalMonedaFormato}" FontWeight="SemiBold"
+                               HorizontalAlignment="Right" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="3">
+                    <TextBlock Text="Ajuste Neto a Registrar" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding AjusteTotalMonedaFormato}" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource AccentDarkBrush}" HorizontalAlignment="Right" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Row 6: Botones de acción ═══ -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancelar / Limpiar" Command="{Binding CancelarCommand}"
+                    Padding="16,8" Margin="0,0,8,0" />
+            <Button Content="Aplicar Reexpresión" Command="{Binding AplicarReexpresionCommand}"
+                    Style="{StaticResource AccentButton}" Padding="20,8" />
+        </StackPanel>
+    </Grid>
+</Page>
