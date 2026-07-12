@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:conv="clr-namespace:Sistema_contable.Converters"
+      xmlns:vm="clr-namespace:Sistema_contable.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="1100"
       Title="Cobranza">
@@ -28,39 +29,48 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Gestión de Cobranza" Style="{StaticResource TitleTextBlock}" />
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Gestión de Cobranza" Style="{StaticResource TitleTextBlock}" />
+                <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"
+                           Text="Registre y administre las facturas pendientes de cobro. Use '+ Nueva Factura' para agregar un cliente que le debe, luego márquela como Cobrada cuando reciba el pago." />
+            </StackPanel>
             <Button Grid.Column="1" Content="+ Nueva Factura"
                     Command="{Binding NuevaFacturaCommand}"
-                    Style="{StaticResource AccentButton}" Padding="14,6" />
+                    Style="{StaticResource AccentButton}" Padding="14,6"
+                    ToolTip="Registrar una nueva factura o deuda pendiente de cobro" />
         </Grid>
 
         <!-- Tarjetas resumen -->
         <UniformGrid Grid.Row="1" Rows="1" Columns="3" Margin="0,0,0,14">
-            <Border Style="{StaticResource SummaryCard}">
+            <Border Style="{StaticResource SummaryCard}" ToolTip="Facturas activas que aún no han sido cobradas">
                 <StackPanel>
-                    <TextBlock Text="Facturas Pendientes" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Por Cobrar" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
                     <TextBlock Text="{Binding Pendientes}" FontSize="26" FontWeight="Bold" Foreground="#FF9800" Margin="0,6,0,0" />
                     <TextBlock Text="{Binding MontoPendientes, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                    <TextBlock Text="facturas pendientes" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
             </Border>
-            <Border Style="{StaticResource SummaryCard}">
+            <Border Style="{StaticResource SummaryCard}" ToolTip="Facturas cuya fecha de vencimiento ya pasó sin ser cobradas">
                 <StackPanel>
-                    <TextBlock Text="Facturas Vencidas" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Vencidas (¡Urgente!)" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
                     <TextBlock Text="{Binding Vencidas}" FontSize="26" FontWeight="Bold" Foreground="#F44336" Margin="0,6,0,0" />
                     <TextBlock Text="{Binding MontoVencidas, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                    <TextBlock Text="requieren atención inmediata" FontSize="11" Foreground="#F44336" />
                 </StackPanel>
             </Border>
-            <Border Style="{StaticResource SummaryCard}">
+            <Border Style="{StaticResource SummaryCard}" ToolTip="Total acumulado de facturas ya cobradas exitosamente">
                 <StackPanel>
                     <TextBlock Text="Cobrado (total)" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
                     <TextBlock Text="{Binding Cobradas}" FontSize="26" FontWeight="Bold" Foreground="#4CAF50" Margin="0,6,0,0" />
                     <TextBlock Text="{Binding MontoCobradas, StringFormat='Bs. {0:N2}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                    <TextBlock Text="facturas cobradas" FontSize="11" Foreground="#4CAF50" />
                 </StackPanel>
             </Border>
         </UniformGrid>
 
         <!-- Filtros -->
-        <GroupBox Grid.Row="2" Header="Filtros" Margin="0,0,0,10">
+        <GroupBox Grid.Row="2" Header="Buscar / Filtrar facturas" Margin="0,0,0,10"
+                  ToolTip="Use los filtros para encontrar facturas específicas. Puede buscar por nombre de cliente, por estado o por rango de fechas.">
             <Grid Margin="6,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -78,24 +88,30 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" Text="{Binding FiltroCliente, UpdateSourceTrigger=PropertyChanged}"
-                         Tag="Buscar cliente o N° factura..." />
-                <ComboBox Grid.Column="2" SelectedValue="{Binding FiltroEstado}" SelectedValuePath="Content">
+                         Tag="🔍 Buscar por cliente o N° factura..."
+                         ToolTip="Escriba el nombre del cliente o el número de factura para buscar" />
+                <ComboBox Grid.Column="2" SelectedValue="{Binding FiltroEstado}" SelectedValuePath="Content"
+                          ToolTip="Filtre por estado: Pendiente = sin cobrar, Vencida = pasó la fecha, Pagada = ya cobrada">
                     <ComboBoxItem Content="Todos los estados" IsSelected="True" />
                     <ComboBoxItem Content="Pendiente" />
                     <ComboBoxItem Content="Vencida" />
                     <ComboBoxItem Content="Pagada" />
                     <ComboBoxItem Content="Anulada" />
                 </ComboBox>
-                <Label Grid.Column="4" Content="Desde:" VerticalAlignment="Center" Padding="0,0,4,0" />
+                <Label Grid.Column="4" Content="Desde:" VerticalAlignment="Center" Padding="0,0,4,0"
+                       ToolTip="Fecha de emisión inicial" />
                 <DatePicker Grid.Column="5" SelectedDate="{Binding FiltroDesde}" />
-                <Label Grid.Column="7" Content="Hasta:" VerticalAlignment="Center" Padding="0,0,4,0" />
+                <Label Grid.Column="7" Content="Hasta:" VerticalAlignment="Center" Padding="0,0,4,0"
+                       ToolTip="Fecha de emisión final" />
                 <DatePicker Grid.Column="8" SelectedDate="{Binding FiltroHasta}" />
                 <Button Grid.Column="10" Content="Aplicar"
                         Command="{Binding AplicarFiltrosCommand}"
-                        Style="{StaticResource AccentButton}" Padding="12,4" />
+                        Style="{StaticResource AccentButton}" Padding="12,4"
+                        ToolTip="Aplicar los filtros seleccionados" />
                 <Button Grid.Column="12" Content="Limpiar"
                         Command="{Binding LimpiarFiltrosCommand}"
-                        Padding="12,4" />
+                        Padding="12,4"
+                        ToolTip="Eliminar todos los filtros y ver todas las facturas" />
             </Grid>
         </GroupBox>
 
@@ -120,6 +136,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Tipo de Pago"   Width="110" Binding="{Binding TipoPago}" />
                 <DataGridTextColumn Header="Días Vencido"   Width="90"  Binding="{Binding DiasVencido}" />
                 <DataGridTemplateColumn Header="Acciones" Width="210">
                     <DataGridTemplateColumn.CellTemplate>
@@ -130,7 +147,7 @@
                                         FontSize="11" FontWeight="SemiBold"
                                         Foreground="White" Background="#388E3C"
                                         BorderThickness="0" Cursor="Hand"
-                                        ToolTip="Marcar factura como Pagada"
+                                        ToolTip="Registrar el pago: marca la factura como cobrada y genera el asiento contable"
                                         Command="{Binding DataContext.MarcarPagadaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
                                 <Button Content="✏ Editar"
@@ -138,7 +155,7 @@
                                         FontSize="11"
                                         Foreground="White" Background="#1976D2"
                                         BorderThickness="0" Cursor="Hand"
-                                        ToolTip="Editar datos de la factura"
+                                        ToolTip="Modificar los datos de esta factura (cliente, descripción, tipo de pago, fecha)"
                                         Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
                                 <Button Content="✕ Anular"
@@ -146,7 +163,7 @@
                                         FontSize="11"
                                         Foreground="White" Background="#D32F2F"
                                         BorderThickness="0" Cursor="Hand"
-                                        ToolTip="Anular esta factura"
+                                        ToolTip="Cancelar esta factura (no se puede cobrar una factura anulada)"
                                         Command="{Binding DataContext.AnularCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
                             </StackPanel>
@@ -167,12 +184,17 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="{Binding TituloFormulario}"
-                           FontSize="15" FontWeight="SemiBold"
-                           Foreground="{StaticResource AccentBrush}"
-                           Margin="0,0,0,10" />
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="{Binding TituloFormulario}"
+                               FontSize="15" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="12,0,0,0"
+                               Text="Complete los campos obligatorios (*) y haga clic en Guardar." />
+                </StackPanel>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -187,34 +209,60 @@
 
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Cliente *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
-                        <TextBox Text="{Binding EditCliente, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Text="{Binding EditCliente, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Nombre completo de la persona o empresa que debe pagar" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Descripción / Concepto" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
-                        <TextBox Text="{Binding EditDescripcion, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Text="{Binding EditDescripcion, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Describa brevemente por qué se genera este cobro (ej: Servicio de contabilidad enero)" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="4">
                         <TextBlock Text="Monto *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
                         <TextBox Text="{Binding EditMonto, UpdateSourceTrigger=PropertyChanged}"
-                                 IsEnabled="{Binding MontoEditable}" />
+                                 IsEnabled="{Binding MontoEditable}"
+                                 ToolTip="Monto total a cobrar en Bolívares. No se puede modificar después de guardar." />
                     </StackPanel>
 
                     <StackPanel Grid.Column="6">
                         <TextBlock Text="Fecha Vencimiento *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
-                        <DatePicker SelectedDate="{Binding EditFechaVencimiento}" />
+                        <DatePicker SelectedDate="{Binding EditFechaVencimiento}"
+                                    ToolTip="Fecha límite para recibir el pago. Al superarla, la factura pasará a estado Vencida." />
                     </StackPanel>
                 </Grid>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                <!-- Fila 2 del formulario: Tipo de Pago -->
+                <Grid Grid.Row="2" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Tipo de Pago *" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3" />
+                        <ComboBox ItemsSource="{x:Static vm:CobranzaViewModel.OpcionesTipoPago}"
+                                  SelectedItem="{Binding EditTipoPago}"
+                                  ToolTip="Indique la naturaleza del cobro: Mensualidad=cobro recurrente mensual, Pago Único=cobro de una sola vez, Pago Pendiente=deuda anterior, Abono Parcial=pago parcial de una deuda mayor" />
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,12,0,0">
                     <Button Content="💾  Guardar Factura"
                             Command="{Binding GuardarCommand}"
                             Style="{StaticResource AccentButton}"
-                            Padding="16,6" Margin="0,0,8,0" />
+                            Padding="16,6" Margin="0,0,8,0"
+                            ToolTip="Guardar la factura y generar el asiento contable correspondiente" />
                     <Button Content="✕  Cancelar"
                             Command="{Binding CancelarEdicionCommand}"
-                            Padding="16,6" />
+                            Padding="16,6"
+                            ToolTip="Cerrar el formulario sin guardar cambios" />
                 </StackPanel>
             </Grid>
         </Border>
