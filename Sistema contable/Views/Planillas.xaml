@@ -1,0 +1,256 @@
+<Window x:Class="Sistema_contable.Views.Planillas"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gestión de Planillas"
+        Height="720" Width="1020"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Grid.Row="0" Text="Gestión de Planillas" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="1" Text="Administre las planillas de sueldos e impuestos de la empresa."
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+        <!-- TabControl principal -->
+        <TabControl Grid.Row="2" x:Name="TabPrincipal">
+
+            <!-- Pestaña Sueldos -->
+            <TabItem Header="Sueldos y Salarios">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Encabezado de planilla -->
+                    <GroupBox Grid.Row="0" Header="Datos de la Planilla" Margin="0,0,0,12">
+                        <Grid Margin="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Content="Período:" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1">
+                                <ComboBoxItem Content="Enero 2026" IsSelected="True" />
+                                <ComboBoxItem Content="Febrero 2026" />
+                                <ComboBoxItem Content="Marzo 2026" />
+                                <ComboBoxItem Content="Abril 2026" />
+                                <ComboBoxItem Content="Mayo 2026" />
+                                <ComboBoxItem Content="Junio 2026" />
+                            </ComboBox>
+
+                            <Label Grid.Column="3" Content="Fecha Pago:" VerticalAlignment="Center" />
+                            <DatePicker Grid.Column="4" />
+
+                            <Label Grid.Column="6" Content="N° Planilla:" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="7" Text="PL-001" />
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- Barra de herramientas -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="+ Agregar Empleado" Style="{StaticResource AccentButton}"
+                                Click="BtnAgregarEmpleado_Click" Margin="0,0,6,0" />
+                        <Button Content="- Eliminar" Click="BtnEliminarEmpleado_Click" Margin="0,0,6,0" />
+                        <Separator Width="1" Margin="8,0" />
+                        <Button Content="Calcular Planilla" Click="BtnCalcularSueldos_Click" Margin="0,0,6,0" />
+                        <Button Content="Exportar Excel" Margin="0,0,6,0" />
+                    </StackPanel>
+
+                    <!-- DataGrid de empleados -->
+                    <DataGrid Grid.Row="2" x:Name="GridSueldos" AutoGenerateColumns="False"
+                              CanUserAddRows="False" Margin="0,0,0,12">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Cédula" Width="100" Binding="{Binding Cedula}" />
+                            <DataGridTextColumn Header="Nombre Completo" Width="*" Binding="{Binding Nombre}" />
+                            <DataGridTextColumn Header="Cargo" Width="150" Binding="{Binding Cargo}" />
+                            <DataGridTextColumn Header="Salario Base" Width="120" Binding="{Binding SalarioBase, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Asignaciones" Width="110" Binding="{Binding Asignaciones, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Deducciones" Width="110" Binding="{Binding Deducciones, StringFormat=N2}" />
+                            <DataGridTextColumn Header="SSO" Width="90" Binding="{Binding Sso, StringFormat=N2}" />
+                            <DataGridTextColumn Header="FAOV" Width="90" Binding="{Binding Faov, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Neto a Pagar" Width="120" Binding="{Binding NetoPagar, StringFormat=N2}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Resumen -->
+                    <Border Grid.Row="3" Background="{StaticResource AccentLightBrush}"
+                            BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Padding="12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="140" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="Total Salarios:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="Bs. 0.00" FontWeight="Bold" FontSize="14"
+                                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="Total Deducciones:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="5" Text="Bs. 0.00" FontWeight="Bold" FontSize="14"
+                                       Foreground="#E53935" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="7" Text="Total Neto:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="8" Text="Bs. 0.00" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- Pestaña Impuestos -->
+            <TabItem Header="Impuestos y Retenciones">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Filtros -->
+                    <GroupBox Grid.Row="0" Header="Filtros" Margin="0,0,0,12">
+                        <Grid Margin="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="160" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Content="Período:" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1">
+                                <ComboBoxItem Content="Primer Trimestre 2026" IsSelected="True" />
+                                <ComboBoxItem Content="Segundo Trimestre 2026" />
+                                <ComboBoxItem Content="Tercer Trimestre 2026" />
+                                <ComboBoxItem Content="Cuarto Trimestre 2026" />
+                            </ComboBox>
+
+                            <Label Grid.Column="3" Content="Tipo Impuesto:" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="4">
+                                <ComboBoxItem Content="Todos" IsSelected="True" />
+                                <ComboBoxItem Content="IVA" />
+                                <ComboBoxItem Content="ISLR" />
+                                <ComboBoxItem Content="Retenciones" />
+                            </ComboBox>
+
+                            <Label Grid.Column="6" Content="Estado:" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="7">
+                                <ComboBoxItem Content="Todos" IsSelected="True" />
+                                <ComboBoxItem Content="Pendiente" />
+                                <ComboBoxItem Content="Pagado" />
+                                <ComboBoxItem Content="Vencido" />
+                            </ComboBox>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- Barra de herramientas -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="+ Nueva Declaración" Style="{StaticResource AccentButton}"
+                                Click="BtnNuevoImpuesto_Click" Margin="0,0,6,0" />
+                        <Button Content="Calcular" Click="BtnCalcularImpuestos_Click" Margin="0,0,6,0" />
+                        <Separator Width="1" Margin="8,0" />
+                        <Button Content="Marcar como Pagado" Margin="0,0,6,0" />
+                        <Button Content="Exportar" Margin="0,0,6,0" />
+                    </StackPanel>
+
+                    <!-- DataGrid de impuestos -->
+                    <DataGrid Grid.Row="2" x:Name="GridImpuestos" AutoGenerateColumns="False"
+                              CanUserAddRows="False" Margin="0,0,0,12">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tipo" Width="120" Binding="{Binding TipoImpuesto}" />
+                            <DataGridTextColumn Header="Descripción" Width="*" Binding="{Binding Descripcion}" />
+                            <DataGridTextColumn Header="Período" Width="130" Binding="{Binding Periodo}" />
+                            <DataGridTextColumn Header="Fecha Vence" Width="110" Binding="{Binding FechaVencimiento}" />
+                            <DataGridTextColumn Header="Base Imponible" Width="130" Binding="{Binding BaseImponible, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Alícuota %" Width="90" Binding="{Binding Alicuota, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Monto" Width="120" Binding="{Binding Monto, StringFormat=N2}" />
+                            <DataGridTemplateColumn Header="Estado" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="4,2" HorizontalAlignment="Center">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FFF3E0" />
+                                                    <Setter Property="BorderBrush" Value="#FF9800" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Estado}" Value="Pagado">
+                                                            <Setter Property="Background" Value="#E2EFDA" />
+                                                            <Setter Property="BorderBrush" Value="#217346" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Estado}" Value="Vencido">
+                                                            <Setter Property="Background" Value="#FDE8E8" />
+                                                            <Setter Property="BorderBrush" Value="#E53935" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Estado}" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Resumen -->
+                    <Border Grid.Row="3" Background="{StaticResource AccentLightBrush}"
+                            BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Padding="12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="140" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="Total Pendiente:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="Bs. 0.00" FontWeight="Bold" FontSize="14"
+                                       Foreground="#FF9800" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="Total Período:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="5" Text="Bs. 0.00" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Botones de ventana -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Guardar Planilla" Style="{StaticResource AccentButton}"
+                    Click="BtnGuardar_Click" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Generar Asiento Contable" Click="BtnGenerarAsiento_Click"
+                    Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cerrar" Click="BtnCerrar_Click" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Window>

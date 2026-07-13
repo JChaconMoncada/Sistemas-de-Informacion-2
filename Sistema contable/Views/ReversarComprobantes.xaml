@@ -1,0 +1,133 @@
+<Window x:Class="Sistema_contable.Views.ReversarComprobantes"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Reversar Comprobante"
+        Height="640" Width="940"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Grid.Row="0" Text="Reversar Comprobante" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="1"
+                   Text="Seleccione un comprobante para generar un contra-asiento que anule sus efectos contables."
+                   Style="{StaticResource SubtitleTextBlock}" Margin="0,0,0,16" />
+
+        <!-- Selección de comprobante -->
+        <GroupBox Grid.Row="2" Header="Comprobante a Reversar" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="160" />
+                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Content="N° Comprobante:" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="1" x:Name="CmbComprobante" SelectionChanged="CmbComprobante_SelectionChanged">
+                    <ComboBoxItem Content="CB-2026-001" />
+                    <ComboBoxItem Content="CB-2026-002" />
+                    <ComboBoxItem Content="CB-2026-003" />
+                    <ComboBoxItem Content="CB-2026-004" />
+                    <ComboBoxItem Content="CB-2026-005" />
+                </ComboBox>
+
+                <Label Grid.Column="3" Content="Fecha Original:" VerticalAlignment="Center" />
+                <TextBox Grid.Column="4" x:Name="TxtFechaOriginal" IsReadOnly="True"
+                         Text="--/--/----" Background="{StaticResource ContentBackgroundBrush}" />
+
+                <Label Grid.Column="6" Content="Descripción:" VerticalAlignment="Center" />
+                <TextBox Grid.Column="7" x:Name="TxtDescripcionOriginal" IsReadOnly="True"
+                         Text="" Background="{StaticResource ContentBackgroundBrush}" />
+
+                <Button Grid.Column="8" Content="Cargar" Click="BtnCargarComprobante_Click"
+                        Style="{StaticResource AccentButton}" Margin="6,0,0,0" Padding="12,5" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Comprobante original (solo lectura) -->
+        <GroupBox Grid.Row="3" Header="Detalle del Comprobante Original" Margin="0,0,0,12">
+            <DataGrid x:Name="GridOriginal" AutoGenerateColumns="False"
+                      CanUserAddRows="False" IsReadOnly="True" MaxHeight="140">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" />
+                    <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding DescripcionCuenta}" />
+                    <DataGridTextColumn Header="Debe" Width="140" Binding="{Binding Debe, StringFormat=N2}" />
+                    <DataGridTextColumn Header="Haber" Width="140" Binding="{Binding Haber, StringFormat=N2}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- Datos de la reversión -->
+        <GroupBox Grid.Row="4" Header="Datos del Contra-Asiento" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Fecha Reversión:" VerticalAlignment="Center" />
+                <DatePicker Grid.Row="0" Grid.Column="1" x:Name="DtpFechaReversion" />
+
+                <Label Grid.Row="0" Grid.Column="3" Content="Motivo de Reversión:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="0" Grid.Column="4" x:Name="TxtMotivoReversion"
+                         Text="Reversión de comprobante por error" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Vista Previa Contra-Asiento:" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Margin="0,12,0,4" Grid.ColumnSpan="5" />
+
+                <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+                          x:Name="GridContraAsiento" AutoGenerateColumns="False"
+                          CanUserAddRows="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" />
+                        <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding DescripcionCuenta}" />
+                        <DataGridTextColumn Header="Debe (Reversión)" Width="150" Binding="{Binding Debe, StringFormat=N2}" />
+                        <DataGridTextColumn Header="Haber (Reversión)" Width="150" Binding="{Binding Haber, StringFormat=N2}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+
+        <!-- Nota informativa -->
+        <Border Grid.Row="5" Background="{StaticResource AccentLightBrush}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                Padding="10,8" Margin="0,0,0,12">
+            <TextBlock TextWrapping="Wrap">
+                <Run FontWeight="Bold" Text="Nota: " />
+                <Run Text="El contra-asiento invertirá los valores Debe y Haber del comprobante original. Ambos comprobantes quedarán vinculados en el sistema." />
+            </TextBlock>
+        </Border>
+
+        <!-- Botones -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Vista Previa" Click="BtnVistaPrevia_Click" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Generar Reversión" Style="{StaticResource AccentButton}"
+                    Click="BtnReversarComprobante_Click" Margin="0,0,6,0" Padding="16,8" />
+            <Button Content="Cancelar" Click="BtnCancelar_Click" Padding="16,8" />
+        </StackPanel>
+    </Grid>
+</Window>

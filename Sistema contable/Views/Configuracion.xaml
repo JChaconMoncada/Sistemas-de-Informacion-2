@@ -1,0 +1,144 @@
+<Page x:Class="Sistema_contable.Views.Configuracion"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="Configuracion">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Configuración y Backups" Style="{StaticResource TitleTextBlock}" />
+
+            <GroupBox Grid.Row="1" Header="Gestión de Backups" Margin="0,0,0,16">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="200" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button Content="Crear Backup Ahora" Command="{Binding CrearBackupCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+                        <Button Content="Restaurar Backup..." Command="{Binding RestaurarBackupCommand}" Margin="0,0,6,0" />
+                        <Separator Width="1" Margin="8,0" />
+                        <Button Content="Abrir Carpeta de Backups" Command="{Binding AbrirCarpetaBackupsCommand}" />
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="{StaticResource AccentLightBrush}" 
+                            BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" 
+                            Padding="12" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Último Backup:" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBlock Text="{Binding UltimoBackupTexto}" FontWeight="SemiBold" Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Ubicación:" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBlock Text="{Binding UltimaUbicacionBackup}" 
+                                           FontWeight="SemiBold" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <GroupBox Grid.Row="2" Header="Historial de Backups">
+                        <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                                  ItemsSource="{Binding HistorialBackups}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Fecha" Width="150" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" />
+                                <DataGridTextColumn Header="Archivo" Width="*" Binding="{Binding NombreArchivo}" />
+                                <DataGridTextColumn Header="Tamaño" Width="100" Binding="{Binding Tamaño}" />
+                                <DataGridTemplateColumn Header="Acciones" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="Restaurar" Width="70" Height="24" Margin="2"
+                                                        Command="{Binding DataContext.RestaurarDesdeHistorialCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Row="2" Header="Configuración Fiscal" Margin="0,0,0,16">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="Porcentaje IVA:" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PorcentajeIva, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="4,0,0,0" />
+
+                    <Label Grid.Row="0" Grid.Column="3" Content="Porcentaje ISLR:" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding PorcentajeIslr, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="0" Grid.Column="5" Text="%" VerticalAlignment="Center" Margin="4,0,0,0" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Content="Régimen Fiscal:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                              ItemsSource="{Binding RegimenesFiscales}" SelectedItem="{Binding RegimenFiscal, Mode=TwoWay}" />
+
+                    <Label Grid.Row="2" Grid.Column="0" Content="Moneda Base:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                              ItemsSource="{Binding MonedasBase}" SelectedItem="{Binding MonedaBase, Mode=TwoWay}" />
+
+                    <Label Grid.Row="3" Grid.Column="0" Content="Ejercicio Fiscal:" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                              ItemsSource="{Binding EjerciciosFiscales}" SelectedItem="{Binding EjercicioFiscal, Mode=TwoWay}" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Row="3" Header="Configuración General">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <CheckBox Grid.Row="0" Content="Habilitar autoguardado" IsChecked="{Binding AutoguardadoHabilitado, Mode=TwoWay}" Margin="0,0,0,8" />
+                    <CheckBox Grid.Row="1" Content="Crear backup automático periódicamente" IsChecked="{Binding BackupAutomaticoHabilitado, Mode=TwoWay}" Margin="0,0,0,8" />
+                    <CheckBox Grid.Row="2" Content="Mostrar alertas de vencimientos tributarios" IsChecked="{Binding MostrarAlertasVencimientos, Mode=TwoWay}" Margin="0,0,0,8" />
+                    <CheckBox Grid.Row="3" Content="Confirmar antes de eliminar registros" IsChecked="{Binding ConfirmarAntesDeEliminar, Mode=TwoWay}" Margin="0,0,0,16" />
+
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <Button Content="Guardar Configuración" Command="{Binding GuardarConfiguracionCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" Padding="16,8" />
+                        <Button Content="Restaurar Valores Predeterminados" Command="{Binding RestaurarValoresPredeterminadosCommand}" Padding="16,8" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
+</Page>
