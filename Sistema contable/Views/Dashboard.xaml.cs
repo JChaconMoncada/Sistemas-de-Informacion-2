@@ -41,7 +41,12 @@ namespace Sistema_contable.Views
         }
 
         private void BtnBackup_Click(object sender, RoutedEventArgs e)
-            => GetMain()?.MenuBackup_Click(sender, e);
+        {
+            if (GetMain()?.DataContext is ViewModels.MainWindowViewModel vm)
+            {
+                vm.RealizarBackupCommand.Execute(null);
+            }
+        }
 
         private void BtnImportarBancos_Click(object sender, RoutedEventArgs e)
         {

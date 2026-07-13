@@ -11,9 +11,6 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}" Padding="4">
             <MenuItem Header="_Archivo">
-                <MenuItem Header="Realizar Backup" Click="MenuBackup_Click" />
-                <MenuItem Header="Restaurar Backup" Click="MenuRestore_Click" />
-                <Separator />
                 <MenuItem Header="Salir" Click="MenuSalir_Click" />
             </MenuItem>
             <MenuItem Header="_Empresas">
@@ -51,8 +48,6 @@
                 <MenuItem Header="Flujo de Efectivo" Click="MenuInformes_Click" />
             </MenuItem>
             <MenuItem Header="_Herramientas">
-                <MenuItem Header="Realizar Backup" Click="MenuBackup_Click" />
-                <MenuItem Header="Restaurar Backup" Click="MenuRestore_Click" />
                 <MenuItem Header="Abrir Carpeta de Backups" Click="MenuAbrirCarpetaBackups_Click" />
                 <Separator />
                 <MenuItem Header="Reexpresión Monetaria" Click="MenuReexpresion_Click" />
@@ -71,7 +66,7 @@
             </StatusBarItem>
             <Separator />
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="Backup: No realizado" Foreground="{StaticResource TextSecondaryBrush}" />
+                <TextBlock Text="{Binding UltimoBackupStatus}" Foreground="{StaticResource TextSecondaryBrush}" />
             </StatusBarItem>
         </StatusBar>
 
@@ -99,6 +94,24 @@
                                     Style="{StaticResource AccentButton}" FontSize="11"
                                     Click="BtnGestionarEmpresas_Click" ToolTip="Crear o gestionar empresas" />
                         </Grid>
+                    </Border>
+
+                    <!-- ── Sección de Backup (Abajo) ── -->
+                    <Border DockPanel.Dock="Bottom" Background="{StaticResource DataGridHeaderBackgroundBrush}" 
+                            Padding="12" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,1,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Backups" FontWeight="SemiBold" FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10" />
+                            
+                            <Button Content="Realizar Backup" 
+                                    Command="{Binding RealizarBackupCommand}"
+                                    Style="{StaticResource AccentButton}"
+                                    Margin="0,0,0,8" Padding="10,6" />
+                            
+                            <Button Content="Cargar Backup" 
+                                    Command="{Binding RestaurarBackupCommand}"
+                                    Padding="10,6" />
+                        </StackPanel>
                     </Border>
 
                     <!-- ── Lista de empresas (ocupa el espacio restante) ── -->

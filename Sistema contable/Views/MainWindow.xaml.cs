@@ -37,14 +37,9 @@ namespace Sistema_contable.Views
         }
 
         // Menu Handlers
-        internal void MenuBackup_Click(object sender, RoutedEventArgs e)
+        private void MenuSalir_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 10;
-        }
-
-        private void MenuRestore_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 10;
+            Application.Current.Shutdown();
         }
 
         private void MenuAbrirCarpetaBackups_Click(object sender, RoutedEventArgs e)
@@ -54,11 +49,6 @@ namespace Sistema_contable.Views
             {
                 viewModel.AbrirCarpetaBackups();
             }
-        }
-
-        private void MenuSalir_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
         }
 
         private void MenuNuevaEmpresa_Click(object sender, RoutedEventArgs e)
