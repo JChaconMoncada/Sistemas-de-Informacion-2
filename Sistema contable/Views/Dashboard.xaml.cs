@@ -53,5 +53,6 @@ namespace Sistema_contable.Views
             if (GetMain() is MainWindow main)
                 main.MainTabControl.SelectedIndex = 9;
         }
+
     }
 }
