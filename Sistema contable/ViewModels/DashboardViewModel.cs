@@ -16,6 +16,9 @@ namespace Sistema_contable.ViewModels
         public string Descripcion { get; set; } = string.Empty;
         public string Fecha       { get; set; } = string.Empty;
         public string Estado      { get; set; } = string.Empty;
+        public int    IdFactura   { get; set; } = 0;
+        public string ColorEstado { get; set; } = "#FF9800";
+        public bool   EsCobranza  { get; set; } = false;
     }
 
     public class MovimientoReciente
@@ -101,14 +104,30 @@ namespace Sistema_contable.ViewModels
         }
 
         // ── Comandos ──────────────────────────────────────────────────────────────
-        public ICommand RefrescarCommand { get; }
+        public ICommand RefrescarCommand           { get; }
+        public ICommand MarcarPagadaAlertaCommand  { get; }
 
         public DashboardViewModel()
         {
             _svc = ContabilidadService.Instance;
-            RefrescarCommand = new RelayCommand(() => CargarDatos());
+            RefrescarCommand          = new RelayCommand(() => CargarDatos());
+            MarcarPagadaAlertaCommand = new RelayCommand<AlertaDashboard>(EjecutarMarcarPagadaAlerta);
             _svc.OnEmpresaCambiada += CargarDatos;
             CargarDatos();
+        }
+
+        private void EjecutarMarcarPagadaAlerta(AlertaDashboard? alerta)
+        {
+            if (alerta == null || alerta.IdFactura == 0) return;
+            try
+            {
+                _svc.MarcarFacturaPagada(alerta.IdFactura);
+                CargarDatos();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void CargarDatos()
@@ -226,7 +245,10 @@ namespace Sistema_contable.ViewModels
                     Tipo        = "Cobranza Vencida",
                     Descripcion = $"{f.NumeroFactura} – {f.NombreCliente} | {f.TipoPago} | Bs. {f.Monto:N2}",
                     Fecha       = f.FechaVencimiento.ToString("dd/MM/yyyy"),
-                    Estado      = $"Vencida ({f.DiasVencido}d)"
+                    Estado      = $"Vencida ({f.DiasVencido}d)",
+                    IdFactura   = f.Id,
+                    ColorEstado = "#F44336",
+                    EsCobranza  = true
                 });
 
             foreach (var f in facturasCobranza
@@ -240,7 +262,27 @@ namespace Sistema_contable.ViewModels
                     Tipo        = "Por Vencer",
                     Descripcion = $"{f.NumeroFactura} – {f.NombreCliente} | {f.TipoPago} | Bs. {f.Monto:N2}",
                     Fecha       = f.FechaVencimiento.ToString("dd/MM/yyyy"),
-                    Estado      = f.DiasRestantes == 0 ? "Vence hoy" : $"Vence en {f.DiasRestantes}d"
+                    Estado      = f.DiasRestantes == 0 ? "Vence hoy" : $"Vence en {f.DiasRestantes}d",
+                    IdFactura   = f.Id,
+                    ColorEstado = "#FF9800",
+                    EsCobranza  = true
+                });
+
+            foreach (var f in facturasCobranza
+                .Where(f => f.Estado == "Pendiente"
+                         && f.DiasRestantes > 5
+                         && f.DiasRestantes <= 20)
+                .Take(3))
+                alertas.Add(new AlertaDashboard
+                {
+                    Icono       = "🔵",
+                    Tipo        = "Próxima a Vencer",
+                    Descripcion = $"{f.NumeroFactura} – {f.NombreCliente} | {f.TipoPago} | Bs. {f.Monto:N2}",
+                    Fecha       = f.FechaVencimiento.ToString("dd/MM/yyyy"),
+                    Estado      = $"Vence en {f.DiasRestantes}d",
+                    IdFactura   = f.Id,
+                    ColorEstado = "#1976D2",
+                    EsCobranza  = true
                 });
 
             AlertasPendientes = alertas.Count;

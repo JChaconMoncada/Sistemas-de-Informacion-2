@@ -150,7 +150,7 @@ public class ContabilidadService
                 IdEmpresa       = empresaId,
                 Fecha           = factura.FechaEmision,
                 Descripcion     = $"Factura {factura.NumeroFactura} – {cliente}",
-                TipoComprobante = "Ingreso",
+                TipoComprobante = "Egreso",
                 Estado          = "Registrado"
             };
             compEmision.Lineas.Add(new AsientoLinea { CodigoCuenta = "1.1.02.01", DescripcionCuenta = "Clientes Nacionales", Debe = monto, Haber = 0 });
@@ -639,7 +639,7 @@ public class ContabilidadService
                 IdEmpresa       = EmpresaActivaId.Value,
                 Fecha           = factura.FechaEmision,
                 Descripcion     = $"Factura {factura.NumeroFactura} – {factura.NombreCliente}",
-                TipoComprobante = "Ingreso",
+                TipoComprobante = "Egreso",
                 Estado          = "Registrado"
             };
             compEmision.Lineas.Add(new AsientoLinea
