@@ -84,6 +84,7 @@ namespace Sistema_contable.ViewModels
         public ICommand CancelarCommand { get; }
         public ICommand AgregarFilaCommand { get; }
         public ICommand EliminarFilaCommand { get; }
+        public ICommand EliminarErroresCommand { get; }
 
         public BancosViewModel()
         {
@@ -98,6 +99,7 @@ namespace Sistema_contable.ViewModels
             CancelarCommand = new RelayCommand(() => Cancelar());
             AgregarFilaCommand = new RelayCommand(() => AgregarFila());
             EliminarFilaCommand = new RelayCommand<TransaccionBancariaViewModel>(tx => EliminarFila(tx));
+            EliminarErroresCommand = new RelayCommand(() => EliminarErrores());
 
             CargarCuentas();
             _contabilidadService.OnEmpresaCambiada += CargarCuentas;
@@ -172,6 +174,15 @@ namespace Sistema_contable.ViewModels
                 {
                     SelectedTransaccion = null;
                 }
+            }
+        }
+
+        private void EliminarErrores()
+        {
+            var errores = Transacciones.Where(t => t.IsError).ToList();
+            foreach (var error in errores)
+            {
+                Transacciones.Remove(error);
             }
         }
 
@@ -333,7 +344,9 @@ namespace Sistema_contable.ViewModels
                         Fecha = tx.Fecha ?? DateTime.Now,
                         Descripcion = $"Importación bancaria: {tx.Descripcion} (Ref: {tx.Referencia})",
                         TipoComprobante = "Diario",
-                        Estado = "Pendiente de Validación"
+                        Estado = "Pendiente de Validación",
+                        MontoTotal = tx.Debito > 0 ? tx.Debito : tx.Credito,
+                        CuentaAsociada = tx.CuentaSeleccionada?.Nombre ?? ""
                     };
 
                     if (tx.Debito > 0)

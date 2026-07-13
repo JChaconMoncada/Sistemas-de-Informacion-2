@@ -68,7 +68,7 @@
                             <ItemsControl ItemsSource="{Binding Lineas}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,2">
+                                        <Grid Margin="{Binding Margen}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="90" />
                                                 <ColumnDefinition Width="*" />
@@ -81,6 +81,9 @@
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding EsEncabezado}" Value="True">
                                                 <Setter Property="TextElement.FontWeight" Value="Bold" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding EsCuentaPadre}" Value="True">
+                                                <Setter Property="TextElement.FontWeight" Value="SemiBold" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding EsTotal}" Value="True">
                                                 <Setter Property="TextElement.FontWeight" Value="SemiBold" />

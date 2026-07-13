@@ -8,6 +8,7 @@ using SistemaContableZulay.UI.Domain;
 using Documento = Sistema_contable.Models.Documento;
 using ConfiguracionSistema = Sistema_contable.Models.ConfiguracionSistema;
 using BackupInfo = Sistema_contable.Models.BackupInfo;
+using HistorialReexpresion = Sistema_contable.Models.HistorialReexpresion;
 
 namespace SistemaContableZulay.UI.Services;
 
@@ -27,6 +28,12 @@ public class ContabilidadService
         OnEmpresaCambiada?.Invoke();
     }
 
+    public EmpresaCliente ObtenerEmpresaActiva()
+    {
+        if (EmpresaActivaId == null) return null;
+        return _empresasGuardadas.FirstOrDefault(e => e.Id == EmpresaActivaId.Value);
+    }
+
     private readonly string _datosPath;
     private readonly string _comprobantesFile;
     private readonly string _cuentasFile;
@@ -35,6 +42,7 @@ public class ContabilidadService
     private readonly string _facturasFile;
     private readonly string _documentosFile;
     private readonly string _configuracionFile;
+    private readonly string _historialReexpresionesFile;
 
     private List<ComprobanteContable> _comprobantesGuardados = new();
     private List<CuentaContable> _cuentasGuardadas = new();
@@ -42,6 +50,7 @@ public class ContabilidadService
     private List<PeriodoFiscal> _periodosFiscales = new();
     private List<FacturaCobranza> _facturasCobranza = new();
     private List<Documento> _documentosGuardados = new();
+    private List<HistorialReexpresion> _historialReexpresiones = new();
     private ConfiguracionSistema _configuracion = new();
 
     private ContabilidadService()
@@ -59,6 +68,7 @@ public class ContabilidadService
         _facturasFile  = Path.Combine(_datosPath, "facturas.xml");
         _documentosFile = Path.Combine(_datosPath, "documentos.xml");
         _configuracionFile = Path.Combine(_datosPath, "configuracion.xml");
+        _historialReexpresionesFile = Path.Combine(_datosPath, "historial_reexpresiones.xml");
 
         CargarDatos();
     }
@@ -71,6 +81,7 @@ public class ContabilidadService
         _periodosFiscales = CargarLista<PeriodoFiscal>(_periodosFile) ?? new List<PeriodoFiscal>();
         _facturasCobranza = CargarLista<FacturaCobranza>(_facturasFile) ?? new List<FacturaCobranza>();
         _documentosGuardados = CargarLista<Documento>(_documentosFile) ?? new List<Documento>();
+        _historialReexpresiones = CargarLista<HistorialReexpresion>(_historialReexpresionesFile) ?? new List<HistorialReexpresion>();
         _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
 
         SembrarCuentasPorDefecto();
@@ -776,5 +787,68 @@ public class ContabilidadService
         }
 
         return 0m;
+    }
+
+    // ─── Historial de Reexpresiones ───────────────────────────────────────────
+
+    public List<HistorialReexpresion> ObtenerHistorialReexpresiones(string codigoCuenta = null)
+    {
+        if (EmpresaActivaId == null) return new List<HistorialReexpresion>();
+
+        var query = _historialReexpresiones.Where(h => h.IdEmpresa == EmpresaActivaId.Value && !h.Anulado);
+
+        if (!string.IsNullOrEmpty(codigoCuenta))
+        {
+            query = query.Where(h => h.CodigoCuenta == codigoCuenta);
+        }
+
+        return query.OrderByDescending(h => h.FechaCalculo).ToList();
+    }
+
+    public void GuardarHistorialReexpresion(HistorialReexpresion historial)
+    {
+        if (EmpresaActivaId == null) throw new InvalidOperationException("No hay empresa activa seleccionada.");
+
+        if (historial.Id == 0)
+        {
+            historial.Id = _historialReexpresiones.Count > 0 ? _historialReexpresiones.Max(h => h.Id) + 1 : 1;
+        }
+
+        historial.IdEmpresa = EmpresaActivaId.Value;
+
+        var existente = _historialReexpresiones.FirstOrDefault(h => h.Id == historial.Id);
+        if (existente != null) _historialReexpresiones.Remove(existente);
+
+        _historialReexpresiones.Add(historial);
+        GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
+    }
+
+    public void RestaurarReexpresion(int idHistorial)
+    {
+        var historial = _historialReexpresiones.FirstOrDefault(h => h.Id == idHistorial);
+        if (historial == null || historial.Anulado) return;
+
+        // 1. Eliminar o reversar el comprobante generado
+        if (historial.IdComprobanteAsociado > 0)
+        {
+            EliminarComprobante(historial.IdComprobanteAsociado);
+        }
+
+        // 2. Marcar el historial como anulado
+        historial.Anulado = true;
+        GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
+    }
+
+    public void DesactivarComprobanteReexpresion(int idHistorial)
+    {
+        var historial = _historialReexpresiones.FirstOrDefault(h => h.Id == idHistorial);
+        if (historial == null || historial.Anulado) return;
+
+        if (historial.IdComprobanteAsociado > 0)
+        {
+            EliminarComprobante(historial.IdComprobanteAsociado);
+            historial.IdComprobanteAsociado = 0;
+            GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
+        }
     }
 }

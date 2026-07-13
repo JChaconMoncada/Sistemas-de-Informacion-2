@@ -87,6 +87,7 @@
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
                     <Button Content="Agregar Fila" Command="{Binding AgregarFilaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,8,0" Padding="12,6" />
                     <Button Content="Eliminar Fila Seleccionada" Command="{Binding EliminarFilaCommand}" CommandParameter="{Binding SelectedItem, ElementName=GridTransacciones}" Margin="0,0,8,0" Padding="12,6" />
+                    <Button Content="Eliminar Errores (Rojos)" Command="{Binding EliminarErroresCommand}" Background="#D32F2F" Foreground="White" BorderThickness="0" Margin="0,0,8,0" Padding="12,6" />
                 </StackPanel>
 
                 <GroupBox Header="Transacciones Extraídas - Mapeo a Cuentas Contables">
