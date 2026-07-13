@@ -6,6 +6,7 @@ namespace SistemaContableZulay.UI.Domain;
 
 public class ComprobanteContable
 {
+    public int Id { get; set; }
     public int IdComprobante { get; set; }
     public DateTime Fecha { get; set; } = DateTime.Now;
     public string Descripcion { get; set; } = string.Empty;
@@ -14,6 +15,9 @@ public class ComprobanteContable
     public string Estado { get; set; } = "Pendiente de Validación";
     public decimal MontoTotal { get; set; }
     public string Moneda { get; set; } = "Bs";
+
+    public Guid SyncId { get; set; } = Guid.NewGuid();
+    public bool Sincronizado { get; set; } = false;
     public string CuentaAsociada { get; set; } = string.Empty; // Added to easily show in DataGrid
     public List<AsientoLinea> Lineas { get; set; } = new();
 

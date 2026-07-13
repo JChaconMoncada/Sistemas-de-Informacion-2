@@ -16,7 +16,11 @@ namespace SistemaContableZulay.UI.Domain
         public string Estado { get; set; } = "Pendiente";
         public DateTime? FechaPago { get; set; }
         public int IdComprobanteEmision { get; set; }
-        public int IdComprobantePago { get; set; }
+        public int? IdComprobantePago { get; set; }
+        public int? IdComprobanteReversion { get; set; }
+
+        public Guid SyncId { get; set; } = Guid.NewGuid();
+        public bool Sincronizado { get; set; } = false;
 
         [XmlIgnore]
         public int DiasVencido =>

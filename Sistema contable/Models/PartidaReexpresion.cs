@@ -2,6 +2,7 @@ namespace SistemaContableZulay.UI.Domain
 {
     public class PartidaReexpresion : Sistema_contable.ViewModels.ViewModelBase
     {
+        public int Id { get; set; }
         private bool _aplicar = false;
         private string _codigo = string.Empty;
         private string _nombre = string.Empty;
