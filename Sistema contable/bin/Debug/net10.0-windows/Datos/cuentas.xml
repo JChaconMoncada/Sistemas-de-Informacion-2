@@ -1,0 +1,941 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfCuentaContable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CuentaContable>
+    <Codigo>1.0.00.00</Codigo>
+    <Nombre>Activo</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>1.1.00.00</Codigo>
+        <Nombre>Activo Corriente</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>1.0.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>1.1.01.00</Codigo>
+            <Nombre>Efectivo y Equivalentes</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>1.1.00.00</CuentaPadre>
+            <AceptaMovimiento>false</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos>
+              <CuentaContable>
+                <Codigo>1.1.01.01</Codigo>
+                <Nombre>Caja General</Nombre>
+                <Tipo>Activo</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>1.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+              <CuentaContable>
+                <Codigo>1.1.01.02</Codigo>
+                <Nombre>Banco Mercantil 0105</Nombre>
+                <Tipo>Activo</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>1.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+              <CuentaContable>
+                <Codigo>1.1.01.03</Codigo>
+                <Nombre>Banco Banesco 0134</Nombre>
+                <Tipo>Activo</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>1.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+            </Hijos>
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>1.1.02.00</Codigo>
+            <Nombre>Cuentas por Cobrar</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>1.1.00.00</CuentaPadre>
+            <AceptaMovimiento>false</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos>
+              <CuentaContable>
+                <Codigo>1.1.02.01</Codigo>
+                <Nombre>Clientes Nacionales</Nombre>
+                <Tipo>Activo</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>1.1.02.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+            </Hijos>
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.00.00</Codigo>
+    <Nombre>Activo Corriente</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>2</Nivel>
+    <CuentaPadre>1.0.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>1.1.01.00</Codigo>
+        <Nombre>Efectivo y Equivalentes</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>1.1.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>1.1.01.01</Codigo>
+            <Nombre>Caja General</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>1.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>1.1.01.02</Codigo>
+            <Nombre>Banco Mercantil 0105</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>1.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>1.1.01.03</Codigo>
+            <Nombre>Banco Banesco 0134</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>1.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>1.1.02.00</Codigo>
+        <Nombre>Cuentas por Cobrar</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>1.1.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>1.1.02.01</Codigo>
+            <Nombre>Clientes Nacionales</Nombre>
+            <Tipo>Activo</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>1.1.02.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.01.00</Codigo>
+    <Nombre>Efectivo y Equivalentes</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>1.1.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>1.1.01.01</Codigo>
+        <Nombre>Caja General</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>1.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>1.1.01.02</Codigo>
+        <Nombre>Banco Mercantil 0105</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>1.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>1.1.01.03</Codigo>
+        <Nombre>Banco Banesco 0134</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>1.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.01.01</Codigo>
+    <Nombre>Caja General</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>1.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.01.02</Codigo>
+    <Nombre>Banco Mercantil 0105</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>1.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.01.03</Codigo>
+    <Nombre>Banco Banesco 0134</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>1.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.02.00</Codigo>
+    <Nombre>Cuentas por Cobrar</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>1.1.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>1.1.02.01</Codigo>
+        <Nombre>Clientes Nacionales</Nombre>
+        <Tipo>Activo</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>1.1.02.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>1.1.02.01</Codigo>
+    <Nombre>Clientes Nacionales</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>1.1.02.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>2.0.00.00</Codigo>
+    <Nombre>Pasivo</Nombre>
+    <Tipo>Pasivo</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>2.1.00.00</Codigo>
+        <Nombre>Pasivo Corriente</Nombre>
+        <Tipo>Pasivo</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>2.0.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>2.1.01.00</Codigo>
+            <Nombre>Cuentas por Pagar Comerciales</Nombre>
+            <Tipo>Pasivo</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>2.1.00.00</CuentaPadre>
+            <AceptaMovimiento>false</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos>
+              <CuentaContable>
+                <Codigo>2.1.01.01</Codigo>
+                <Nombre>Proveedores Locales</Nombre>
+                <Tipo>Pasivo</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>2.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+            </Hijos>
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>2.1.00.00</Codigo>
+    <Nombre>Pasivo Corriente</Nombre>
+    <Tipo>Pasivo</Tipo>
+    <Nivel>2</Nivel>
+    <CuentaPadre>2.0.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>2.1.01.00</Codigo>
+        <Nombre>Cuentas por Pagar Comerciales</Nombre>
+        <Tipo>Pasivo</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>2.1.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>2.1.01.01</Codigo>
+            <Nombre>Proveedores Locales</Nombre>
+            <Tipo>Pasivo</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>2.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>2.1.01.00</Codigo>
+    <Nombre>Cuentas por Pagar Comerciales</Nombre>
+    <Tipo>Pasivo</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>2.1.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>2.1.01.01</Codigo>
+        <Nombre>Proveedores Locales</Nombre>
+        <Tipo>Pasivo</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>2.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>2.1.01.01</Codigo>
+    <Nombre>Proveedores Locales</Nombre>
+    <Tipo>Pasivo</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>2.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>3.0.00.00</Codigo>
+    <Nombre>Patrimonio</Nombre>
+    <Tipo>Patrimonio</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>3.1.00.00</Codigo>
+        <Nombre>Capital Social</Nombre>
+        <Tipo>Patrimonio</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>3.0.00.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>3.2.00.00</Codigo>
+        <Nombre>Resultados Acumulados</Nombre>
+        <Tipo>Patrimonio</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>3.0.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>3.2.01.00</Codigo>
+            <Nombre>Resultado por Exposición a la Inflación (REI)</Nombre>
+            <Tipo>Patrimonio</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>3.2.00.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>3.1.00.00</Codigo>
+    <Nombre>Capital Social</Nombre>
+    <Tipo>Patrimonio</Tipo>
+    <Nivel>2</Nivel>
+    <CuentaPadre>3.0.00.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>3.2.00.00</Codigo>
+    <Nombre>Resultados Acumulados</Nombre>
+    <Tipo>Patrimonio</Tipo>
+    <Nivel>2</Nivel>
+    <CuentaPadre>3.0.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>3.2.01.00</Codigo>
+        <Nombre>Resultado por Exposición a la Inflación (REI)</Nombre>
+        <Tipo>Patrimonio</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>3.2.00.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>3.2.01.00</Codigo>
+    <Nombre>Resultado por Exposición a la Inflación (REI)</Nombre>
+    <Tipo>Patrimonio</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>3.2.00.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>4.0.00.00</Codigo>
+    <Nombre>Ingresos</Nombre>
+    <Tipo>Ingreso</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>4.1.00.00</Codigo>
+        <Nombre>Ingresos Operacionales</Nombre>
+        <Tipo>Ingreso</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>4.0.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>4.1.01.00</Codigo>
+            <Nombre>Ventas</Nombre>
+            <Tipo>Ingreso</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>4.1.00.00</CuentaPadre>
+            <AceptaMovimiento>false</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos>
+              <CuentaContable>
+                <Codigo>4.1.01.01</Codigo>
+                <Nombre>Ventas de Bienes / Servicios</Nombre>
+                <Tipo>Ingreso</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>4.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+            </Hijos>
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>4.1.00.00</Codigo>
+    <Nombre>Ingresos Operacionales</Nombre>
+    <Tipo>Ingreso</Tipo>
+    <Nivel>2</Nivel>
+    <CuentaPadre>4.0.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>4.1.01.00</Codigo>
+        <Nombre>Ventas</Nombre>
+        <Tipo>Ingreso</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>4.1.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>4.1.01.01</Codigo>
+            <Nombre>Ventas de Bienes / Servicios</Nombre>
+            <Tipo>Ingreso</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>4.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>4.1.01.00</Codigo>
+    <Nombre>Ventas</Nombre>
+    <Tipo>Ingreso</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>4.1.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>4.1.01.01</Codigo>
+        <Nombre>Ventas de Bienes / Servicios</Nombre>
+        <Tipo>Ingreso</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>4.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>4.1.01.01</Codigo>
+    <Nombre>Ventas de Bienes / Servicios</Nombre>
+    <Tipo>Ingreso</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>4.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.0.00.00</Codigo>
+    <Nombre>Egresos y Gastos</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>5.1.00.00</Codigo>
+        <Nombre>Gastos de Operación</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>2</Nivel>
+        <CuentaPadre>5.0.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>5.1.01.00</Codigo>
+            <Nombre>Gastos Administrativos</Nombre>
+            <Tipo>Egreso</Tipo>
+            <Nivel>3</Nivel>
+            <CuentaPadre>5.1.00.00</CuentaPadre>
+            <AceptaMovimiento>false</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos>
+              <CuentaContable>
+                <Codigo>5.1.01.01</Codigo>
+                <Nombre>Gastos de Alquiler</Nombre>
+                <Tipo>Egreso</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>5.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+              <CuentaContable>
+                <Codigo>5.1.01.02</Codigo>
+                <Nombre>Gastos de Servicios Públicos</Nombre>
+                <Tipo>Egreso</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>5.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+              <CuentaContable>
+                <Codigo>5.1.01.03</Codigo>
+                <Nombre>Comisiones Bancarias</Nombre>
+                <Tipo>Egreso</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>5.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+              <CuentaContable>
+                <Codigo>5.1.01.04</Codigo>
+                <Nombre>Gastos de Honorarios Profesionales</Nombre>
+                <Tipo>Egreso</Tipo>
+                <Nivel>4</Nivel>
+                <CuentaPadre>5.1.01.00</CuentaPadre>
+                <AceptaMovimiento>true</AceptaMovimiento>
+                <Activo>true</Activo>
+                <Hijos />
+                <Descripcion />
+                <IsVisible>true</IsVisible>
+                <IsExpanded>false</IsExpanded>
+              </CuentaContable>
+            </Hijos>
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.01.00</Codigo>
+    <Nombre>Gastos Administrativos</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>3</Nivel>
+    <CuentaPadre>5.1.00.00</CuentaPadre>
+    <AceptaMovimiento>false</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos>
+      <CuentaContable>
+        <Codigo>5.1.01.01</Codigo>
+        <Nombre>Gastos de Alquiler</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>5.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>5.1.01.02</Codigo>
+        <Nombre>Gastos de Servicios Públicos</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>5.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>5.1.01.03</Codigo>
+        <Nombre>Comisiones Bancarias</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>5.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+      <CuentaContable>
+        <Codigo>5.1.01.04</Codigo>
+        <Nombre>Gastos de Honorarios Profesionales</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>4</Nivel>
+        <CuentaPadre>5.1.01.00</CuentaPadre>
+        <AceptaMovimiento>true</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos />
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.01.01</Codigo>
+    <Nombre>Gastos de Alquiler</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>5.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.01.02</Codigo>
+    <Nombre>Gastos de Servicios Públicos</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>5.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.01.03</Codigo>
+    <Nombre>Comisiones Bancarias</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>5.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.01.04</Codigo>
+    <Nombre>Gastos de Honorarios Profesionales</Nombre>
+    <Tipo>Egreso</Tipo>
+    <Nivel>4</Nivel>
+    <CuentaPadre>5.1.01.00</CuentaPadre>
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion />
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>5.1.00.00</Codigo>
+    <Nombre>Nueva Cuenta</Nombre>
+    <Tipo>Gasto</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion>sisa</Descripcion>
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+</ArrayOfCuentaContable>
