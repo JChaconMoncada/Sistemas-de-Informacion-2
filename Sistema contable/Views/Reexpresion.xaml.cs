@@ -14,6 +14,14 @@ namespace Sistema_contable.Views
         {
             InitializeComponent();
             DataContext = new ReexpresionViewModel();
+            this.IsVisibleChanged += (s, e) =>
+            {
+                if (this.IsVisible && this.DataContext is ReexpresionViewModel vm)
+                {
+                    if (vm.ActualizarCommand.CanExecute(null))
+                        vm.ActualizarCommand.Execute(null);
+                }
+            };
         }
 
         private void GridPartidas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

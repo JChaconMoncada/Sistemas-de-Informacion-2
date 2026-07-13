@@ -344,7 +344,7 @@ namespace Sistema_contable.ViewModels
                         Fecha = tx.Fecha ?? DateTime.Now,
                         Descripcion = $"Importación bancaria: {tx.Descripcion} (Ref: {tx.Referencia})",
                         TipoComprobante = "Diario",
-                        Estado = "Pendiente de Validación",
+                        Estado = "Registrado",
                         MontoTotal = tx.Debito > 0 ? tx.Debito : tx.Credito,
                         CuentaAsociada = tx.CuentaSeleccionada?.Nombre ?? ""
                     };
@@ -392,7 +392,7 @@ namespace Sistema_contable.ViewModels
                     importadas++;
                 }
 
-                MessageBox.Show($"Se han importado exitosamente {importadas} transacciones como comprobantes contables en estado 'Pendiente de Validación'.", "Importación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Se han importado exitosamente {importadas} transacciones como comprobantes contables en estado 'Registrado'.", "Importación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
                 
                 FilePath = string.Empty;
                 RawText = string.Empty;

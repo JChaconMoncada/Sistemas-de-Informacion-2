@@ -271,15 +271,12 @@ namespace Sistema_contable.ViewModels
 
             foreach (var partida in Partidas.Where(p => p.Aplicar && p.Diferencia > 0))
             {
-                // Eliminar comprobantes anteriores para no duplicar el ajuste en el saldo de la cuenta
-                var historialesAnteriores = _contabilidadService.ObtenerHistorialReexpresiones(partida.Codigo);
+                // Eliminar reexpresiones anteriores DEL MISMO MOVIMIENTO para no duplicar el ajuste
+                var historialesAnteriores = _contabilidadService.ObtenerHistorialReexpresiones(partida.Codigo)
+                                                .Where(h => h.IdMovimientoOriginal == partida.IdMovimientoOriginal);
                 foreach (var ant in historialesAnteriores)
                 {
-                    if (ant.IdComprobanteAsociado > 0)
-                    {
-                        _contabilidadService.EliminarComprobante(ant.IdComprobanteAsociado);
-                        ant.IdComprobanteAsociado = 0; // Desvincular el comprobante
-                    }
+                    _contabilidadService.RestaurarReexpresion(ant.Id);
                 }
 
                 // Generar Asiento individual
@@ -347,7 +344,11 @@ namespace Sistema_contable.ViewModels
             if (res == MessageBoxResult.Yes)
             {
                 _contabilidadService.RestaurarReexpresion(historial.Id);
-                CargarPartidas();
+                var partidaPadre = Partidas.FirstOrDefault(p => p.IdMovimientoOriginal == historial.IdMovimientoOriginal && p.Codigo == historial.CodigoCuenta);
+                if (partidaPadre != null)
+                {
+                    partidaPadre.HistorialesAnteriores.Remove(historial);
+                }
             }
         }
 

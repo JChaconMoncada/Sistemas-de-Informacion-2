@@ -84,6 +84,21 @@ public class ContabilidadService
         _historialReexpresiones = CargarLista<HistorialReexpresion>(_historialReexpresionesFile) ?? new List<HistorialReexpresion>();
         _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
 
+        bool guardadoNecesario = false;
+        foreach (var c in _comprobantesGuardados)
+        {
+            if (c.MontoTotal == 0 && c.Lineas != null && c.Lineas.Count > 0)
+            {
+                c.MontoTotal = c.TotalDebe;
+                guardadoNecesario = true;
+            }
+        }
+        
+        if (guardadoNecesario)
+        {
+            GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        }
+
         SembrarCuentasPorDefecto();
 
         GuardarEmpresas();
@@ -755,14 +770,23 @@ public class ContabilidadService
 
     public decimal ObtenerSaldoCuentaAFecha(string codigoCuenta, DateTime fechaCorte)
     {
+        return ObtenerSaldoCuentaEntreFechas(codigoCuenta, null, fechaCorte);
+    }
+
+    public decimal ObtenerSaldoCuentaEntreFechas(string codigoCuenta, DateTime? fechaInicio, DateTime fechaFin)
+    {
         if (EmpresaActivaId == null) return 0m;
 
         var cuenta = _cuentasGuardadas.FirstOrDefault(c => c.Codigo == codigoCuenta);
         if (cuenta == null) return 0m;
 
-        var comprobantes = _comprobantesGuardados
-            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaCorte.Date)
-            .ToList();
+        var query = _comprobantesGuardados.Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaFin.Date);
+        if (fechaInicio.HasValue)
+        {
+            query = query.Where(c => c.Fecha.Date >= fechaInicio.Value.Date);
+        }
+
+        var comprobantes = query.ToList();
 
         decimal totalDebe = 0m;
         decimal totalHaber = 0m;

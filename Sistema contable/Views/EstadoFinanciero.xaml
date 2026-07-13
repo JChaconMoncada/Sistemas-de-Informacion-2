@@ -40,9 +40,12 @@
                     <TextBox Text="{Binding TasaCambioTexto, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="8,0" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,0,16"/>
                 </StackPanel>
 
-                <!-- Fecha -->
-                <TextBlock Text="Fecha de Corte:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
-                <DatePicker SelectedDate="{Binding FechaCorte, UpdateSourceTrigger=PropertyChanged}" Height="36" FontSize="14" Margin="0,0,0,24" />
+                <!-- Fechas -->
+                <TextBlock Text="Fecha de Inicio:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                <DatePicker SelectedDate="{Binding FechaInicio, UpdateSourceTrigger=PropertyChanged}" KeyUp="DatePicker_KeyUp" Height="36" FontSize="14" Margin="0,0,0,16" />
+
+                <TextBlock Text="Fecha Final:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                <DatePicker SelectedDate="{Binding FechaCorte, UpdateSourceTrigger=PropertyChanged}" KeyUp="DatePicker_KeyUp" Height="36" FontSize="14" Margin="0,0,0,24" />
 
                 <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,1,0,0" Margin="-24,0,-24,20" />
 

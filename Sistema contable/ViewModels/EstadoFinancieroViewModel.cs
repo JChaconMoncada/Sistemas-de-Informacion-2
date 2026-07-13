@@ -50,6 +50,7 @@ namespace Sistema_contable.ViewModels
         private readonly ContabilidadService _contabilidadService;
 
         private ObservableCollection<NodoEstadoFinanciero> _nodos;
+        private DateTime _fechaInicio;
         private DateTime _fechaCorte;
         private string _tituloReporte;
         private string _subtituloReporte;
@@ -64,6 +65,12 @@ namespace Sistema_contable.ViewModels
         {
             get => _nodos;
             set => SetProperty(ref _nodos, value);
+        }
+
+        public DateTime FechaInicio
+        {
+            get => _fechaInicio;
+            set { if (SetProperty(ref _fechaInicio, value)) GenerarReporte(); }
         }
 
         public DateTime FechaCorte
@@ -182,6 +189,7 @@ namespace Sistema_contable.ViewModels
             _contabilidadService = ContabilidadService.Instance;
             Nodos = new ObservableCollection<NodoEstadoFinanciero>();
 
+            _fechaInicio = new DateTime(DateTime.Now.Year, 1, 1);
             _fechaCorte = DateTime.Now;
             _tasaCambio = 1m;
 
@@ -241,7 +249,7 @@ namespace Sistema_contable.ViewModels
             foreach (var c in cuentas.Where(x => x.AceptaMovimiento))
             {
                 if (c.Codigo == "3.2.01.00") continue; // Ignorar REI a petición del usuario
-                decimal saldoMonto = _contabilidadService.ObtenerSaldoCuentaAFecha(c.Codigo, FechaCorte);
+                decimal saldoMonto = _contabilidadService.ObtenerSaldoCuentaEntreFechas(c.Codigo, FechaInicio, FechaCorte);
                 
                 if (MonedaSeleccionada.Contains("COP") || MonedaSeleccionada.Contains("Pesos"))
                 {
@@ -349,7 +357,7 @@ namespace Sistema_contable.ViewModels
             
             string sufijoMoneda = MonedaSeleccionada == "Bolívares (Bs) - Oficial" ? "" : $" (Expresado en {MonedaSeleccionada})";
             TituloReporte = $"ESTADO FINANCIERO DETALLADO{sufijoMoneda}";
-            SubtituloReporte = $"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
+            SubtituloReporte = $"Del {FechaInicio:dd/MM/yyyy} al {FechaCorte:dd/MM/yyyy}";
             TieneDatos = rootNodos.Any();
         }
 
@@ -505,7 +513,7 @@ namespace Sistema_contable.ViewModels
                 {
                     column.Item().Text("ESTADO FINANCIERO").FontSize(20).SemiBold().FontColor(Colors.Blue.Darken2);
                     column.Item().Text(empresa).FontSize(14).FontColor(Colors.Grey.Darken3);
-                    column.Item().Text($"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}").FontSize(12).FontColor(Colors.Grey.Medium);
+                    column.Item().Text($"Del {FechaInicio:dd/MM/yyyy} al {FechaCorte:dd/MM/yyyy}").FontSize(12).FontColor(Colors.Grey.Medium);
                 });
 
                 row.ConstantItem(150).AlignRight().Column(column =>
