@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using Sistema_contable.Models;
+
 namespace SistemaContableZulay.UI.Domain
 {
     public class PartidaReexpresion : Sistema_contable.ViewModels.ViewModelBase
@@ -6,11 +9,23 @@ namespace SistemaContableZulay.UI.Domain
         private string _codigo = string.Empty;
         private string _nombre = string.Empty;
         private string _tipo = string.Empty;
+        private string _moneda = "Bs";
         private decimal _valorOriginal;
         private decimal _factor = 1m;
         private decimal _valorAjustado;
         private decimal _diferencia;
-        private string _moneda = "Bs";
+        private string _descripcionDetalle = string.Empty;
+        private bool _isExpanded;
+
+        public int IdMovimientoOriginal { get; set; }
+
+        public ObservableCollection<HistorialReexpresion> HistorialesAnteriores { get; } = new ObservableCollection<HistorialReexpresion>();
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => SetProperty(ref _isExpanded, value);
+        }
 
         public bool Aplicar
         {
@@ -71,6 +86,14 @@ namespace SistemaContableZulay.UI.Domain
             get => _diferencia;
             set => SetProperty(ref _diferencia, value);
         }
+
+        public string DescripcionDetalle
+        {
+            get => _descripcionDetalle;
+            set => SetProperty(ref _descripcionDetalle, value);
+        }
+
+        public bool TieneHistorialesAnteriores => HistorialesAnteriores.Count > 0;
 
         public void CalcularAjuste()
         {

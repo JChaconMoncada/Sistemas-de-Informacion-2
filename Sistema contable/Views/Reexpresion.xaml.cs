@@ -1,6 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 using Sistema_contable.ViewModels;
+using SistemaContableZulay.UI.Domain;
+using Sistema_contable.Models;
 
 namespace Sistema_contable.Views
 {
@@ -10,32 +14,68 @@ namespace Sistema_contable.Views
         {
             InitializeComponent();
             DataContext = new ReexpresionViewModel();
+            this.IsVisibleChanged += (s, e) =>
+            {
+                if (this.IsVisible && this.DataContext is ReexpresionViewModel vm)
+                {
+                    if (vm.ActualizarCommand.CanExecute(null))
+                        vm.ActualizarCommand.Execute(null);
+                }
+            };
         }
 
-        public void ActivarModoReconversion2021()
+        private void GridPartidas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CmbModo.SelectedIndex = 1;
+            if (e.OriginalSource is DependencyObject depObj)
+            {
+                // Dejar que el ToggleButton maneje su propio click para expandir
+                var btn = FindAncestor<ToggleButton>(depObj);
+                if (btn != null) return;
+
+                // Si hizo click en los detalles de la fila (ej. botones de historial), no hacer toggle de la fila
+                var details = FindAncestor<DataGridDetailsPresenter>(depObj);
+                if (details != null) return;
+                
+                var row = FindAncestor<DataGridRow>(depObj);
+                if (row != null && row.Item is PartidaReexpresion partida)
+                {
+                    partida.Aplicar = !partida.Aplicar;
+                    
+                    if (DataContext is ReexpresionViewModel vm)
+                    {
+                        vm.PartidaSeleccionada = partida;
+                    }
+                    
+                    // Prevenir que el DataGrid haga su selección nativa y expanda detalles automáticamente
+                    e.Handled = true; 
+                }
+            }
         }
 
-        private void CmbModo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void BtnExpandir_Click(object sender, RoutedEventArgs e)
         {
-            if (!IsLoaded) return;
+            if (sender is ToggleButton btn)
+            {
+                var row = FindAncestor<DataGridRow>(btn);
+                if (row != null)
+                {
+                    row.DetailsVisibility = btn.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+        }
 
-            bool esReconversion = CmbModo.SelectedIndex == 1;
-
-            if (DataContext is ReexpresionViewModel vm)
-                vm.SetModoReconversion2021(esReconversion);
-
-            TxtTitulo.Text = esReconversion
-                ? "Reconversión Monetaria 2021"
-                : "Reexpresión Monetaria (Ajuste por Inflación)";
-
-            TxtSubtitulo.Text = esReconversion
-                ? "Reconversión según el Decreto N° 4.553 del BCV: 1.000.000 Bs. S equivalen a 1 Bs. D (Bolívar Digital)."
-                : "Asistente para ajustar los valores contables según el Índice de Precios al Consumidor (IPC) del BCV";
-
-            PanelAviso2021.Visibility = esReconversion ? Visibility.Visible : Visibility.Collapsed;
-            GrpParametros.IsEnabled = !esReconversion;
+        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
         }
     }
 }

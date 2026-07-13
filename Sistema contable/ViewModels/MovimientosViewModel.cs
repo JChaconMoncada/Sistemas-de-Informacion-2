@@ -87,12 +87,14 @@ namespace Sistema_contable.ViewModels
 
         public ICommand GuardarMovimientoCommand { get; }
         public ICommand EliminarMovimientoCommand { get; }
+        public ICommand RefrescarCommand { get; }
 
         public MovimientosViewModel()
         {
             _contabilidadService = ContabilidadService.Instance;
             GuardarMovimientoCommand = new RelayCommand(ExecuteGuardarMovimiento, CanGuardarMovimiento);
             EliminarMovimientoCommand = new RelayCommand(ExecuteEliminarMovimiento, () => ComprobanteSeleccionado != null);
+            RefrescarCommand = new RelayCommand(CargarDatos);
             
             _contabilidadService.OnEmpresaCambiada += CargarDatos;
             CargarDatos();

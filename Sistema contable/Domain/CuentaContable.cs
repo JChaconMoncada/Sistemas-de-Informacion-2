@@ -11,7 +11,11 @@ public class CuentaContable : INotifyPropertyChanged
     public string CuentaPadre { get; set; } = string.Empty;
     public bool AceptaMovimiento { get; set; } = true;
     public bool Activo { get; set; } = true;
+
     public ObservableCollection<CuentaContable> Hijos { get; set; } = new ObservableCollection<CuentaContable>(); 
+    public string Descripcion { get; set; } = string.Empty;
+
+
     public string DisplayName => $"{Codigo} - {Nombre}";
     private bool _isVisible = true;
     public bool IsVisible

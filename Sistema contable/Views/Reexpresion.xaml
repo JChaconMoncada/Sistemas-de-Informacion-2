@@ -7,6 +7,10 @@
       d:DesignHeight="720" d:DesignWidth="1100"
       Title="Reexpresion">
 
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />   <!-- 0: Encabezado + selector de modo -->
@@ -24,16 +28,9 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" x:Name="TxtTitulo"
+            <TextBlock Grid.Column="0" Grid.ColumnSpan="2" x:Name="TxtTitulo"
                        Text="Reexpresión Monetaria (Ajuste por Inflación)"
                        Style="{StaticResource TitleTextBlock}" VerticalAlignment="Center" />
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Modo:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
-                <ComboBox x:Name="CmbModo" Width="240" SelectionChanged="CmbModo_SelectionChanged">
-                    <ComboBoxItem Content="Reexpresión por Inflación (IPC)" IsSelected="True" />
-                    <ComboBoxItem Content="Reconversión Monetaria 2021" />
-                </ComboBox>
-            </StackPanel>
         </Grid>
 
         <!-- ═══ Row 1: Subtítulo ═══ -->
@@ -137,22 +134,101 @@
                     <Button Content="Excluir Seleccionado" Command="{Binding EliminarPartidaCommand}"
                             Foreground="Red" Padding="12,4" />
                 </StackPanel>
-                <DataGrid Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
-                          ItemsSource="{Binding Partidas}"
+                <DataGrid x:Name="GridPartidas" ItemsSource="{Binding Partidas}" AutoGenerateColumns="False" 
+                          CanUserAddRows="False" CanUserDeleteRows="False" Background="White"
+                          RowHeight="34" BorderBrush="#E0E0E0" BorderThickness="1"
+                          SelectionMode="Single" SelectionUnit="FullRow"
                           SelectedItem="{Binding PartidaSeleccionada, Mode=TwoWay}"
-                          SelectionMode="Single" SelectionUnit="FullRow" MinHeight="100">
+                          PreviewMouseLeftButtonDown="GridPartidas_PreviewMouseLeftButtonDown">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="DetailsVisibility" Value="Collapsed" />
+                        </Style>
+                    </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Header="✓" Width="46"
-                                                Binding="{Binding Aplicar, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn Header="Código"          Width="100" Binding="{Binding Codigo}" />
-                        <DataGridTextColumn Header="Cuenta / Movimiento" Width="*"  Binding="{Binding Nombre}" />
-                        <DataGridTextColumn Header="Tipo"            Width="90"  Binding="{Binding Tipo}" />
-                        <DataGridTextColumn Header="Moneda"          Width="70"  Binding="{Binding Moneda}" />
-                        <DataGridTextColumn Header="Valor Original"  Width="120" Binding="{Binding ValorOriginal, StringFormat=N2}" />
-                        <DataGridTextColumn Header="Factor"          Width="90"  Binding="{Binding Factor, StringFormat=N6}" />
-                        <DataGridTextColumn Header="Valor Ajustado"  Width="120" Binding="{Binding ValorAjustado, StringFormat=N2}" />
-                        <DataGridTextColumn Header="Diferencia"      Width="110" Binding="{Binding Diferencia, StringFormat=N2}" />
+                        <DataGridTemplateColumn Width="36">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ToggleButton x:Name="BtnExpandir" Content="▼" Width="20" Height="20" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Ver Historial y Detalles" Click="BtnExpandir_Click" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridCheckBoxColumn Header="✓" Width="46" IsReadOnly="True"
+                                                Binding="{Binding Aplicar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn Header="Código"          Width="100" Binding="{Binding Codigo}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Cuenta / Movimiento" Width="*"  Binding="{Binding Nombre}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Tipo"            Width="90"  Binding="{Binding Tipo}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Precio de compra"  Width="120" Binding="{Binding ValorOriginal, StringFormat=N2}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Factor (calculado)" Width="120"  Binding="{Binding Factor, StringFormat=N6}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Valor Calculado"  Width="120" Binding="{Binding ValorAjustado, StringFormat=N2}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Diferencia (Ajuste)" Width="130" Binding="{Binding Diferencia, StringFormat=N2}" IsReadOnly="True" />
                     </DataGrid.Columns>
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate>
+                            <Border Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1" Margin="40,4,4,8" Padding="12" CornerRadius="4">
+                                <StackPanel>
+                                    <StackPanel Visibility="{Binding TieneHistorialesAnteriores, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TextBlock Text="Cálculos de Reexpresión Previos:" FontWeight="SemiBold" Foreground="#555" Margin="0,0,0,6" />
+                                        
+                                        <ItemsControl ItemsSource="{Binding HistorialesAnteriores}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,0,0,8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="150" />
+                                                            <ColumnDefinition Width="150" />
+                                                            <ColumnDefinition Width="150" />
+                                                            <ColumnDefinition Width="150" />
+                                                            <ColumnDefinition Width="150" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Text="Fecha" FontSize="11" Foreground="#777" />
+                                                            <TextBlock Text="{Binding FechaCalculo, StringFormat=dd-MM-yyyy}" FontWeight="Medium" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock Text="Factor Anterior" FontSize="11" Foreground="#777" />
+                                                            <TextBlock Text="{Binding FactorAplicado, StringFormat=N6}" FontWeight="Medium" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock Text="Ajuste" FontSize="11" Foreground="#777" />
+                                                            <TextBlock Text="{Binding MontoAjuste, StringFormat=N2}" FontWeight="Medium" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="3">
+                                                            <TextBlock Text="Nuevo Valor" FontSize="11" Foreground="#777" />
+                                                            <TextBlock Text="{Binding ValorAjustado, StringFormat=N2}" FontWeight="Medium" Foreground="#E03A3E" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                            <Button Content="Usar" Margin="0,0,4,0" Padding="8,2" FontSize="11"
+                                                                    Command="{Binding DataContext.UsarHistorialCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Reactivar esta reexpresión" />
+                                                            <Button Content="🗑️" Padding="4,2" FontSize="11" Background="#FFF" BorderBrush="#DDD"
+                                                                    Command="{Binding DataContext.EliminarHistorialCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Eliminar historial" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding TieneHistorialesAnteriores}" Value="False">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="Aún no hay historial de reexpresión para este movimiento" FontStyle="Italic" Foreground="#999" HorizontalAlignment="Center" Margin="0,10" />
+                                    </StackPanel>
+                                    
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
                 </DataGrid>
             </Grid>
         </GroupBox>

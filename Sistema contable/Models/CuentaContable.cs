@@ -11,5 +11,6 @@ namespace Sistema_contable.Models
         public int? CuentaPadreId { get; set; }
         public bool AceptaMovimiento { get; set; }
         public bool Activo { get; set; }
+        public string Descripcion { get; set; }
     }
 }
