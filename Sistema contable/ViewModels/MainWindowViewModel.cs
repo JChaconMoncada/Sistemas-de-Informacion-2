@@ -67,6 +67,10 @@ namespace Sistema_contable.ViewModels
                 _empresaSeleccionada = Empresas.FirstOrDefault(e => e.Id == _contabilidadService.EmpresaActivaId.Value);
                 OnPropertyChanged(nameof(EmpresaSeleccionada));
             }
+            else if (Empresas.Count == 1)
+            {
+                EmpresaSeleccionada = Empresas[0];
+            }
         }
     }
 }

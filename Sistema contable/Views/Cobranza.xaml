@@ -130,8 +130,25 @@
                 <DataGridTemplateColumn Header="Estado" Width="90">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource StatusBadge}" Padding="6,2">
-                                <TextBlock Text="{Binding Estado}" FontSize="11" />
+                            <Border Padding="6,2" CornerRadius="4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#FF9800" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Estado}" Value="Vencida">
+                                                <Setter Property="Background" Value="#F44336" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Estado}" Value="Pagada">
+                                                <Setter Property="Background" Value="#4CAF50" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Estado}" Value="Anulada">
+                                                <Setter Property="Background" Value="#9E9E9E" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding Estado}" FontSize="11"
+                                           Foreground="White" FontWeight="SemiBold" />
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
