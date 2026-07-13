@@ -190,8 +190,8 @@
 
                 <!-- Alertas reales -->
                 <GroupBox Grid.Column="0" Header="Alertas Activas">
-                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False"
-                              ItemsSource="{Binding Alertas}" MaxHeight="220">
+                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                              ItemsSource="{Binding Alertas}" MaxHeight="200">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header=""            Width="28"  Binding="{Binding Icono}" IsReadOnly="True" />
                             <DataGridTextColumn Header="Tipo"        Width="150" Binding="{Binding Tipo}"  IsReadOnly="True" />

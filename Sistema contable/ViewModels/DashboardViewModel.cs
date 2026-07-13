@@ -9,16 +9,27 @@ using SistemaContableZulay.UI.Services;
 
 namespace Sistema_contable.ViewModels
 {
-    public class AlertaDashboard
+    public class AlertaDashboard : System.ComponentModel.INotifyPropertyChanged
     {
-        public string Icono       { get; set; } = string.Empty;
-        public string Tipo        { get; set; } = string.Empty;
-        public string Descripcion { get; set; } = string.Empty;
-        public string Fecha       { get; set; } = string.Empty;
-        public string Estado      { get; set; } = string.Empty;
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+        private void Notify(string p) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(p));
+
+        private string _icono       = string.Empty;
+        private string _tipo        = string.Empty;
+        private string _descripcion = string.Empty;
+        private string _fecha       = string.Empty;
+        private string _estado      = string.Empty;
+        private string _colorEstado = "#FF9800";
+        private bool   _esCobranza  = false;
+
+        public string Icono       { get => _icono;       set { _icono       = value; Notify(nameof(Icono));       } }
+        public string Tipo        { get => _tipo;        set { _tipo        = value; Notify(nameof(Tipo));        } }
+        public string Descripcion { get => _descripcion; set { _descripcion = value; Notify(nameof(Descripcion)); } }
+        public string Fecha       { get => _fecha;       set { _fecha       = value; Notify(nameof(Fecha));       } }
+        public string Estado      { get => _estado;      set { _estado      = value; Notify(nameof(Estado));      } }
+        public string ColorEstado { get => _colorEstado; set { _colorEstado = value; Notify(nameof(ColorEstado)); } }
+        public bool   EsCobranza  { get => _esCobranza;  set { _esCobranza  = value; Notify(nameof(EsCobranza));  } }
         public int    IdFactura   { get; set; } = 0;
-        public string ColorEstado { get; set; } = "#FF9800";
-        public bool   EsCobranza  { get; set; } = false;
     }
 
     public class MovimientoReciente
@@ -112,21 +123,51 @@ namespace Sistema_contable.ViewModels
             _svc = ContabilidadService.Instance;
             RefrescarCommand          = new RelayCommand(() => CargarDatos());
             MarcarPagadaAlertaCommand = new RelayCommand<AlertaDashboard>(EjecutarMarcarPagadaAlerta);
-            _svc.OnEmpresaCambiada += CargarDatos;
+            _svc.OnEmpresaCambiada     += () => System.Windows.Application.Current.Dispatcher.Invoke(CargarDatos);
+            _svc.OnFacturasModificadas += OnFacturasModificadasHandler;
             CargarDatos();
         }
+
+        private void OnFacturasModificadasHandler()
+            => System.Windows.Application.Current.Dispatcher.Invoke(CargarDatos);
 
         private void EjecutarMarcarPagadaAlerta(AlertaDashboard? alerta)
         {
             if (alerta == null || alerta.IdFactura == 0) return;
             try
             {
+                // Desuscribir para que CargarDatos no borre la alerta que vamos a modificar
+                _svc.OnFacturasModificadas -= OnFacturasModificadasHandler;
+
                 _svc.MarcarFacturaPagada(alerta.IdFactura);
-                CargarDatos();
+
+                alerta.Icono       = "✅";
+                alerta.Tipo        = "Cobro Registrado";
+                alerta.Descripcion = $"Su deuda ha sido pagada – {alerta.Descripcion}";
+                alerta.Estado      = "Pagada";
+                alerta.ColorEstado = "#4CAF50";
+                alerta.EsCobranza  = false;
+
+                var idx = Alertas.IndexOf(alerta);
+                if (idx >= 0)
+                {
+                    Alertas.RemoveAt(idx);
+                    Alertas.Insert(idx, alerta);
+                }
+
+                AlertasPendientes = Alertas.Count(a => a.EsCobranza);
+                SubtituloAlertas  = AlertasPendientes > 0
+                    ? $"{AlertasPendientes} requieren atención"
+                    : "Sin alertas activas";
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+            finally
+            {
+                // Volver a suscribir para cambios futuros (ej: pagar desde Cobranza)
+                _svc.OnFacturasModificadas += OnFacturasModificadasHandler;
             }
         }
 
