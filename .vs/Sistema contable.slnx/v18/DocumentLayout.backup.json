@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\supre\\Downloads\\Sistemas-de-Informacion-2-main-ORIGINAL\\Sistemas-de-Informacion-2-main\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8CFC1504-6A6E-4ABA-9512-CFCD98DF4F94}|Sistema contable\\Sistema contable.csproj|c:\\users\\supre\\downloads\\sistemas-de-informacion-2-main-original\\sistemas-de-informacion-2-main\\sistema contable\\sistema contable.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{8CFC1504-6A6E-4ABA-9512-CFCD98DF4F94}|Sistema contable\\Sistema contable.csproj|solutionrelative:sistema contable\\sistema contable.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Sistema contable",
+              "DocumentMoniker": "C:\\Users\\supre\\Downloads\\Sistemas-de-Informacion-2-main-ORIGINAL\\Sistemas-de-Informacion-2-main\\Sistema contable\\Sistema contable.csproj",
+              "RelativeDocumentMoniker": "Sistema contable\\Sistema contable.csproj",
+              "ToolTip": "C:\\Users\\supre\\Downloads\\Sistemas-de-Informacion-2-main-ORIGINAL\\Sistemas-de-Informacion-2-main\\Sistema contable\\Sistema contable.csproj",
+              "RelativeToolTip": "Sistema contable\\Sistema contable.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-07-12T20:58:35.744Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
