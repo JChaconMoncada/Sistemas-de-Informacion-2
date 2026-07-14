@@ -67,7 +67,7 @@ namespace Sistema_contable.ViewModels
 
         public ObservableCollection<string> TiposReporte { get; } = new ObservableCollection<string>
         {
-            "Estado de Resultados", "Flujo de Efectivo (simplificado)"
+            "Estado de Resultados", "Estado de Flujo de Caja", "Notas y Conclusiones"
         };
 
         public ObservableCollection<int> EjerciciosDisponibles { get; } = new ObservableCollection<int>();
@@ -231,25 +231,44 @@ namespace Sistema_contable.ViewModels
         private void GenerarEstadoResultados()
         {
             ActualizarEncabezado();
+
             var resumen = _contabilidadService.ObtenerResumenEjercicio(EjercicioSeleccionado);
-            var resultado = new ObservableCollection<LineaReporte>
+            var detalle = _contabilidadService.ObtenerDetalleEstadoResultados(EjercicioSeleccionado);
+
+            var resultado = new ObservableCollection<LineaReporte>();
+
+            // ── INGRESOS ──────────────────────────────────────────────
+            resultado.Add(new LineaReporte { Nombre = "INGRESOS", EsEncabezado = true });
+            if (detalle.DetalleIngresos.Any())
             {
-                new LineaReporte { Nombre = "INGRESOS", EsEncabezado = true },
-                new LineaReporte { Nombre = "Total Ingresos", Monto = resumen.TotalIngresos, EsTotal = true },
-                new LineaReporte { Nombre = "EGRESOS Y GASTOS", EsEncabezado = true },
-                new LineaReporte { Nombre = "Total Egresos", Monto = resumen.TotalEgresos, EsTotal = true },
-                new LineaReporte
-                {
-                    Nombre = resumen.Resultado >= 0 ? "UTILIDAD DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO",
-                    Monto = resumen.Resultado,
-                    EsTotal = true
-                }
-            };
+                foreach (var item in detalle.DetalleIngresos)
+                    resultado.Add(new LineaReporte { Codigo = item.Codigo, Nombre = item.Nombre, Monto = item.Monto });
+            }
+            resultado.Add(new LineaReporte { Nombre = "Total Ingresos", Monto = resumen.TotalIngresos, EsTotal = true });
+
+            // ── EGRESOS ───────────────────────────────────────────────
+            resultado.Add(new LineaReporte { Nombre = "EGRESOS Y GASTOS", EsEncabezado = true });
+            if (detalle.DetalleEgresos.Any())
+            {
+                foreach (var item in detalle.DetalleEgresos)
+                    resultado.Add(new LineaReporte { Codigo = item.Codigo, Nombre = item.Nombre, Monto = item.Monto });
+            }
+            resultado.Add(new LineaReporte { Nombre = "Total Egresos", Monto = resumen.TotalEgresos, EsTotal = true });
+
+            // ── RESULTADO ─────────────────────────────────────────────
+            resultado.Add(new LineaReporte
+            {
+                Nombre = resumen.Resultado >= 0 ? "UTILIDAD DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO",
+                Monto = resumen.Resultado,
+                EsTotal = true
+            });
 
             Lineas = resultado;
             TituloReporte = "ESTADO DE RESULTADOS";
+            SubtituloReporte = $"{NombreEmpresa} — Ejercicio Fiscal {EjercicioSeleccionado}";
             TieneDatos = resumen.TotalIngresos != 0 || resumen.TotalEgresos != 0;
         }
+
 
         private void GenerarFlujoCaja()
         {
@@ -320,6 +339,7 @@ namespace Sistema_contable.ViewModels
 
             Lineas = resultado;
             TituloReporte = "ESTADO DE FLUJO DE CAJA";
+            SubtituloReporte = $"{NombreEmpresa} — Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
             TieneDatos = entradas != 0 || salidas != 0;
         }
 
@@ -328,6 +348,7 @@ namespace Sistema_contable.ViewModels
             Lineas = new ObservableCollection<LineaReporte>();
             TituloReporte = "NOTAS, CONCLUSIONES Y RECOMENDACIONES";
             ActualizarEncabezado();
+            SubtituloReporte = $"{NombreEmpresa} — {PeriodoCubierto}";
             TieneDatos = !string.IsNullOrEmpty(NotasExplicativas) || !string.IsNullOrEmpty(ConclusionesRecomendaciones);
         }
 

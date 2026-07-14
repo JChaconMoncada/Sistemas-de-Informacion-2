@@ -491,7 +491,10 @@ public class ContabilidadService
             .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Year == anio)
             .ToList();
 
-        var cuentas = _cuentasGuardadas;
+        // Construir diccionario de cuentas para búsqueda rápida
+        var cuentasDict = _cuentasGuardadas
+            .GroupBy(c => c.Codigo)
+            .ToDictionary(g => g.Key, g => g.First());
 
         decimal totalIngresos = 0;
         decimal totalEgresos = 0;
@@ -500,13 +503,42 @@ public class ContabilidadService
         {
             foreach (var linea in comp.Lineas)
             {
-                var cuenta = cuentas.FirstOrDefault(c => c.Codigo == linea.CodigoCuenta);
-                if (cuenta == null) continue;
+                if (string.IsNullOrEmpty(linea.CodigoCuenta)) continue;
 
-                if (cuenta.Tipo == "Ingreso")
-                    totalIngresos += linea.Haber - linea.Debe;
-                else if (cuenta.Tipo == "Egreso")
-                    totalEgresos += linea.Debe - linea.Haber;
+                // Determinar el tipo de cuenta: usar Tipo si está disponible,
+                // si no, inferir por el código (4.x = Ingreso, 5.x = Egreso)
+                string tipo = null;
+                if (cuentasDict.TryGetValue(linea.CodigoCuenta, out var cuenta))
+                {
+                    tipo = cuenta.Tipo;
+                }
+
+                // Si Tipo está vacío o no reconocido, inferir por el prefijo del código
+                if (string.IsNullOrEmpty(tipo) || (tipo != "Ingreso" && tipo != "Egreso"))
+                {
+                    if (linea.CodigoCuenta.StartsWith("4."))
+                        tipo = "Ingreso";
+                    else if (linea.CodigoCuenta.StartsWith("5."))
+                        tipo = "Egreso";
+                    else
+                        continue;
+                }
+
+                if (tipo == "Ingreso")
+                {
+                    // Saldo normal de ingreso: Haber - Debe
+                    // Si la empresa registró al revés (Debe en cuenta ingreso), tomamos el valor absoluto
+                    var saldo = linea.Haber - linea.Debe;
+                    if (saldo < 0) saldo = -saldo; // protección ante asiento invertido
+                    totalIngresos += saldo;
+                }
+                else if (tipo == "Egreso")
+                {
+                    // Saldo normal de egreso: Debe - Haber
+                    var saldo = linea.Debe - linea.Haber;
+                    if (saldo < 0) saldo = -saldo; // protección ante asiento invertido
+                    totalEgresos += saldo;
+                }
             }
         }
 
@@ -517,6 +549,80 @@ public class ContabilidadService
             TotalEgresos = totalEgresos,
             Resultado = totalIngresos - totalEgresos
         };
+    }
+
+    public DetalleEstadoResultados ObtenerDetalleEstadoResultados(int anio)
+    {
+        var detalle = new DetalleEstadoResultados();
+        if (EmpresaActivaId == null) return detalle;
+
+        using var db = new ContabilidadDbContext();
+        var comprobantes = db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Year == anio)
+            .ToList();
+
+        var cuentasDict = _cuentasGuardadas
+            .GroupBy(c => c.Codigo)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // Acumular montos por cuenta (código → monto)
+        var acumIngresos = new Dictionary<string, (string Nombre, decimal Monto)>();
+        var acumEgresos  = new Dictionary<string, (string Nombre, decimal Monto)>();
+
+        foreach (var comp in comprobantes)
+        {
+            foreach (var linea in comp.Lineas)
+            {
+                if (string.IsNullOrEmpty(linea.CodigoCuenta)) continue;
+
+                string tipo = null;
+                string nombre = linea.CodigoCuenta;
+                if (cuentasDict.TryGetValue(linea.CodigoCuenta, out var cuenta))
+                {
+                    tipo = cuenta.Tipo;
+                    nombre = cuenta.Nombre;
+                }
+
+                if (string.IsNullOrEmpty(tipo) || (tipo != "Ingreso" && tipo != "Egreso"))
+                {
+                    if (linea.CodigoCuenta.StartsWith("4.")) tipo = "Ingreso";
+                    else if (linea.CodigoCuenta.StartsWith("5.")) tipo = "Egreso";
+                    else continue;
+                }
+
+                if (tipo == "Ingreso")
+                {
+                    var saldo = linea.Haber - linea.Debe;
+                    if (saldo < 0) saldo = -saldo;
+                    if (!acumIngresos.ContainsKey(linea.CodigoCuenta))
+                        acumIngresos[linea.CodigoCuenta] = (nombre, 0);
+                    acumIngresos[linea.CodigoCuenta] = (nombre, acumIngresos[linea.CodigoCuenta].Monto + saldo);
+                }
+                else if (tipo == "Egreso")
+                {
+                    var saldo = linea.Debe - linea.Haber;
+                    if (saldo < 0) saldo = -saldo;
+                    if (!acumEgresos.ContainsKey(linea.CodigoCuenta))
+                        acumEgresos[linea.CodigoCuenta] = (nombre, 0);
+                    acumEgresos[linea.CodigoCuenta] = (nombre, acumEgresos[linea.CodigoCuenta].Monto + saldo);
+                }
+            }
+        }
+
+        detalle.DetalleIngresos = acumIngresos
+            .Where(kv => kv.Value.Monto != 0)
+            .OrderBy(kv => kv.Key)
+            .Select(kv => new LineaDetalleResultado { Codigo = kv.Key, Nombre = kv.Value.Nombre, Monto = kv.Value.Monto })
+            .ToList();
+
+        detalle.DetalleEgresos = acumEgresos
+            .Where(kv => kv.Value.Monto != 0)
+            .OrderBy(kv => kv.Key)
+            .Select(kv => new LineaDetalleResultado { Codigo = kv.Key, Nombre = kv.Value.Nombre, Monto = kv.Value.Monto })
+            .ToList();
+
+        return detalle;
     }
 
     public void CerrarEjercicio(int anio)
