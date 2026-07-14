@@ -899,6 +899,9 @@ public class ContabilidadService
 
             if (Directory.Exists(_datosPath))
             {
+                // La base de datos SQLite ahora vive dentro de _datosPath nativamente,
+                // por lo que ZipFile empacará contable.db junto a todos los .xml.
+                Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
                 ZipFile.CreateFromDirectory(_datosPath, backupPath);
                 return backupPath;
             }
@@ -943,6 +946,9 @@ public class ContabilidadService
         {
             ZipFile.ExtractToDirectory(rutaZip, tempDir);
 
+            // Limpiar pools de SQLite por si hay bloqueos sobre contable.db local
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
             foreach (var file in Directory.GetFiles(tempDir))
             {
                 var destino = Path.Combine(_datosPath, Path.GetFileName(file));
@@ -974,13 +980,18 @@ public class ContabilidadService
         if (cuenta == null) return 0m;
 
         using var db = new ContabilidadDbContext();
+        
+        DateTime fin = fechaFin.Date.AddDays(1).AddTicks(-1);
         var query = db.ComprobantesContables
             .Include(c => c.Lineas)
-            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaFin.Date);
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha <= fin);
 
-        if (fechaInicio.HasValue)
+        // Si es una cuenta de Resultado (Ingreso/Egreso), el saldo es la variación en el periodo.
+        // Si es una cuenta de Balance (Activo/Pasivo/Patrimonio), el saldo es el acumulado histórico, por lo que ignoramos la fecha de inicio.
+        if (fechaInicio.HasValue && (cuenta.Tipo == "Ingreso" || cuenta.Tipo == "Egreso"))
         {
-            query = query.Where(c => c.Fecha.Date >= fechaInicio.Value.Date);
+            DateTime inicio = fechaInicio.Value.Date;
+            query = query.Where(c => c.Fecha >= inicio);
         }
 
         var comprobantes = query.ToList();

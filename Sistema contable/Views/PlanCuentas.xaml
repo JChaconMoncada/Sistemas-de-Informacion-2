@@ -99,8 +99,15 @@
                     <TextBox Text="{Binding CuentaSeleccionada.Descripcion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" TextWrapping="Wrap" MinLines="2" />
 
                     <Label Content="Tipo:" FontWeight="SemiBold" />
-                    <ComboBox ItemsSource="{Binding TiposDeCuenta}" SelectedItem="{Binding CuentaSeleccionada.Tipo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
-
+                    <ComboBox SelectedValue="{Binding CuentaSeleccionada.Tipo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" Margin="0,0,0,12">
+                        <ComboBoxItem Content="Activo" />
+                        <ComboBoxItem Content="Pasivo" />
+                        <ComboBoxItem Content="Patrimonio" />
+                        <ComboBoxItem Content="Ingreso" />
+                        <ComboBoxItem Content="Egreso" />
+                        <ComboBoxItem Content="Costo" />
+                    </ComboBox>
+                    
                     <Label Content="Nivel:" FontWeight="SemiBold" />
                     <TextBox Text="{Binding CuentaSeleccionada.Nivel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
 

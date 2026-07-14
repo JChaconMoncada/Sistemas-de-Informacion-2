@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
 using SistemaContableZulay.UI.Domain;
 using SistemaContableZulay.UI.Services;
 
@@ -87,6 +88,7 @@ namespace Sistema_contable.ViewModels
 
         public ICommand GuardarMovimientoCommand { get; }
         public ICommand EliminarMovimientoCommand { get; }
+        public ICommand BorrarTodoCommand { get; }
         public ICommand RefrescarCommand { get; }
 
         public MovimientosViewModel()
@@ -94,6 +96,7 @@ namespace Sistema_contable.ViewModels
             _contabilidadService = ContabilidadService.Instance;
             GuardarMovimientoCommand = new RelayCommand(ExecuteGuardarMovimiento, CanGuardarMovimiento);
             EliminarMovimientoCommand = new RelayCommand(ExecuteEliminarMovimiento, () => ComprobanteSeleccionado != null);
+            BorrarTodoCommand = new RelayCommand(ExecuteBorrarTodo);
             RefrescarCommand = new RelayCommand(CargarDatos);
             
             _contabilidadService.OnEmpresaCambiada += CargarDatos;
@@ -238,6 +241,28 @@ namespace Sistema_contable.ViewModels
             {
                 _contabilidadService.EliminarComprobante(ComprobanteSeleccionado.IdComprobante);
                 RefrescarHistorialTransacciones();
+            }
+        }
+
+        private void ExecuteBorrarTodo()
+        {
+            var result = MessageBox.Show("¿Está seguro que desea borrar TODOS los movimientos de la base de datos? Esta acción es irreversible.", "Confirmar Borrado", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var db = new Sistema_contable.Data.ContabilidadDbContext())
+                    {
+                        db.Database.ExecuteSqlRaw("DELETE FROM LineasAsiento");
+                        db.Database.ExecuteSqlRaw("DELETE FROM ComprobantesContables");
+                    }
+                    RefrescarHistorialTransacciones();
+                    MessageBox.Show("Todos los movimientos han sido borrados con éxito.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al borrar los datos: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

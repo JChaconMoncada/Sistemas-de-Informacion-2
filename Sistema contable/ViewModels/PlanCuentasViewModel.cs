@@ -40,6 +40,29 @@ namespace Sistema_contable.ViewModels
             {
                 OnPropertyChanged(nameof(CuentasPadreDisponibles));
             }
+            else if (e.PropertyName == nameof(CuentaContable.CuentaPadre))
+            {
+                // Si el usuario cambia el padre manualmente en el combobox, recalculamos el Nivel y el Código
+                if (CuentaSeleccionada != null)
+                {
+                    if (string.IsNullOrEmpty(CuentaSeleccionada.CuentaPadre))
+                    {
+                        CuentaSeleccionada.Nivel = 1;
+                        OnPropertyChanged(nameof(CuentaSeleccionada)); // Notificar a la UI
+                        CuentaSeleccionada.Codigo = GenerarSiguienteCodigo(null);
+                    }
+                    else
+                    {
+                        var padre = TodasLasCuentasPlanas.FirstOrDefault(c => c.Codigo == CuentaSeleccionada.CuentaPadre);
+                        if (padre != null)
+                        {
+                            CuentaSeleccionada.Nivel = padre.Nivel + 1;
+                            OnPropertyChanged(nameof(CuentaSeleccionada)); // Notificar a la UI
+                            CuentaSeleccionada.Codigo = GenerarSiguienteCodigo(padre);
+                        }
+                    }
+                }
+            }
         }
 
         public ICommand NuevaCuentaCommand { get; }
@@ -82,12 +105,24 @@ namespace Sistema_contable.ViewModels
         {
             get
             {
+                var lista = new List<CuentaContable>();
+                // Añadir opción vacía para poder hacer que una cuenta vuelva a ser raíz (Nivel 1)
+                lista.Add(new CuentaContable { Codigo = null, Nombre = "(Ninguna - Cuenta Principal)" });
+
                 var query = TodasLasCuentasPlanas.Where(c => !c.AceptaMovimiento);
                 if (CuentaSeleccionada != null && !string.IsNullOrEmpty(CuentaSeleccionada.Tipo))
                 {
                     query = query.Where(c => c.Tipo == CuentaSeleccionada.Tipo);
+
+                    // Evitar que la cuenta sea padre de sí misma o de sus hijos
+                    if (!string.IsNullOrEmpty(CuentaSeleccionada.Codigo))
+                    {
+                        query = query.Where(c => c.Codigo != CuentaSeleccionada.Codigo && !c.Codigo.StartsWith(CuentaSeleccionada.Codigo + "."));
+                    }
                 }
-                return query.ToList();
+                
+                lista.AddRange(query);
+                return lista;
             }
         }
 

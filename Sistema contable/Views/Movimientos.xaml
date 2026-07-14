@@ -69,6 +69,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,8">
+                    <Button Content="⚠️ Borrar Todo" Command="{Binding BorrarTodoCommand}" Background="#FFEEEE" Foreground="DarkRed" Margin="0,0,16,0" Padding="12,4"/>
                     <Button Content="Refrescar 🔄" Command="{Binding RefrescarCommand}" Margin="0,0,8,0" Padding="12,4"/>
                     <Button Content="Eliminar Seleccionado" Command="{Binding EliminarMovimientoCommand}" Foreground="Red" Padding="12,4"/>
                 </StackPanel>

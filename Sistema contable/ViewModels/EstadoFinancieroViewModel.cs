@@ -253,11 +253,11 @@ namespace Sistema_contable.ViewModels
                 
                 if (MonedaSeleccionada.Contains("COP") || MonedaSeleccionada.Contains("Pesos"))
                 {
-                    saldos[c.Codigo] = saldoMonto * tasa;
+                    saldos[c.Codigo] = Math.Abs(saldoMonto * tasa);
                 }
                 else
                 {
-                    saldos[c.Codigo] = saldoMonto / tasa;
+                    saldos[c.Codigo] = Math.Abs(saldoMonto / tasa);
                 }
             }
 

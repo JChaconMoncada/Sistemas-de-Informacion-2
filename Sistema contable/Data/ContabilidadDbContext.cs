@@ -14,13 +14,12 @@ namespace Sistema_contable.Data
 
         public ContabilidadDbContext()
         {
-            var carpetaApp = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "SistemaContable");
-
-            Directory.CreateDirectory(carpetaApp);
+            var carpetaApp = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datos");
+            if (!Directory.Exists(carpetaApp))
+            {
+                Directory.CreateDirectory(carpetaApp);
+            }
             _dbPath = Path.Combine(carpetaApp, "contable.db");
-
         }
 
         // Entidades de base de datos activas en SQLite
