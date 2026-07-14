@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfEmpresaCliente xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <EmpresaCliente>
+    <Id>1</Id>
+    <NombreEmpresa>penelope</NombreEmpresa>
+    <Rif>EJIRIJR</Rif>
+    <RazonSocial>eklkmrkrmkr</RazonSocial>
+    <Direccion>lrrltmtmk</Direccion>
+    <Telefono>4949323932</Telefono>
+    <Email>krorkrorok</Email>
+  </EmpresaCliente>
+  <EmpresaCliente>
+    <Id>2</Id>
+    <NombreEmpresa>culiar</NombreEmpresa>
+    <Rif>ELMKMT</Rif>
+    <RazonSocial>sisa</RazonSocial>
+    <Direccion>sisa</Direccion>
+    <Telefono>9558494</Telefono>
+    <Email>sisa</Email>
+  </EmpresaCliente>
+</ArrayOfEmpresaCliente>

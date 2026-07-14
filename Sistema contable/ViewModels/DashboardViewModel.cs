@@ -6,6 +6,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SistemaContableZulay.UI.Domain;
 using SistemaContableZulay.UI.Services;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.Measure;
 
 namespace Sistema_contable.ViewModels
 {
@@ -99,6 +102,8 @@ namespace Sistema_contable.ViewModels
         private string _textoResultado = string.Empty;
         public string TextoResultado { get => _textoResultado; set => SetProperty(ref _textoResultado, value); }
 
+
+
         // ── Colecciones ───────────────────────────────────────────────────────────
         private ObservableCollection<AlertaDashboard> _alertas = new();
         public ObservableCollection<AlertaDashboard> Alertas
@@ -112,7 +117,13 @@ namespace Sistema_contable.ViewModels
         {
             get => _ultimosMovimientos;
             set => SetProperty(ref _ultimosMovimientos, value);
+
         }
+
+
+        public ISeries[] Series { get; set; } = Array.Empty<ISeries>();
+
+        public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
 
         // ── Comandos ──────────────────────────────────────────────────────────────
         public ICommand RefrescarCommand           { get; }
@@ -178,6 +189,7 @@ namespace Sistema_contable.ViewModels
             PeriodoActual       = hoy.ToString("MMMM yyyy").ToUpperInvariant();
             TotalEmpresas       = _svc.ObtenerEmpresas().Count;
             TotalCuentas        = _svc.ObtenerCuentasContables().Count;
+            
 
             var empresaId = _svc.EmpresaActivaId;
             if (empresaId == null)
@@ -213,7 +225,10 @@ namespace Sistema_contable.ViewModels
             {
                 foreach (var linea in comp.Lineas)
                 {
+
                     var cuenta = cuentas.FirstOrDefault(c => c.Codigo == linea.CodigoCuenta);
+
+
                     if (cuenta == null) continue;
                     if (cuenta.Tipo == "Ingreso")
                         ingresos += linea.Haber - linea.Debe;
@@ -242,6 +257,41 @@ namespace Sistema_contable.ViewModels
                 ColorSaldo     = new SolidColorBrush(Color.FromRgb(0xF4, 0x43, 0x36));
                 SubtituloSaldo = "Resultado negativo";
             }
+
+
+
+
+            // =========================
+            // Gráfico Ingresos vs Gastos
+            // =========================
+            Series = new ISeries[]
+            {
+    new ColumnSeries<double>
+    {
+        Name = "Monto",
+        Values = new double[]
+        {
+            (double)IngresosMes,
+            (double)GastosMes
+        }
+    }
+            };
+
+            XAxes = new Axis[]
+            {
+    new Axis
+    {
+        Labels = new[]
+        {
+            "Ingresos",
+            "Gastos"
+        },
+        LabelsRotation = 0
+    }
+            };
+
+            OnPropertyChanged(nameof(Series));
+            OnPropertyChanged(nameof(XAxes));
 
             // ── Movimientos ────────────────────────────────────────────────────────
             TotalMovimientos = todosComprobantes.Count;

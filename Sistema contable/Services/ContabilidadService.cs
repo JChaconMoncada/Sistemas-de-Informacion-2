@@ -60,6 +60,9 @@ public class ContabilidadService
     private ContabilidadService()
     {
         _datosPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datos");
+
+
+
         if (!Directory.Exists(_datosPath))
         {
             Directory.CreateDirectory(_datosPath);
@@ -807,6 +810,8 @@ public class ContabilidadService
         _ = SincronizarFacturaAsync(factura);
     }
 
+
+
     public string EjecutarRespaldoAutomatico() => EjecutarBackup("Respaldo_Reexpresion");
 
     public string EjecutarBackupManual() => EjecutarBackup("Backup");
@@ -982,6 +987,7 @@ public class ContabilidadService
         historial.Anulado = true;
         GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
     }
+
 
     public void DesactivarComprobanteReexpresion(int idHistorial)
     {

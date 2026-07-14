@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using LiveChartsCore.SkiaSharpView.WPF;
 
 namespace Sistema_contable.Views
 {

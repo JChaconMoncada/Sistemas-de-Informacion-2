@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Sistema_contable.ViewModels"
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       mc:Ignorable="d" 
       d:DesignHeight="750" d:DesignWidth="1100"
       Title="Dashboard">
@@ -11,6 +12,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="16">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -189,7 +191,15 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Alertas reales -->
-                <GroupBox Grid.Column="0" Header="Alertas Activas">
+                <GroupBox Grid.Column="0" Header="Ingresos vs Gastos">
+                    <lvc:CartesianChart
+                        Series="{Binding Series}"
+                        XAxes="{Binding XAxes}"
+                        Height="200"/>
+                </GroupBox>
+
+                <!-- Alertas reales (movidas a Row 4) -->
+                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="Alertas Activas" Margin="0,16,0,0">
                     <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                               ItemsSource="{Binding Alertas}" MaxHeight="200">
                         <DataGrid.Columns>
@@ -254,6 +264,7 @@
                         </DataGrid.Style>
                     </DataGrid>
                 </GroupBox>
+
 
                 <!-- Acciones Rápidas -->
                 <GroupBox Grid.Column="2" Header="Acciones Rápidas">

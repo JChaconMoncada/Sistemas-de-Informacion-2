@@ -80,6 +80,7 @@ namespace Sistema_contable.ViewModels
                     item.PropertyChanged += Item_PropertyChanged;
                 }
             }
+
             if (e.OldItems != null)
             {
                 foreach (AsientoLineaViewModel item in e.OldItems)
@@ -87,6 +88,7 @@ namespace Sistema_contable.ViewModels
                     item.PropertyChanged -= Item_PropertyChanged;
                 }
             }
+
             RecalcularTotales();
         }
 
@@ -127,6 +129,7 @@ namespace Sistema_contable.ViewModels
                 TipoComprobante = "Diario",
                 Moneda = "Bs"
             };
+
             Detalles.Clear();
             AgregarLinea();
             AgregarLinea();
@@ -135,14 +138,21 @@ namespace Sistema_contable.ViewModels
         private int ObtenerSiguienteNumero()
         {
             var comprobantes = _contabilidadService.ObtenerComprobantesGuardados();
-            return comprobantes.Count > 0 ? comprobantes.Max(c => c.IdComprobante) + 1 : 1;
+            return comprobantes.Count > 0
+                ? comprobantes.Max(c => c.IdComprobante) + 1
+                : 1;
         }
 
         private void GuardarComprobante()
         {
             if (!EstaCuadrado)
             {
-                System.Windows.MessageBox.Show("El comprobante está descuadrado. El Debe y el Haber deben ser iguales y mayores a cero.", "Advertencia - Cuadre Contable", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show(
+                    "El comprobante está descuadrado. El Debe y el Haber deben ser iguales y mayores a cero.",
+                    "Advertencia - Cuadre Contable",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning);
+
                 return;
             }
 
@@ -163,12 +173,22 @@ namespace Sistema_contable.ViewModels
             try
             {
                 _contabilidadService.GuardarComprobante(cc);
-                System.Windows.MessageBox.Show("El comprobante contable se guardó con éxito.", "Guardado Exitoso", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+                System.Windows.MessageBox.Show(
+                    "El comprobante contable se guardó con éxito.",
+                    "Guardado Exitoso",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+
                 ReiniciarFormulario();
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error al guardar: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(
+                    $"Error al guardar: {ex.Message}",
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
     }
