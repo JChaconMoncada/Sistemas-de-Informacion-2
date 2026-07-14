@@ -240,32 +240,16 @@ namespace Sistema_contable.ViewModels
             decimal ingresos = 0, gastos = 0;
             foreach (var comp in compsPeriodo)
             {
-                foreach (var linea in comp.Lineas)
+                if (comp.TipoComprobante.Equals("Ingreso", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Buscamos la cuenta ignorando espacios y mayúsculas/minúsculas
-                    var cuenta = cuentas.FirstOrDefault(c => 
-                        string.Equals(c.Codigo?.Trim(), linea.CodigoCuenta?.Trim(), StringComparison.OrdinalIgnoreCase));
-
-                    if (cuenta == null) continue;
-
-                    string tipo = cuenta.Tipo?.Trim() ?? string.Empty;
-                    
-                    // Categorizamos según el tipo de cuenta (P&L)
-                    if (tipo.Equals("Ingreso", StringComparison.OrdinalIgnoreCase) || 
-                        tipo.Equals("Ingresos", StringComparison.OrdinalIgnoreCase))
-                    {
-                        ingresos += (linea.Haber - linea.Debe);
-                    }
-                    else if (tipo.Equals("Egreso", StringComparison.OrdinalIgnoreCase) || 
-                             tipo.Equals("Egresos", StringComparison.OrdinalIgnoreCase) ||
-                             tipo.Equals("Gasto", StringComparison.OrdinalIgnoreCase) ||
-                             tipo.Equals("Gastos", StringComparison.OrdinalIgnoreCase))
-                    {
-                        gastos += (linea.Debe - linea.Haber);
-                    }
+                    ingresos += comp.Lineas.Sum(l => l.Debe);
+                }
+                else if (comp.TipoComprobante.Equals("Egreso", StringComparison.OrdinalIgnoreCase))
+                {
+                    gastos += comp.Lineas.Sum(l => l.Debe);
                 }
             }
-            IngresosMes = ingresos; // Eliminado Math.Max para ver saldos reales aunque sean negativos (ajustes)
+            IngresosMes = ingresos;
             GastosMes   = gastos;
             SaldoTotal  = IngresosMes - GastosMes;
 
@@ -339,27 +323,13 @@ namespace Sistema_contable.ViewModels
             decimal ingresosHist = 0, gastosHist = 0;
             foreach (var comp in todosComprobantes)
             {
-                foreach (var linea in comp.Lineas)
+                if (comp.TipoComprobante.Equals("Ingreso", StringComparison.OrdinalIgnoreCase))
                 {
-                    var cuenta = cuentas.FirstOrDefault(c => 
-                        string.Equals(c.Codigo?.Trim(), linea.CodigoCuenta?.Trim(), StringComparison.OrdinalIgnoreCase));
-
-                    if (cuenta == null) continue;
-                    
-                    string tipo = cuenta.Tipo?.Trim() ?? string.Empty;
-
-                    if (tipo.Equals("Ingreso", StringComparison.OrdinalIgnoreCase) || 
-                        tipo.Equals("Ingresos", StringComparison.OrdinalIgnoreCase))
-                    {
-                        ingresosHist += (linea.Haber - linea.Debe);
-                    }
-                    else if (tipo.Equals("Egreso", StringComparison.OrdinalIgnoreCase) || 
-                             tipo.Equals("Egresos", StringComparison.OrdinalIgnoreCase) ||
-                             tipo.Equals("Gasto", StringComparison.OrdinalIgnoreCase) ||
-                             tipo.Equals("Gastos", StringComparison.OrdinalIgnoreCase))
-                    {
-                        gastosHist += (linea.Debe - linea.Haber);
-                    }
+                    ingresosHist += comp.Lineas.Sum(l => l.Debe);
+                }
+                else if (comp.TipoComprobante.Equals("Egreso", StringComparison.OrdinalIgnoreCase))
+                {
+                    gastosHist += comp.Lineas.Sum(l => l.Debe);
                 }
             }
             SaldoAcumulado = ingresosHist - gastosHist;
