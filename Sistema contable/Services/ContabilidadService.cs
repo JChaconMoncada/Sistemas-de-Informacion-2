@@ -24,6 +24,7 @@ public class ContabilidadService
     public int? EmpresaActivaId { get; set; }
     public event Action OnEmpresaCambiada;
     public event Action OnEmpresasModificadas;
+    public event Action OnFacturasModificadas;
 
     public void SeleccionarEmpresa(int? id)
     {
@@ -755,6 +756,7 @@ public class ContabilidadService
         factura.FechaPago = DateTime.Now;
         factura.IdComprobantePago = compPago.IdComprobante;
         db.SaveChanges();
+        OnFacturasModificadas?.Invoke();
 
         _ = SincronizarFacturaAsync(factura);
         _ = SincronizarComprobanteAsync(compPago);
@@ -810,6 +812,7 @@ public class ContabilidadService
 
         factura.Estado = "Anulada";
         db.SaveChanges();
+        OnFacturasModificadas?.Invoke();
 
         _ = SincronizarFacturaAsync(factura);
     }

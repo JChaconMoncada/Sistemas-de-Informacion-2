@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:vm="clr-namespace:Sistema_contable.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="750" d:DesignWidth="1100"
       Title="Dashboard">
@@ -192,16 +193,42 @@
                     <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                               ItemsSource="{Binding Alertas}" MaxHeight="200">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header=""           Width="28"  Binding="{Binding Icono}" />
-                            <DataGridTextColumn Header="Tipo"       Width="160" Binding="{Binding Tipo}" />
-                            <DataGridTextColumn Header="Descripción" Width="*"  Binding="{Binding Descripcion}" />
-                            <DataGridTextColumn Header="Fecha"      Width="90"  Binding="{Binding Fecha}" />
-                            <DataGridTemplateColumn Header="Estado" Width="90">
+                            <DataGridTextColumn Header=""            Width="28"  Binding="{Binding Icono}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Tipo"        Width="150" Binding="{Binding Tipo}"  IsReadOnly="True" />
+                            <DataGridTextColumn Header="Descripción" Width="*"   Binding="{Binding Descripcion}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Fecha"       Width="85"  Binding="{Binding Fecha}" IsReadOnly="True" />
+                            <DataGridTemplateColumn Header="Estado" Width="100" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource StatusBadgeWarning}" Padding="5,2">
-                                            <TextBlock Text="{Binding Estado}" FontSize="10" Foreground="#FF9800" />
+                                        <Border Padding="5,2" CornerRadius="4"
+                                                Background="{Binding ColorEstado}">
+                                            <TextBlock Text="{Binding Estado}" FontSize="10"
+                                                       Foreground="White" FontWeight="SemiBold" />
                                         </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Acción" Width="90" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Height="24" Padding="6,0" FontSize="10"
+                                                Content="✔ Pagada"
+                                                Foreground="White" Background="#388E3C"
+                                                BorderThickness="0" Cursor="Hand"
+                                                ToolTip="Marcar esta factura como cobrada"
+                                                Command="{Binding DataContext.MarcarPagadaAlertaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EsCobranza}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

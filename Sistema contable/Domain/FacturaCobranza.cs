@@ -14,6 +14,7 @@ namespace SistemaContableZulay.UI.Domain
         public DateTime FechaVencimiento { get; set; } = DateTime.Now.AddDays(30);
         public decimal Monto { get; set; }
         public string Estado { get; set; } = "Pendiente";
+        public string TipoPago { get; set; } = "Mensualidad";
         public DateTime? FechaPago { get; set; }
         public int IdComprobanteEmision { get; set; }
         public int? IdComprobantePago { get; set; }

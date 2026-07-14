@@ -84,6 +84,20 @@ namespace Sistema_contable.ViewModels
         private bool _montoEditable = true;
         public bool MontoEditable { get => _montoEditable; set => SetProperty(ref _montoEditable, value); }
 
+        private string _editTipoPago = "Mensualidad";
+        public string EditTipoPago { get => _editTipoPago; set => SetProperty(ref _editTipoPago, value); }
+
+        public static IReadOnlyList<string> OpcionesTipoPago { get; } = new List<string>
+        {
+            "Mensualidad",
+            "Pago Único",
+            "Pago Pendiente",
+            "Abono Parcial",
+            "Servicio",
+            "Producto",
+            "Otro"
+        };
+
         // ─── Comandos ─────────────────────────────────────────────────────────────
         public ICommand NuevaFacturaCommand    { get; }
         public ICommand EditarCommand          { get; }
@@ -107,7 +121,8 @@ namespace Sistema_contable.ViewModels
             AplicarFiltrosCommand  = new RelayCommand(() => AplicarFiltros());
             LimpiarFiltrosCommand  = new RelayCommand(() => LimpiarFiltros());
 
-            _svc.OnEmpresaCambiada += CargarDatos;
+            _svc.OnEmpresaCambiada      += CargarDatos;
+            _svc.OnFacturasModificadas  += CargarDatos;
             CargarDatos();
         }
 
@@ -174,6 +189,7 @@ namespace Sistema_contable.ViewModels
             EditDescripcion      = string.Empty;
             EditMonto            = 0;
             EditFechaVencimiento = DateTime.Now.AddDays(30);
+            EditTipoPago         = "Mensualidad";
             MontoEditable        = true;
             EstaEnModoEdicion    = true;
         }
@@ -193,6 +209,7 @@ namespace Sistema_contable.ViewModels
             EditDescripcion      = target.Descripcion;
             EditMonto            = target.Monto;
             EditFechaVencimiento = target.FechaVencimiento;
+            EditTipoPago         = target.TipoPago;
             MontoEditable        = false;
             EstaEnModoEdicion    = true;
         }
@@ -231,6 +248,7 @@ namespace Sistema_contable.ViewModels
                     Monto            = EditMonto,
                     FechaEmision     = _editandoId == 0 ? DateTime.Now : DateTime.Now,
                     FechaVencimiento = EditFechaVencimiento,
+                    TipoPago         = EditTipoPago,
                     Estado           = "Pendiente"
                 };
 
@@ -244,6 +262,7 @@ namespace Sistema_contable.ViewModels
                         factura.NumeroFactura        = original.NumeroFactura;
                         factura.IdComprobanteEmision = original.IdComprobanteEmision;
                         factura.Estado               = original.Estado;
+                        factura.TipoPago             = EditTipoPago;
                     }
                 }
 
