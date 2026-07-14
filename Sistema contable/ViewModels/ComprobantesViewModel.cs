@@ -17,6 +17,7 @@ namespace Sistema_contable.ViewModels
         private bool _estaCuadrado;
         private DetalleAsiento _selectedDetalle;
         private readonly ContabilidadService _contabilidadService;
+        public ObservableCollection<SistemaContableZulay.UI.Domain.CuentaContable> Cuentas { get; }
 
         public Asiento AsientoActual
         {
@@ -60,6 +61,12 @@ namespace Sistema_contable.ViewModels
         {
             _contabilidadService = ContabilidadService.Instance;
 
+            Cuentas = new ObservableCollection<SistemaContableZulay.UI.Domain.CuentaContable>(
+    _contabilidadService
+        .ObtenerCuentasContables()
+        .Where(c => c.AceptaMovimiento)
+);
+
             Detalles = new ObservableCollection<DetalleAsiento>();
             Detalles.CollectionChanged += Detalles_CollectionChanged;
 
@@ -95,10 +102,25 @@ namespace Sistema_contable.ViewModels
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DetalleAsiento.Debe) ||
-                e.PropertyName == nameof(DetalleAsiento.Haber))
+            if (sender is DetalleAsiento detalle)
             {
-                RecalcularTotales();
+                // Cuando cambia la cuenta, completar automáticamente el nombre
+                if (e.PropertyName == nameof(DetalleAsiento.CodigoCuenta))
+                {
+                    var cuenta = Cuentas.FirstOrDefault(c => c.Codigo == detalle.CodigoCuenta);
+
+                    if (cuenta != null)
+                    {
+                        detalle.NombreCuenta = cuenta.Nombre;
+                    }
+                }
+
+                // Cuando cambia Debe o Haber, recalcular los totales
+                if (e.PropertyName == nameof(DetalleAsiento.Debe) ||
+                    e.PropertyName == nameof(DetalleAsiento.Haber))
+                {
+                    RecalcularTotales();
+                }
             }
         }
 
@@ -151,6 +173,18 @@ namespace Sistema_contable.ViewModels
                 System.Windows.MessageBox.Show(
                     "El comprobante está descuadrado. El Debe y el Haber deben ser iguales y mayores a cero.",
                     "Advertencia - Cuadre Contable",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning);
+
+                return;
+            }
+
+
+            if (string.IsNullOrWhiteSpace(AsientoActual.Descripcion))
+            {
+                System.Windows.MessageBox.Show(
+                    "Debe ingresar una descripción para el comprobante.",
+                    "Descripción requerida",
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Warning);
 

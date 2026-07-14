@@ -163,8 +163,15 @@ namespace Sistema_contable.ViewModels
             // ── Ingresos y Gastos reales via cuentas contables ────────────────────
             var cuentas = _svc.ObtenerCuentasContables();
             decimal ingresos = 0, gastos = 0;
+
+
+
+
+
             foreach (var comp in compsMes)
             {
+
+
                 foreach (var linea in comp.Lineas)
                 {
 

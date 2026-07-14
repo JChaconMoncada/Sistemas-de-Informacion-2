@@ -58,7 +58,14 @@ namespace Sistema_contable.ViewModels
         public string TipoTransaccion
         {
             get => _tipoTransaccion;
-            set => SetProperty(ref _tipoTransaccion, value);
+            set
+            {
+                if (SetProperty(ref _tipoTransaccion, value))
+                {
+                    CuentaSeleccionada = null;
+                    CargarCuentas();
+                }
+            }
         }
 
         public string MonedaSeleccionada
@@ -108,22 +115,23 @@ namespace Sistema_contable.ViewModels
 
         private void CargarCuentas()
         {
-            var cuentaAnteriorCodigo = _cuentaSeleccionada?.Codigo;
             CuentasDisponibles.Clear();
-            var cuentas = _contabilidadService.ObtenerCuentasContables().Where(c => c.AceptaMovimiento);
+
+            var cuentas = _contabilidadService
+                .ObtenerCuentasContables()
+                .Where(c =>
+                    c.AceptaMovimiento &&
+                    c.Tipo == TipoTransaccion &&
+                    c.Codigo != "1.1.01.01")
+                .OrderBy(c => c.Codigo);
+
             foreach (var cuenta in cuentas)
             {
-                // Excluimos la cuenta de banco principal para no permitir que la seleccionen directamente como contrapartida en esta vista rápida
-                if (cuenta.Codigo != "1.1.01.01")
-                {
-                    CuentasDisponibles.Add(cuenta);
-                }
+                CuentasDisponibles.Add(cuenta);
             }
-            
-            if (cuentaAnteriorCodigo != null)
-            {
-                CuentaSeleccionada = CuentasDisponibles.FirstOrDefault(c => c.Codigo == cuentaAnteriorCodigo);
-            }
+
+            // Siempre obligamos al usuario a seleccionar una cuenta válida
+            CuentaSeleccionada = null;
         }
 
         private void RefrescarHistorialTransacciones()

@@ -321,6 +321,9 @@ public class ContabilidadService
         
         _comprobantesGuardados.Add(comprobante);
         GuardarLista(_comprobantesGuardados, _comprobantesFile);
+
+        // Fuerza la actualización del Dashboard
+        OnEmpresaCambiada?.Invoke();
     }
 
     public IReadOnlyList<ComprobanteContable> ObtenerComprobantesGuardados() 

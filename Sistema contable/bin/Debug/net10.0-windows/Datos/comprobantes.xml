@@ -1,2 +1,428 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ArrayOfComprobanteContable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+<ArrayOfComprobanteContable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ComprobanteContable>
+    <IdComprobante>1</IdComprobante>
+    <Fecha>2026-07-14T00:17:19.4705716-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>20</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>3.2.01.00</CodigoCuenta>
+        <DescripcionCuenta>Resultado por Exposición a la Inflación (REI)</DescripcionCuenta>
+        <Debe>20</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.02</CodigoCuenta>
+        <DescripcionCuenta>Banco Mercantil 0105</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>20</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>2</IdComprobante>
+    <Fecha>2026-07-14T00:19:06.1376338-04:00</Fecha>
+    <Descripcion>hamburguesa</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>112</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>12</Debe>
+        <Haber>100</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>5.1.01.04</CodigoCuenta>
+        <DescripcionCuenta>Gastos de Honorarios Profesionales</DescripcionCuenta>
+        <Debe>100</Debe>
+        <Haber>12</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>3</IdComprobante>
+    <Fecha>2026-07-14T00:20:15.4583567-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>1012</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>1000</Debe>
+        <Haber>12</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.02.01</CodigoCuenta>
+        <DescripcionCuenta>Clientes Nacionales</DescripcionCuenta>
+        <Debe>12</Debe>
+        <Haber>1000</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>4</IdComprobante>
+    <Fecha>2026-07-14T00:22:14.256019-04:00</Fecha>
+    <Descripcion>hola</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>501</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>1</Debe>
+        <Haber>500</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>500</Debe>
+        <Haber>1</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>5</IdComprobante>
+    <Fecha>2026-07-14T00:23:01.2284279-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>1100</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>1000</Debe>
+        <Haber>1000</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>100</Debe>
+        <Haber>100</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>6</IdComprobante>
+    <Fecha>2026-07-14T00:29:20.0161218-04:00</Fecha>
+    <Descripcion>ingreso prueba</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>300</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>100</Debe>
+        <Haber>200</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>200</Debe>
+        <Haber>100</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>7</IdComprobante>
+    <Fecha>2026-07-14T00:34:33.4933018-04:00</Fecha>
+    <Descripcion>siuuuu</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>100</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>5.1.01.03</CodigoCuenta>
+        <DescripcionCuenta>Comisiones Bancarias</DescripcionCuenta>
+        <Debe>100</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>5.1.01.03</CodigoCuenta>
+        <DescripcionCuenta>Comisiones Bancarias</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>100</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>8</IdComprobante>
+    <Fecha>2026-07-14T01:08:22.0593457-04:00</Fecha>
+    <Descripcion>hola</Descripcion>
+    <TipoComprobante>Ingreso</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>100.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Capital Social</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>100.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>100.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>9</IdComprobante>
+    <Fecha>2026-07-14T01:13:11.8167734-04:00</Fecha>
+    <Descripcion>prelacion</Descripcion>
+    <TipoComprobante>Ingreso</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>1000.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Capital Social</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>1000.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>1000.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>10</IdComprobante>
+    <Fecha>2026-07-14T01:19:42.5270148-04:00</Fecha>
+    <Descripcion>sisa</Descripcion>
+    <TipoComprobante>Activo</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>100.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Ventas de Bienes / Servicios</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>100.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>100.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>11</IdComprobante>
+    <Fecha>2026-07-14T01:19:42.5270148-04:00</Fecha>
+    <Descripcion>aja</Descripcion>
+    <TipoComprobante>Activo</TipoComprobante>
+    <IdEmpresa>2</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>200.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Capital Social</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>200.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>200.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>12</IdComprobante>
+    <Fecha>2026-07-14T01:24:58.0068168-04:00</Fecha>
+    <Descripcion>hola</Descripcion>
+    <TipoComprobante>Ingreso</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>1000.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Capital Social</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>1000.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>3.1.00.00</CodigoCuenta>
+        <DescripcionCuenta>Capital Social</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>1000.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>13</IdComprobante>
+    <Fecha>2026-07-14T01:49:26.6055848-04:00</Fecha>
+    <Descripcion>sisarras</Descripcion>
+    <TipoComprobante>Ingreso</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>12.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Proveedores Locales</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>12.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>2.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Proveedores Locales</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>12.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>14</IdComprobante>
+    <Fecha>2026-07-14T02:02:22.6155382-04:00</Fecha>
+    <Descripcion>hola</Descripcion>
+    <TipoComprobante>Ingreso</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>500.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Ventas de Bienes / Servicios</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>500.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>500.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>15</IdComprobante>
+    <Fecha>2026-07-14T02:02:22.6155382-04:00</Fecha>
+    <Descripcion>sisalos</Descripcion>
+    <TipoComprobante>Activo</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Registrado</Estado>
+    <MontoTotal>100.00</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada>Banco Banesco 0134</CuentaAsociada>
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.03</CodigoCuenta>
+        <DescripcionCuenta>Banco Banesco 0134</DescripcionCuenta>
+        <Debe>100.00</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>100.00</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>16</IdComprobante>
+    <Fecha>2026-07-14T02:02:22.6089602-04:00</Fecha>
+    <Descripcion>hola amigo</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>0</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>1000</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>1000</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>17</IdComprobante>
+    <Fecha>2026-07-14T02:06:56.5282564-04:00</Fecha>
+    <Descripcion>Prueba Dashboard Ingreso</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>0</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Caja General</DescripcionCuenta>
+        <Debe>100</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>4.1.01.01</CodigoCuenta>
+        <DescripcionCuenta>Ventas de Bienes / Servicios</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>100</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+</ArrayOfComprobanteContable>

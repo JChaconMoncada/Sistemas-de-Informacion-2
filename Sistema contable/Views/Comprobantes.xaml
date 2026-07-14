@@ -58,7 +58,7 @@
         </GroupBox>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
-            <Button Content="+ Nueva Línea" Command="{Binding AgregarLineaCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
+            <!-- <Button Content="+ Nueva Línea" Command="{Binding AgregarLineaCommand} "Style="{StaticResource AccentButton}" Margin="0,0,6,0" /> -->
             <Button Content="- Eliminar Línea" Command="{Binding EliminarLineaCommand}" Margin="0,0,6,0" />
             <Separator Width="1" Margin="8,0" />
             <Button Content="Seleccionar Cuenta" Margin="0,0,6,0" />
@@ -67,9 +67,35 @@
             <Button Content="↩ Reversar Comprobante" Click="BtnReversarComprobante_Click" Margin="0,0,6,0" />
         </StackPanel>
 
-        <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,12">
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,12">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Código" Width="180">
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding CodigoCuenta}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+
+                            <ComboBox
+                ItemsSource="{Binding DataContext.Cuentas,
+                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+
+                DisplayMemberPath="DisplayName"
+
+                SelectedValuePath="Codigo"
+
+                SelectedValue="{Binding CodigoCuenta,
+                                        Mode=TwoWay,
+                                        UpdateSourceTrigger=PropertyChanged}" />
+
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Cuenta"  Width="*" Binding="{Binding NombreCuenta}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Debe" Width="150" Binding="{Binding Debe, StringFormat=N2}" />
                 <DataGridTextColumn Header="Haber" Width="150" Binding="{Binding Haber, StringFormat=N2}" />
