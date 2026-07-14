@@ -106,6 +106,9 @@ namespace Sistema_contable.ViewModels
             CancelarEdicionCommand = new RelayCommand(() => CerrarFormulario());
             EliminarCommand       = new RelayCommand<EmpresaCliente>(emp => EliminarEmpresa(emp));
 
+            _contabilidadService.OnEmpresasModificadas += CargarEmpresas;
+            _contabilidadService.OnDatosModificados += CargarEmpresas;
+
             CargarEmpresas();
         }
 

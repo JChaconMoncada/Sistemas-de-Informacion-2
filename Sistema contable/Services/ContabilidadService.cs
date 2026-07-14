@@ -130,6 +130,7 @@ public class ContabilidadService
         var serializer = new XmlSerializer(typeof(ConfiguracionSistema));
         using var stream = new FileStream(_configuracionFile, FileMode.Create);
         serializer.Serialize(stream, _configuracion);
+        OnDatosModificados?.Invoke();
     }
 
     private async Task SincronizarFacturaAsync(FacturaCobranza factura)
@@ -243,6 +244,7 @@ public class ContabilidadService
 
         _documentosGuardados.Add(documento);
         GuardarLista(_documentosGuardados, _documentosFile);
+        OnDatosModificados?.Invoke();
     }
 
     public void EliminarDocumento(int id)
@@ -252,6 +254,7 @@ public class ContabilidadService
         {
             _documentosGuardados.Remove(existente);
             GuardarLista(_documentosGuardados, _documentosFile);
+            OnDatosModificados?.Invoke();
         }
     }
 
@@ -339,6 +342,7 @@ public class ContabilidadService
         GuardarEmpresas();
 
         OnEmpresasModificadas?.Invoke();
+        OnDatosModificados?.Invoke();
 
         if (EmpresaActivaId == empresa.Id)
         {
@@ -355,6 +359,7 @@ public class ContabilidadService
             GuardarEmpresas();
 
             OnEmpresasModificadas?.Invoke();
+            OnDatosModificados?.Invoke();
 
             if (EmpresaActivaId == id)
             {
@@ -372,6 +377,7 @@ public class ContabilidadService
         }
         _cuentasGuardadas.Add(cuenta);
         GuardarCuentas();
+        OnDatosModificados?.Invoke();
     }
 
     public void EliminarCuenta(string codigo)
@@ -381,6 +387,7 @@ public class ContabilidadService
         {
             _cuentasGuardadas.Remove(existente);
             GuardarCuentas();
+            OnDatosModificados?.Invoke();
         }
     }
 
@@ -887,6 +894,9 @@ public class ContabilidadService
             }
 
             CargarDatos();
+            OnDatosModificados?.Invoke();
+            OnEmpresasModificadas?.Invoke();
+            OnEmpresaCambiada?.Invoke();
         }
         finally
         {

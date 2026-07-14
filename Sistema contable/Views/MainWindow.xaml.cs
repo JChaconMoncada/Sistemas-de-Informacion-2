@@ -60,6 +60,15 @@ namespace Sistema_contable.Views
             Application.Current.Shutdown();
         }
 
+        private void MenuAbrirCarpetaBackups_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as ViewModels.MainWindowViewModel;
+            if (viewModel != null)
+            {
+                viewModel.AbrirCarpetaBackups();
+            }
+        }
+
         private void MenuNuevaEmpresa_Click(object sender, RoutedEventArgs e)
         {
             BtnGestionarEmpresas_Click(sender, e);

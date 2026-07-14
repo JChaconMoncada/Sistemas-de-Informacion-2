@@ -80,7 +80,7 @@
                 <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />
                 <DataGridTextColumn Header="Debe" Width="120" Binding="{Binding Debe, StringFormat=N2}" />
                 <DataGridTextColumn Header="Haber" Width="120" Binding="{Binding Haber, StringFormat=N2}" />
-                <DataGridTextColumn Header="Saldo" Width="120" Binding="{Binding Saldo, StringFormat=N2}" />
+                <DataGridTextColumn Header="Saldo Acumulado" Width="120" Binding="{Binding Saldo, StringFormat=N2}" />
             </DataGrid.Columns>
         </DataGrid>
 
