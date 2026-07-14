@@ -19,6 +19,8 @@
         <TextBlock Grid.Row="0" Text="Libro Mayor" Style="{StaticResource TitleTextBlock}" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button Content="↻  Actualizar" Command="{Binding AplicarFiltroCommand}" Margin="0,0,6,0" />
+            <Separator Width="1" Margin="2,0,8,0" />
             <Button Content="Ver Movimientos" Command="{Binding VerMovimientosCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
             <Button Content="Exportar PDF" Command="{Binding ExportarPdfCommand}" Margin="0,0,6,0" />
             <Button Content="Exportar Excel" Command="{Binding ExportarExcelCommand}" Margin="0,0,6,0" />

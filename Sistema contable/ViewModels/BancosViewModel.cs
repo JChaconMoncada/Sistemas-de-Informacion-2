@@ -339,11 +339,13 @@ namespace Sistema_contable.ViewModels
             {
                 foreach (var tx in seleccionadas)
                 {
+                    var tipoComp = tx.Credito > 0 ? "Ingreso" : (tx.Debito > 0 ? "Egreso" : "Diario");
+
                     var cc = new ComprobanteContable
                     {
                         Fecha = tx.Fecha ?? DateTime.Now,
                         Descripcion = $"Importación bancaria: {tx.Descripcion} (Ref: {tx.Referencia})",
-                        TipoComprobante = "Diario",
+                        TipoComprobante = tipoComp,
                         Estado = "Registrado",
                         MontoTotal = tx.Debito > 0 ? tx.Debito : tx.Credito,
                         CuentaAsociada = tx.CuentaSeleccionada?.Nombre ?? ""

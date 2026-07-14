@@ -39,9 +39,19 @@
                                    Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
-                <Button Grid.Column="1" Content="↻  Actualizar"
-                        Command="{Binding RefrescarCommand}"
-                        Padding="12,6" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Desde:" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,2" />
+                        <DatePicker SelectedDate="{Binding FechaInicio, Mode=TwoWay}" Width="120" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Hasta:" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,2" />
+                        <DatePicker SelectedDate="{Binding FechaFin, Mode=TwoWay}" Width="120" />
+                    </StackPanel>
+                    <Button Content="↻  Actualizar"
+                            Command="{Binding RefrescarCommand}"
+                            Padding="12,6" VerticalAlignment="Bottom" />
+                </StackPanel>
             </Grid>
 
             <!-- ── 4 Tarjetas KPI ─────────────────────────────────────────────── -->
@@ -49,7 +59,7 @@
 
                 <Border Style="{StaticResource SummaryCard}">
                     <StackPanel>
-                        <TextBlock Text="Ingresos del Mes" FontSize="13"
+                        <TextBlock Text="{Binding TituloIngresos}" FontSize="13"
                                    Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBlock Text="{Binding IngresosMes, StringFormat='Bs. {0:N2}'}"
                                    FontSize="22" FontWeight="Bold"
@@ -61,7 +71,7 @@
 
                 <Border Style="{StaticResource SummaryCard}">
                     <StackPanel>
-                        <TextBlock Text="Gastos del Mes" FontSize="13"
+                        <TextBlock Text="{Binding TituloGastos}" FontSize="13"
                                    Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBlock Text="{Binding GastosMes, StringFormat='Bs. {0:N2}'}"
                                    FontSize="22" FontWeight="Bold"
@@ -114,8 +124,7 @@
                             <DataGridTextColumn Header="Tipo"  Width="90"  Binding="{Binding Tipo}" />
                             <DataGridTextColumn Header="Descripción" Width="*" Binding="{Binding Descripcion}" />
                             <DataGridTextColumn Header="Fecha" Width="90"  Binding="{Binding Fecha}" />
-                            <DataGridTextColumn Header="Debe"  Width="100" Binding="{Binding TotalDebe,  StringFormat=N2}" />
-                            <DataGridTextColumn Header="Haber" Width="100" Binding="{Binding TotalHaber, StringFormat=N2}" />
+                            <DataGridTextColumn Header="Monto" Width="100" Binding="{Binding Monto, StringFormat=N2}" />
                             <DataGridTemplateColumn Header="Estado" Width="85">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -182,23 +191,27 @@
                 </GroupBox>
             </Grid>
 
-            <!-- ── Fila 3: Alertas  +  Acciones Rápidas ──────────────────────── -->
+            <!-- ── Fila 3: Gráfico + Alertas + Acciones Rápidas ──────────────────────── -->
             <Grid Grid.Row="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="12" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Alertas reales -->
-                <GroupBox Grid.Column="0" Header="Ingresos vs Gastos">
+                <!-- Gráfico Ingresos vs Gastos -->
+                <GroupBox Grid.Row="0" Grid.Column="0" Header="Ingresos vs Gastos">
                     <lvc:CartesianChart
                         Series="{Binding Series}"
                         XAxes="{Binding XAxes}"
                         Height="200"/>
                 </GroupBox>
 
-                <!-- Alertas reales (movidas a Row 4) -->
+                <!-- Alertas Activas -->
                 <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="Alertas Activas" Margin="0,16,0,0">
                     <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                               ItemsSource="{Binding Alertas}" MaxHeight="200">
@@ -267,7 +280,7 @@
 
 
                 <!-- Acciones Rápidas -->
-                <GroupBox Grid.Column="2" Header="Acciones Rápidas">
+                <GroupBox Grid.Row="0" Grid.Column="2" Header="Acciones Rápidas">
                     <StackPanel Margin="6,8">
                         <Button Content="📄  Nuevo Comprobante"
                                 Style="{StaticResource AccentButton}"

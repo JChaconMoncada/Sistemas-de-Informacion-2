@@ -55,7 +55,6 @@
                 <Separator />
                 <MenuItem Header="Reexpresión Monetaria" Click="MenuReexpresion_Click" />
                 <MenuItem Header="Importar PDF Bancario" Click="MenuBancos_Click" />
-                <MenuItem Header="Configuración" Click="MenuConfiguracion_Click" />
             </MenuItem>
             <MenuItem Header="A_yuda">
                 <MenuItem Header="Manual de Usuario" Click="MenuAyuda_Click" />
@@ -93,9 +92,14 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="EMPRESAS" FontWeight="SemiBold" FontSize="13"
                                        Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="+ Nueva" Padding="7,3" Margin="0,0,4,0"
-                                    Style="{StaticResource AccentButton}" FontSize="11"
-                                    Click="BtnGestionarEmpresas_Click" ToolTip="Crear o gestionar empresas" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="+ Nueva" Padding="7,3" Margin="0,0,4,0"
+                                        Style="{StaticResource AccentButton}" FontSize="11"
+                                        Click="BtnGestionarEmpresas_Click" ToolTip="Crear o gestionar empresas" />
+                                <Button Content="Eliminar" Padding="7,3"
+                                        Command="{Binding EliminarEmpresaCommand}"
+                                        FontSize="11" ToolTip="Eliminar empresa seleccionada" />
+                            </StackPanel>
                         </Grid>
                     </Border>
 
@@ -178,9 +182,6 @@
                 </TabItem>
                 <TabItem Header="Bancos">
                     <Frame x:Name="FrameBancos" NavigationUIVisibility="Hidden" />
-                </TabItem>
-                <TabItem Header="Configuración">
-                    <Frame x:Name="FrameConfiguracion" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Guía de Usuario">
                     <Frame x:Name="FrameAyuda" NavigationUIVisibility="Hidden" />

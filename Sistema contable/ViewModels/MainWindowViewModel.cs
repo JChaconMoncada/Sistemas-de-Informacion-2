@@ -27,6 +27,7 @@ namespace Sistema_contable.ViewModels
         public ICommand RealizarBackupCommand { get; }
         public ICommand RestaurarBackupCommand { get; }
         public ICommand AbrirBackupsCommand { get; }
+        public ICommand EliminarEmpresaCommand { get; }
 
         public EmpresaCliente EmpresaSeleccionada
         {
@@ -64,6 +65,7 @@ namespace Sistema_contable.ViewModels
             RealizarBackupCommand = new RelayCommand(RealizarBackup);
             RestaurarBackupCommand = new RelayCommand(RestaurarBackup);
             AbrirBackupsCommand = new RelayCommand(AbrirCarpetaBackups);
+            EliminarEmpresaCommand = new RelayCommand(EliminarEmpresaSeleccionada);
 
             _contabilidadService.OnEmpresasModificadas += CargarEmpresas;
             _contabilidadService.OnDatosModificados += CargarEmpresas;
@@ -71,6 +73,35 @@ namespace Sistema_contable.ViewModels
 
             CargarEmpresas();
             ActualizarEstadoBackup();
+        }
+
+        private void EliminarEmpresaSeleccionada()
+        {
+            if (EmpresaSeleccionada == null)
+            {
+                System.Windows.MessageBox.Show("Por favor, seleccione una empresa para eliminar.", "Información", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                return;
+            }
+
+            var result = System.Windows.MessageBox.Show(
+                $"¿Está seguro de que desea eliminar la empresa '{EmpresaSeleccionada.NombreEmpresa}'?\nEsta acción no se puede deshacer.",
+                "Confirmar Eliminación",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _contabilidadService.EliminarEmpresa(EmpresaSeleccionada.Id);
+                    EmpresaSeleccionada = null;
+                    CargarEmpresas();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Error al eliminar la empresa: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
         }
 
         private void ActualizarEstadoBackup()

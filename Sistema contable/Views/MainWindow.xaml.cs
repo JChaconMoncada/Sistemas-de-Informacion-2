@@ -33,7 +33,6 @@ namespace Sistema_contable.Views
             FrameDocumentos.Navigate(new Documentos());
             FrameReexpresion.Navigate(new Reexpresion());
             FrameBancos.Navigate(new Bancos());
-            FrameConfiguracion.Navigate(new Configuracion());
             FrameAyuda.Navigate(new Ayuda());
         }
 
@@ -119,11 +118,6 @@ namespace Sistema_contable.Views
         private void MenuBancos_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 10;
-        }
-
-        private void MenuConfiguracion_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 11;
         }
 
         // ─── Menú Procesos ───────────────────────────────────────────────────────

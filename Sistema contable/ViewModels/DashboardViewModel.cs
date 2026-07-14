@@ -41,8 +41,7 @@ namespace Sistema_contable.ViewModels
         public string  Tipo        { get; set; } = string.Empty;
         public string  Descripcion { get; set; } = string.Empty;
         public string  Fecha       { get; set; } = string.Empty;
-        public decimal TotalDebe   { get; set; }
-        public decimal TotalHaber  { get; set; }
+        public decimal Monto       { get; set; }
         public string  Estado      { get; set; } = string.Empty;
     }
 
@@ -50,9 +49,25 @@ namespace Sistema_contable.ViewModels
     {
         private readonly ContabilidadService _svc;
 
+        private DateTime _fechaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        public DateTime FechaInicio { get => _fechaInicio; set { if (SetProperty(ref _fechaInicio, value)) CargarDatos(); } }
+
+        private DateTime _fechaFin = DateTime.Now;
+        public DateTime FechaFin { get => _fechaFin; set { if (SetProperty(ref _fechaFin, value)) CargarDatos(); } }
+
         // ── Tarjetas KPI ──────────────────────────────────────────────────────────
-        private decimal _ingresosMes;   public decimal IngresosMes   { get => _ingresosMes;   set => SetProperty(ref _ingresosMes, value); }
-        private decimal _gastosMes;     public decimal GastosMes     { get => _gastosMes;     set => SetProperty(ref _gastosMes, value); }
+        private string _tituloIngresos = "Ingresos";
+        public string TituloIngresos { get => _tituloIngresos; set => SetProperty(ref _tituloIngresos, value); }
+
+        private string _tituloGastos = "Gastos";
+        public string TituloGastos { get => _tituloGastos; set => SetProperty(ref _tituloGastos, value); }
+
+        private decimal _ingresosMes;
+        public decimal IngresosMes { get => _ingresosMes; set => SetProperty(ref _ingresosMes, value); }
+
+        private decimal _gastosMes;
+        public decimal GastosMes { get => _gastosMes; set => SetProperty(ref _gastosMes, value); }
+
         private decimal _saldoTotal;    public decimal SaldoTotal    { get => _saldoTotal;    set => SetProperty(ref _saldoTotal, value); }
         private int _alertasPendientes; public int AlertasPendientes { get => _alertasPendientes; set => SetProperty(ref _alertasPendientes, value); }
 
@@ -186,9 +201,14 @@ namespace Sistema_contable.ViewModels
         {
             var hoy = DateTime.Now;
             UltimaActualizacion = $"Actualizado: {hoy:dd/MM/yyyy  HH:mm}";
-            PeriodoActual       = hoy.ToString("MMMM yyyy").ToUpperInvariant();
-            TotalEmpresas       = _svc.ObtenerEmpresas().Count;
-            TotalCuentas        = _svc.ObtenerCuentasContables().Count;
+            
+            if (FechaInicio.Month == FechaFin.Month && FechaInicio.Year == FechaFin.Year)
+                PeriodoActual = FechaInicio.ToString("MMMM yyyy").ToUpperInvariant();
+            else
+                PeriodoActual = $"{FechaInicio:dd/MM/yy} - {FechaFin:dd/MM/yy}".ToUpperInvariant();
+
+            TotalEmpresas = _svc.ObtenerEmpresas().Count;
+            TotalCuentas  = _svc.ObtenerCuentasContables().Count;
             
 
             var empresaId = _svc.EmpresaActivaId;
@@ -211,39 +231,63 @@ namespace Sistema_contable.ViewModels
             var empresa = _svc.ObtenerEmpresas().FirstOrDefault(e => e.Id == empresaId);
             EmpresaActiva = empresa?.NombreEmpresa ?? "Empresa desconocida";
 
-            // ── Comprobantes del mes ──────────────────────────────────────────────
+            // ── Comprobantes del período seleccionado ──────────────────────────────
             var todosComprobantes = _svc.ObtenerComprobantesGuardados().ToList();
-            var compsMes = todosComprobantes
-                .Where(c => c.Fecha.Year == hoy.Year && c.Fecha.Month == hoy.Month)
+            var compsPeriodo = todosComprobantes
+                .Where(c => c.Fecha.Date >= FechaInicio.Date && c.Fecha.Date <= FechaFin.Date)
                 .ToList();
-            ComprobantesDelMes = compsMes.Count;
+            ComprobantesDelMes = compsPeriodo.Count;
 
             // ── Ingresos y Gastos reales via cuentas contables ────────────────────
             var cuentas = _svc.ObtenerCuentasContables();
             decimal ingresos = 0, gastos = 0;
-            foreach (var comp in compsMes)
+            foreach (var comp in compsPeriodo)
             {
                 foreach (var linea in comp.Lineas)
                 {
-
-                    var cuenta = cuentas.FirstOrDefault(c => c.Codigo == linea.CodigoCuenta);
-
+                    // Buscamos la cuenta ignorando espacios y mayúsculas/minúsculas
+                    var cuenta = cuentas.FirstOrDefault(c => 
+                        string.Equals(c.Codigo?.Trim(), linea.CodigoCuenta?.Trim(), StringComparison.OrdinalIgnoreCase));
 
                     if (cuenta == null) continue;
-                    if (cuenta.Tipo == "Ingreso")
-                        ingresos += linea.Haber - linea.Debe;
-                    else if (cuenta.Tipo == "Egreso")
-                        gastos += linea.Debe - linea.Haber;
+
+                    string tipo = cuenta.Tipo?.Trim() ?? string.Empty;
+                    
+                    // Categorizamos según el tipo de cuenta (P&L)
+                    if (tipo.Equals("Ingreso", StringComparison.OrdinalIgnoreCase) || 
+                        tipo.Equals("Ingresos", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ingresos += (linea.Haber - linea.Debe);
+                    }
+                    else if (tipo.Equals("Egreso", StringComparison.OrdinalIgnoreCase) || 
+                             tipo.Equals("Egresos", StringComparison.OrdinalIgnoreCase) ||
+                             tipo.Equals("Gasto", StringComparison.OrdinalIgnoreCase) ||
+                             tipo.Equals("Gastos", StringComparison.OrdinalIgnoreCase))
+                    {
+                        gastos += (linea.Debe - linea.Haber);
+                    }
                 }
             }
-            IngresosMes = Math.Max(0, ingresos);
-            GastosMes   = Math.Max(0, gastos);
+            IngresosMes = ingresos; // Eliminado Math.Max para ver saldos reales aunque sean negativos (ajustes)
+            GastosMes   = gastos;
             SaldoTotal  = IngresosMes - GastosMes;
 
-            int nIngreso = compsMes.Count(c => c.TipoComprobante == "Ingreso");
-            int nEgreso  = compsMes.Count(c => c.TipoComprobante == "Egreso");
-            SubtituloIngresos = $"{nIngreso} comprobante(s) de ingreso";
-            SubtituloGastos   = $"{nEgreso} comprobante(s) de egreso";
+            int nIngreso = compsPeriodo.Count(c => c.TipoComprobante.Equals("Ingreso", StringComparison.OrdinalIgnoreCase));
+            int nEgreso  = compsPeriodo.Count(c => c.TipoComprobante.Equals("Egreso", StringComparison.OrdinalIgnoreCase));
+            
+            if (FechaInicio.Month == FechaFin.Month && FechaInicio.Year == FechaFin.Year && FechaInicio.Day == 1 && FechaFin.Day == DateTime.DaysInMonth(FechaFin.Year, FechaFin.Month))
+            {
+                TituloIngresos = "Ingresos del Mes";
+                TituloGastos   = "Gastos del Mes";
+            }
+            else
+            {
+                TituloIngresos = "Ingresos (Período)";
+                TituloGastos   = "Gastos (Período)";
+            }
+
+            SubtituloIngresos = $"{nIngreso} comprobantes de ingreso en este período";
+            SubtituloGastos   = $"{nEgreso} comprobantes de egreso en este período";
 
             if (SaldoTotal >= 0)
             {
@@ -295,8 +339,36 @@ namespace Sistema_contable.ViewModels
 
             // ── Movimientos ────────────────────────────────────────────────────────
             TotalMovimientos = todosComprobantes.Count;
-            MovimientosDelMes = compsMes.Count;
-            SaldoAcumulado    = todosComprobantes.Sum(c => c.Lineas.Sum(l => l.Haber) - c.Lineas.Sum(l => l.Debe));
+            MovimientosDelMes = compsPeriodo.Count;
+
+            // Calcular saldo acumulado histórico (Ingresos - Gastos de toda la historia)
+            decimal ingresosHist = 0, gastosHist = 0;
+            foreach (var comp in todosComprobantes)
+            {
+                foreach (var linea in comp.Lineas)
+                {
+                    var cuenta = cuentas.FirstOrDefault(c => 
+                        string.Equals(c.Codigo?.Trim(), linea.CodigoCuenta?.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                    if (cuenta == null) continue;
+                    
+                    string tipo = cuenta.Tipo?.Trim() ?? string.Empty;
+
+                    if (tipo.Equals("Ingreso", StringComparison.OrdinalIgnoreCase) || 
+                        tipo.Equals("Ingresos", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ingresosHist += (linea.Haber - linea.Debe);
+                    }
+                    else if (tipo.Equals("Egreso", StringComparison.OrdinalIgnoreCase) || 
+                             tipo.Equals("Egresos", StringComparison.OrdinalIgnoreCase) ||
+                             tipo.Equals("Gasto", StringComparison.OrdinalIgnoreCase) ||
+                             tipo.Equals("Gastos", StringComparison.OrdinalIgnoreCase))
+                    {
+                        gastosHist += (linea.Debe - linea.Haber);
+                    }
+                }
+            }
+            SaldoAcumulado = ingresosHist - gastosHist;
 
             // ── Alertas ───────────────────────────────────────────────────────────
             var alertas = new List<AlertaDashboard>();
@@ -394,8 +466,7 @@ namespace Sistema_contable.ViewModels
                                     ? c.Descripcion[..52] + "…"
                                     : c.Descripcion ?? string.Empty,
                     Fecha       = c.Fecha.ToString("dd/MM/yyyy"),
-                    TotalDebe   = c.Lineas.Sum(l => l.Debe),
-                    TotalHaber  = c.Lineas.Sum(l => l.Haber),
+                    Monto       = c.Lineas.Sum(l => l.Debe),
                     Estado      = c.Estado
                 });
             UltimosMovimientos = new ObservableCollection<MovimientoReciente>(recientes);

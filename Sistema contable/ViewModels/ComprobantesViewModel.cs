@@ -131,8 +131,6 @@ namespace Sistema_contable.ViewModels
             };
 
             Detalles.Clear();
-            AgregarLinea();
-            AgregarLinea();
         }
 
         private int ObtenerSiguienteNumero()
