@@ -57,6 +57,8 @@ namespace Sistema_contable.ViewModels
         }
         public ObservableCollection<CuentaContable> TodasLasCuentasPlanas { get; set; } = new ObservableCollection<CuentaContable>();
 
+        public IEnumerable<CuentaContable> CuentasPadreDisponibles => TodasLasCuentasPlanas.Where(c => !c.AceptaMovimiento);
+
         public void ActualizarListaPlana()
         {
             TodasLasCuentasPlanas.Clear();
@@ -65,6 +67,7 @@ namespace Sistema_contable.ViewModels
             {
                 AplanarCuentas(Cuentas);
             }
+            OnPropertyChanged(nameof(CuentasPadreDisponibles));
         }
 
         private void AplanarCuentas(System.Collections.Generic.IEnumerable<CuentaContable> listaJerarquica)

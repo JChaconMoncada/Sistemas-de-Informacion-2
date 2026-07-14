@@ -112,7 +112,7 @@
                     <TextBox Text="{Binding CuentaSeleccionada.Nivel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
 
                     <Label Content="Cuenta Padre:" FontWeight="SemiBold" />
-                    <ComboBox SelectedValue="{Binding CuentaSeleccionada.CuentaPadre, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Codigo" ItemsSource="{Binding TodasLasCuentasPlanas}" Margin="0,0,0,12">
+                    <ComboBox SelectedValue="{Binding CuentaSeleccionada.CuentaPadre, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Codigo" ItemsSource="{Binding CuentasPadreDisponibles}" Margin="0,0,0,12">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding DisplayName}" />
