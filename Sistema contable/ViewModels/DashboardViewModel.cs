@@ -294,27 +294,29 @@ namespace Sistema_contable.ViewModels
             // =========================
             if (Series.Count == 0)
             {
-                Series.Add(new ColumnSeries<double>
+                Series.Add(new ColumnSeries<double?>
                 {
                     Name = "Ingresos",
-                    Values = new ObservableCollection<double> { (double)IngresosMes },
+                    Values = new ObservableCollection<double?> { (double)IngresosMes, null },
                     Fill = new SolidColorPaint(new SKColor(76, 175, 80)), // Verde Material
-                    MaxBarWidth = 60,
+                    MaxBarWidth = 80,
                     Rx = 6,
                     Ry = 6,
+                    IgnoresBarPosition = true,
                     DataLabelsPaint = new SolidColorPaint(new SKColor(60, 60, 60)),
                     DataLabelsPosition = DataLabelsPosition.Top,
                     DataLabelsFormatter = point => $"Bs. {point.Model:N0}"
                 });
 
-                Series.Add(new ColumnSeries<double>
+                Series.Add(new ColumnSeries<double?>
                 {
                     Name = "Gastos",
-                    Values = new ObservableCollection<double> { (double)GastosMes },
+                    Values = new ObservableCollection<double?> { null, (double)GastosMes },
                     Fill = new SolidColorPaint(new SKColor(244, 67, 54)), // Rojo Material
-                    MaxBarWidth = 60,
+                    MaxBarWidth = 80,
                     Rx = 6,
                     Ry = 6,
+                    IgnoresBarPosition = true,
                     DataLabelsPaint = new SolidColorPaint(new SKColor(60, 60, 60)),
                     DataLabelsPosition = DataLabelsPosition.Top,
                     DataLabelsFormatter = point => $"Bs. {point.Model:N0}"
@@ -322,9 +324,9 @@ namespace Sistema_contable.ViewModels
 
                 XAxes.Add(new Axis
                 {
-                    Labels = new[] { "Total del Período" },
+                    Labels = new[] { "Ingresos", "Gastos" },
                     LabelsRotation = 0,
-                    TextSize = 13,
+                    TextSize = 14,
                     LabelsPaint = new SolidColorPaint(new SKColor(120, 120, 120))
                 });
 
@@ -341,11 +343,11 @@ namespace Sistema_contable.ViewModels
             else
             {
                 if (Series.Count >= 2 && 
-                    Series[0] is ColumnSeries<double> s1 && s1.Values is ObservableCollection<double> v1 &&
-                    Series[1] is ColumnSeries<double> s2 && s2.Values is ObservableCollection<double> v2)
+                    Series[0] is ColumnSeries<double?> s1 && s1.Values is ObservableCollection<double?> v1 &&
+                    Series[1] is ColumnSeries<double?> s2 && s2.Values is ObservableCollection<double?> v2)
                 {
                     if (v1.Count > 0) v1[0] = (double)IngresosMes;
-                    if (v2.Count > 0) v2[0] = (double)GastosMes;
+                    if (v2.Count > 1) v2[1] = (double)GastosMes;
                 }
             }
 
