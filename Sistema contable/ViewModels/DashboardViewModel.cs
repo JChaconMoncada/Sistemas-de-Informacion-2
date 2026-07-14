@@ -287,9 +287,7 @@ namespace Sistema_contable.ViewModels
             }
 
 
-
-
-            // =========================
+            // ========================
             // Gráfico Ingresos vs Gastos
             // =========================
             if (Series.Count == 0)
