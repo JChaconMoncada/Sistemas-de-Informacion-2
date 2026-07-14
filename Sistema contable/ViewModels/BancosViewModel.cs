@@ -103,6 +103,7 @@ namespace Sistema_contable.ViewModels
 
             CargarCuentas();
             _contabilidadService.OnEmpresaCambiada += CargarCuentas;
+            _contabilidadService.OnDatosModificados += CargarCuentas;
         }
 
         private void CargarCuentas()

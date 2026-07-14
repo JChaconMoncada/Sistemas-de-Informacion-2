@@ -122,6 +122,7 @@ namespace Sistema_contable.ViewModels
             LimpiarFiltrosCommand  = new RelayCommand(() => LimpiarFiltros());
 
             _svc.OnEmpresaCambiada      += CargarDatos;
+            _svc.OnDatosModificados     += CargarDatos;
             _svc.OnFacturasModificadas  += CargarDatos;
             CargarDatos();
         }

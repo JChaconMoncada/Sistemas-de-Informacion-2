@@ -150,6 +150,7 @@ namespace Sistema_contable.ViewModels
             RefrescarCommand          = new RelayCommand(() => CargarDatos());
             MarcarPagadaAlertaCommand = new RelayCommand<AlertaDashboard>(EjecutarMarcarPagadaAlerta);
             _svc.OnEmpresaCambiada     += () => System.Windows.Application.Current.Dispatcher.Invoke(CargarDatos);
+            _svc.OnDatosModificados    += () => System.Windows.Application.Current.Dispatcher.Invoke(CargarDatos);
             _svc.OnFacturasModificadas += OnFacturasModificadasHandler;
             CargarDatos();
         }

@@ -100,6 +100,7 @@ namespace Sistema_contable.ViewModels
             RefrescarCommand = new RelayCommand(CargarDatos);
             
             _contabilidadService.OnEmpresaCambiada += CargarDatos;
+            _contabilidadService.OnDatosModificados += CargarDatos;
             CargarDatos();
         }
 

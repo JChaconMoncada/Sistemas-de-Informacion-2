@@ -162,6 +162,7 @@ namespace Sistema_contable.ViewModels
             DocumentosFiltrados = new ObservableCollection<Documento>();
 
             _contabilidadService.OnEmpresaCambiada += CargarDocumentos;
+            _contabilidadService.OnDatosModificados += CargarDocumentos;
             CargarDocumentos();
 
             NuevoDocumentoCommand = new RelayCommand(NuevoDocumento);

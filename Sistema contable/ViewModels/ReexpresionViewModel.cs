@@ -137,6 +137,7 @@ namespace Sistema_contable.ViewModels
             UsarHistorialCommand = new RelayCommand<HistorialReexpresion>(ExecuteUsarHistorial);
 
             _contabilidadService.OnEmpresaCambiada += CargarPartidas;
+            _contabilidadService.OnDatosModificados += CargarPartidas;
             CargarPartidas();
             
             // Cargar IPCs iniciales

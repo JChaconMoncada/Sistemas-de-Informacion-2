@@ -203,6 +203,7 @@ namespace Sistema_contable.ViewModels
             _monedaSeleccionada = "Bolívares (Bs)";
 
             _contabilidadService.OnEmpresaCambiada += GenerarReporte;
+            _contabilidadService.OnDatosModificados += GenerarReporte;
 
             GenerarReporteCommand = new RelayCommand(GenerarReporte);
             ExportarPdfCommand = new RelayCommand(ExportarPdf, () => TieneDatos);
