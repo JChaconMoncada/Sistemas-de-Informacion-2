@@ -253,6 +253,11 @@ namespace Sistema_contable.ViewModels
 
         private void GenerarFlujoCaja()
         {
+            ActualizarEncabezado();
+            var comprobantes = _contabilidadService.ObtenerComprobantesGuardados()
+                .Where(c => c.Fecha.Year == EjercicioSeleccionado)
+                .ToList();
+
             var cuentas = _contabilidadService.ObtenerCuentasContables()
                 .Where(c => c.Codigo.StartsWith("1.1.01"))
                 .OrderBy(c => c.Codigo)
@@ -316,6 +321,29 @@ namespace Sistema_contable.ViewModels
             Lineas = resultado;
             TituloReporte = "ESTADO DE FLUJO DE CAJA";
             TieneDatos = entradas != 0 || salidas != 0;
+        }
+
+        private void GenerarNotasConclusiones()
+        {
+            Lineas = new ObservableCollection<LineaReporte>();
+            TituloReporte = "NOTAS, CONCLUSIONES Y RECOMENDACIONES";
+            ActualizarEncabezado();
+            TieneDatos = !string.IsNullOrEmpty(NotasExplicativas) || !string.IsNullOrEmpty(ConclusionesRecomendaciones);
+        }
+
+        private void ActualizarEncabezado()
+        {
+            var empresa = _contabilidadService.ObtenerEmpresaActiva();
+            NombreEmpresa = empresa?.NombreEmpresa ?? "Sin Empresa";
+            
+            if (TipoReporteSeleccionado == "Estado de Resultados")
+            {
+                PeriodoCubierto = $"Ejercicio Fiscal {EjercicioSeleccionado}";
+            }
+            else
+            {
+                PeriodoCubierto = $"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
+            }
         }
     }
 }

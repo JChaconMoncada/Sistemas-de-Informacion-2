@@ -25,7 +25,7 @@ public class ContabilidadService
     public event Action OnEmpresaCambiada;
     public event Action OnEmpresasModificadas;
     public event Action OnFacturasModificadas;
-
+    public event Action OnDatosModificados;
     public void SeleccionarEmpresa(int? id)
     {
         if (EmpresaActivaId == id) return;
