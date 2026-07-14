@@ -89,8 +89,8 @@
         <GroupBox Grid.Row="3" Grid.Column="1" Header="Detalle de Cuenta" Margin="8,0,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="8">
-                    <Label Content="Código:" FontWeight="SemiBold" />
-                    <TextBox Text="{Binding CuentaSeleccionada.Codigo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                    <Label Content="Código:" FontWeight="SemiBold" Visibility="Collapsed" />
+                    <TextBox Text="{Binding CuentaSeleccionada.Codigo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" Visibility="Collapsed" />
 
                     <Label Content="Nombre:" FontWeight="SemiBold" />
                     <TextBox Text="{Binding CuentaSeleccionada.Nombre, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />

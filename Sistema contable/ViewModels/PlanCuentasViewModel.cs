@@ -186,20 +186,75 @@ namespace Sistema_contable.ViewModels
                 nueva.CuentaPadre = cuentaPadreActual.Codigo;
                 nueva.Tipo = cuentaPadreActual.Tipo; // Hereda el mismo tipo (ej: si el padre es Activo, el hijo es Activo)
                 nueva.Nivel = cuentaPadreActual.Nivel + 1; // Sube un nivel en la jerarquía
-
-                // Sugerimos el prefijo del código automáticamente (Ej: si el padre es "1.1", sugerimos "1.1.")
-                nueva.Codigo = $"{cuentaPadreActual.Codigo}.";
+                
+                nueva.Codigo = GenerarSiguienteCodigo(cuentaPadreActual);
             }
             else
             {
                 // No había nada seleccionado, se crea una cuenta RAÍZ (Nivel 1)
                 nueva.CuentaPadre = null;
                 nueva.Nivel = 1;
-                nueva.Codigo = ""; // El usuario asigna el dígito principal (ej: 1, 2, 3...)
+                nueva.Codigo = GenerarSiguienteCodigo(null);
             }
 
             // 4. Pasamos la nueva cuenta al formulario para que el usuario termine de rellenar
             CuentaSeleccionada = nueva;
+        }
+
+        private string GenerarSiguienteCodigo(CuentaContable padre)
+        {
+            if (padre == null)
+            {
+                // Generar código para una nueva raíz
+                int maxRoot = 0;
+                foreach (var c in Cuentas)
+                {
+                    if (!string.IsNullOrEmpty(c.Codigo) && char.IsDigit(c.Codigo[0]))
+                    {
+                        int val = c.Codigo[0] - '0';
+                        if (val > maxRoot) maxRoot = val;
+                    }
+                }
+                return $"{maxRoot + 1}.0.00.00";
+            }
+
+            // Generar código para hijo
+            if (padre.Hijos == null || padre.Hijos.Count == 0)
+            {
+                // No tiene hijos aún
+                var parts = padre.Codigo.Split('.');
+                if (parts.Length != 4) return padre.Codigo + ".01";
+                
+                if (padre.Nivel == 1) return $"{parts[0]}.1.00.00";
+                if (padre.Nivel == 2) return $"{parts[0]}.{parts[1]}.01.00";
+                if (padre.Nivel == 3) return $"{parts[0]}.{parts[1]}.{parts[2]}.01";
+                return $"{padre.Codigo}.01";
+            }
+            else
+            {
+                // Buscar el hijo con el código mayor
+                var maxHijo = padre.Hijos.OrderByDescending(h => h.Codigo).First();
+                var parts = maxHijo.Codigo.Split('.');
+                if (parts.Length == 4)
+                {
+                    if (padre.Nivel == 1)
+                    {
+                        int val = int.Parse(parts[1]);
+                        return $"{parts[0]}.{val + 1}.00.00";
+                    }
+                    if (padre.Nivel == 2)
+                    {
+                        int val = int.Parse(parts[2]);
+                        return $"{parts[0]}.{parts[1]}.{(val + 1):D2}.00";
+                    }
+                    if (padre.Nivel >= 3)
+                    {
+                        int val = int.Parse(parts[3]);
+                        return $"{parts[0]}.{parts[1]}.{parts[2]}.{(val + 1):D2}";
+                    }
+                }
+                return maxHijo.Codigo + "+1";
+            }
         }
 
         private void GuardarCuenta()
