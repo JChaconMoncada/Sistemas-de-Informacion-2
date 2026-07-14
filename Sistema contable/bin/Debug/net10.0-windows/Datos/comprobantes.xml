@@ -87,4 +87,104 @@
       </AsientoLinea>
     </Lineas>
   </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>4</IdComprobante>
+    <Fecha>2026-07-13T21:20:23.0076444-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>27</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1</CodigoCuenta>
+        <DescripcionCuenta />
+        <Debe>12</Debe>
+        <Haber>12</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>2</CodigoCuenta>
+        <DescripcionCuenta />
+        <Debe>15</Debe>
+        <Haber>15</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>5</IdComprobante>
+    <Fecha>2026-07-13T21:22:12.7112128-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>1</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>1000</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1</CodigoCuenta>
+        <DescripcionCuenta>1.1.01.01</DescripcionCuenta>
+        <Debe>1000</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>2</CodigoCuenta>
+        <DescripcionCuenta>4.1.01.01</DescripcionCuenta>
+        <Debe>0</Debe>
+        <Haber>1000</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>6</IdComprobante>
+    <Fecha>2026-07-13T21:47:15.2468971-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>2</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>1000</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1</CodigoCuenta>
+        <DescripcionCuenta>yeha</DescripcionCuenta>
+        <Debe>1000</Debe>
+        <Haber>1000</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta />
+        <DescripcionCuenta />
+        <Debe>0</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>7</IdComprobante>
+    <Fecha>2026-07-13T21:50:26.0047814-04:00</Fecha>
+    <Descripcion />
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>2</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>1</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>12</CodigoCuenta>
+        <DescripcionCuenta>ekeke</DescripcionCuenta>
+        <Debe>1</Debe>
+        <Haber>1</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta />
+        <DescripcionCuenta />
+        <Debe>0</Debe>
+        <Haber>0</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
 </ArrayOfComprobanteContable>

@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:lvc="http://livecharts.com"
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       mc:Ignorable="d" 
       d:DesignHeight="750" d:DesignWidth="1100"
       Title="Dashboard">
@@ -191,11 +191,10 @@
                 <!-- Alertas reales -->
 
                 <GroupBox Grid.Column="0" Header="Ingresos vs Gastos">
-                            <lvc:CartesianChart
+                                    <lvc:CartesianChart
                     Series="{Binding Series}"
                     XAxes="{Binding XAxes}"
-                    Height="200"
-                    Margin="8"/>    
+                    Height="200"/>
                 </GroupBox>
 
 

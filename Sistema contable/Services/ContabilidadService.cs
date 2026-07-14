@@ -56,6 +56,9 @@ public class ContabilidadService
     private ContabilidadService()
     {
         _datosPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datos");
+
+
+
         if (!Directory.Exists(_datosPath))
         {
             Directory.CreateDirectory(_datosPath);
@@ -690,6 +693,19 @@ public class ContabilidadService
         }
     }
 
+public void LimpiarComprobantes()
+{
+    System.Windows.MessageBox.Show(
+        $"Antes: {_comprobantesGuardados.Count} comprobantes");
+
+    _comprobantesGuardados.Clear();
+
+    GuardarLista(_comprobantesGuardados, _comprobantesFile);
+
+    System.Windows.MessageBox.Show(
+        $"Después: {_comprobantesGuardados.Count} comprobantes\n\nArchivo:\n{_comprobantesFile}");
+}
+
     public string EjecutarRespaldoAutomatico() => EjecutarBackup("Respaldo_Reexpresion");
 
     public string EjecutarBackupManual() => EjecutarBackup("Backup");
@@ -862,6 +878,7 @@ public class ContabilidadService
         historial.Anulado = true;
         GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
     }
+
 
     public void DesactivarComprobanteReexpresion(int idHistorial)
     {

@@ -167,7 +167,10 @@ namespace Sistema_contable.ViewModels
             {
                 foreach (var linea in comp.Lineas)
                 {
+
                     var cuenta = cuentas.FirstOrDefault(c => c.Codigo == linea.CodigoCuenta);
+
+
                     if (cuenta == null) continue;
                     if (cuenta.Tipo == "Ingreso")
                         ingresos += linea.Haber - linea.Debe;
@@ -196,6 +199,8 @@ namespace Sistema_contable.ViewModels
                 ColorSaldo     = new SolidColorBrush(Color.FromRgb(0xF4, 0x43, 0x36));
                 SubtituloSaldo = "Resultado negativo";
             }
+
+
 
 
             // =========================
