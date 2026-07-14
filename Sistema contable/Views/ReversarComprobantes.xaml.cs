@@ -105,13 +105,6 @@ namespace Sistema_contable.Views
                 return;
             }
 
-            if (DtpFechaReversion.SelectedDate == null)
-            {
-                MessageBox.Show("Indique la fecha de reversión.", "Advertencia",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
             if (string.IsNullOrWhiteSpace(TxtMotivoReversion.Text))
             {
                 MessageBox.Show("Ingrese el motivo de la reversión.", "Advertencia",
@@ -119,22 +112,37 @@ namespace Sistema_contable.Views
                 return;
             }
 
-            var result = MessageBox.Show(
-                $"¿Confirma la reversión del comprobante #{_comprobanteSeleccionado.IdComprobante}?\n\nMotivo: {TxtMotivoReversion.Text}\n\nEsta acción no puede deshacerse.",
-                "Confirmar Reversión", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (DtpFechaReversion.SelectedDate == null)
+            {
+                MessageBox.Show("Seleccione la fecha de reversión.", "Advertencia",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var mensaje = $"¿Confirma la reversión del comprobante #{_comprobanteSeleccionado.IdComprobante}?\n\n" +
+                        $"Descripción: {_comprobanteSeleccionado.Descripcion}\n" +
+                        $"Tipo: {_comprobanteSeleccionado.TipoComprobante}\n" +
+                        $"Motivo: {TxtMotivoReversion.Text}\n\n" +
+                        $"Esta acción generará un contra-asiento y no puede deshacerse.";
+
+            var result = MessageBox.Show(mensaje, "Confirmar Reversión", 
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
                 try
                 {
-                    var contra = _servicio.ReversarComprobante(
+                    _servicio.ReversarComprobante(
                         _comprobanteSeleccionado.IdComprobante,
                         DtpFechaReversion.SelectedDate.Value,
                         TxtMotivoReversion.Text);
 
                     MessageBox.Show(
-                        $"Reversión generada exitosamente.\nNuevo comprobante de reversión: #{contra.IdComprobante}",
+                        $"Reversión generada exitosamente.\n\n" +
+                        $"Comprobante original #{_comprobanteSeleccionado.IdComprobante} marcado como 'Reversado'.\n" +
+                        $"Se ha creado un contra-asiento con los débitos y créditos invertidos.",
                         "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                    
                     this.Close();
                 }
                 catch (Exception ex)

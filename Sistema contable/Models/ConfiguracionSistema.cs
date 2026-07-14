@@ -2,6 +2,7 @@ namespace Sistema_contable.Models
 {
     public class ConfiguracionSistema
     {
+        public int Id { get; set; }
         public decimal PorcentajeIva { get; set; } = 16;
         public decimal PorcentajeIslr { get; set; } = 34;
         public string RegimenFiscal { get; set; } = "Ordinario";

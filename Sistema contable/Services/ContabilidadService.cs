@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using SistemaContableZulay.UI.Domain;
 using Documento = Sistema_contable.Models.Documento;
 using ConfiguracionSistema = Sistema_contable.Models.ConfiguracionSistema;
 using BackupInfo = Sistema_contable.Models.BackupInfo;
 using HistorialReexpresion = Sistema_contable.Models.HistorialReexpresion;
+using Sistema_contable.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using Sistema_contable.Services;
 
 namespace SistemaContableZulay.UI.Services;
 
@@ -39,16 +44,15 @@ public class ContabilidadService
     private readonly string _cuentasFile;
     private readonly string _empresasFile;
     private readonly string _periodosFile;
-    private readonly string _facturasFile;
     private readonly string _documentosFile;
     private readonly string _configuracionFile;
     private readonly string _historialReexpresionesFile;
+    private readonly SupabaseSyncService _syncService = new SupabaseSyncService();
+    private System.Timers.Timer _timerSincronizacion;
 
     private List<ComprobanteContable> _comprobantesGuardados = new();
     private List<CuentaContable> _cuentasGuardadas = new();
     private List<EmpresaCliente> _empresasGuardadas = new();
-    private List<PeriodoFiscal> _periodosFiscales = new();
-    private List<FacturaCobranza> _facturasCobranza = new();
     private List<Documento> _documentosGuardados = new();
     private List<HistorialReexpresion> _historialReexpresiones = new();
     private ConfiguracionSistema _configuracion = new();
@@ -65,7 +69,6 @@ public class ContabilidadService
         _cuentasFile = Path.Combine(_datosPath, "cuentas.xml");
         _empresasFile = Path.Combine(_datosPath, "empresas.xml");
         _periodosFile = Path.Combine(_datosPath, "periodos.xml");
-        _facturasFile  = Path.Combine(_datosPath, "facturas.xml");
         _documentosFile = Path.Combine(_datosPath, "documentos.xml");
         _configuracionFile = Path.Combine(_datosPath, "configuracion.xml");
         _historialReexpresionesFile = Path.Combine(_datosPath, "historial_reexpresiones.xml");
@@ -78,8 +81,6 @@ public class ContabilidadService
         _empresasGuardadas = CargarLista<EmpresaCliente>(_empresasFile) ?? new List<EmpresaCliente>();
         _cuentasGuardadas = CargarLista<CuentaContable>(_cuentasFile) ?? new List<CuentaContable>();
         _comprobantesGuardados = CargarLista<ComprobanteContable>(_comprobantesFile) ?? new List<ComprobanteContable>();
-        _periodosFiscales = CargarLista<PeriodoFiscal>(_periodosFile) ?? new List<PeriodoFiscal>();
-        _facturasCobranza = CargarLista<FacturaCobranza>(_facturasFile) ?? new List<FacturaCobranza>();
         _documentosGuardados = CargarLista<Documento>(_documentosFile) ?? new List<Documento>();
         _historialReexpresiones = CargarLista<HistorialReexpresion>(_historialReexpresionesFile) ?? new List<HistorialReexpresion>();
         _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
@@ -128,6 +129,94 @@ public class ContabilidadService
         var serializer = new XmlSerializer(typeof(ConfiguracionSistema));
         using var stream = new FileStream(_configuracionFile, FileMode.Create);
         serializer.Serialize(stream, _configuracion);
+    }
+
+    private async Task SincronizarFacturaAsync(FacturaCobranza factura)
+    {
+        var payload = new
+        {
+            sync_id = factura.SyncId,
+            id = factura.Id,
+            numero_factura = factura.NumeroFactura,
+            id_empresa = factura.IdEmpresa,
+            nombre_cliente = factura.NombreCliente,
+            descripcion = factura.Descripcion,
+            fecha_emision = factura.FechaEmision,
+            fecha_vencimiento = factura.FechaVencimiento,
+            monto = factura.Monto,
+            estado = factura.Estado,
+            fecha_pago = factura.FechaPago,
+            id_comprobante_emision = factura.IdComprobanteEmision,
+            id_comprobante_pago = factura.IdComprobantePago,
+            id_comprobante_reversion = factura.IdComprobanteReversion
+        };
+
+        bool ok = await _syncService.UpsertAsync("facturas_cobranza", payload);
+
+        using var db = new ContabilidadDbContext();
+        if (ok)
+        {
+            var f = db.FacturasCobranza.FirstOrDefault(x => x.Id == factura.Id);
+            if (f != null) { f.Sincronizado = true; db.SaveChanges(); }
+        }
+        else
+        {
+            db.ColaSincronizacion.Add(new SistemaContableZulay.UI.Domain.ColaSincronizacion
+            {
+                TipoEntidad = "FacturaCobranza",
+                PayloadJson = JsonSerializer.Serialize(payload)
+            });
+            db.SaveChanges();
+        }
+    }
+
+    private async Task SincronizarComprobanteAsync(ComprobanteContable comp)
+    {
+        var payload = new
+        {
+            sync_id = comp.SyncId,
+            id_comprobante = comp.IdComprobante,
+            fecha = comp.Fecha,
+            descripcion = comp.Descripcion,
+            tipo_comprobante = comp.TipoComprobante,
+            id_empresa = comp.IdEmpresa,
+            estado = comp.Estado,
+            monto_total = comp.MontoTotal,
+            moneda = comp.Moneda
+        };
+
+        bool ok = await _syncService.UpsertAsync("comprobantes_contables", payload);
+
+        using var db = new ContabilidadDbContext();
+        if (ok)
+        {
+            var c = db.ComprobantesContables.FirstOrDefault(x => x.IdComprobante == comp.IdComprobante);
+            if (c != null) { c.Sincronizado = true; db.SaveChanges(); }
+
+            // Sincronizar también las líneas del comprobante
+            foreach (var linea in comp.Lineas)
+            {
+                var lineaPayload = new
+                {
+                    sync_id = Guid.NewGuid(),
+                    comprobante_sync_id = comp.SyncId,
+                    codigo_cuenta = linea.CodigoCuenta,
+                    descripcion_cuenta = linea.DescripcionCuenta,
+                    debe = linea.Debe,
+                    haber = linea.Haber
+                };
+                await _syncService.UpsertAsync("asiento_lineas", lineaPayload);
+            }
+        }
+        else
+        {
+            db.ColaSincronizacion.Add(new SistemaContableZulay.UI.Domain.ColaSincronizacion
+            {
+                TipoEntidad = "ComprobanteContable",
+                PayloadJson = JsonSerializer.Serialize(payload)
+            });
+            db.SaveChanges();
+        }
     }
 
     // ─── Documentos ───────────────────────────────────────────────────────────
@@ -250,7 +339,6 @@ public class ContabilidadService
 
         OnEmpresasModificadas?.Invoke();
 
-        // Si se editó la empresa activa, disparamos el evento para que la interfaz se refresque
         if (EmpresaActivaId == empresa.Id)
         {
             OnEmpresaCambiada?.Invoke();
@@ -297,7 +385,6 @@ public class ContabilidadService
 
     private void GuardarEmpresas() => GuardarLista(_empresasGuardadas, _empresasFile);
     private void GuardarCuentas() => GuardarLista(_cuentasGuardadas, _cuentasFile);
-    private void GuardarFacturas() => GuardarLista(_facturasCobranza, _facturasFile);
 
     public List<string> ObtenerTiposComprobante()
     {
@@ -310,28 +397,55 @@ public class ContabilidadService
 
         comprobante.IdEmpresa = EmpresaActivaId.Value;
 
+        using var db = new ContabilidadDbContext();
+
         if (comprobante.IdComprobante == 0)
-            comprobante.IdComprobante = _comprobantesGuardados.Count > 0 ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1;
-            
-        var existente = _comprobantesGuardados.FirstOrDefault(c => c.IdComprobante == comprobante.IdComprobante);
-        if(existente != null) _comprobantesGuardados.Remove(existente);
-        
-        _comprobantesGuardados.Add(comprobante);
-        GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        {
+            db.ComprobantesContables.Add(comprobante);
+        }
+        else
+        {
+            var existente = db.ComprobantesContables
+                .Include(c => c.Lineas)
+                .FirstOrDefault(c => c.IdComprobante == comprobante.IdComprobante);
+
+            if (existente != null)
+            {
+                db.LineasAsiento.RemoveRange(existente.Lineas);
+                db.Entry(existente).CurrentValues.SetValues(comprobante);
+                existente.Lineas = comprobante.Lineas;
+            }
+            else
+            {
+                db.ComprobantesContables.Add(comprobante);
+            }
+        }
+
+        db.SaveChanges();
+
+        _ = SincronizarComprobanteAsync(comprobante);
     }
 
-    public IReadOnlyList<ComprobanteContable> ObtenerComprobantesGuardados() 
+    public IReadOnlyList<ComprobanteContable> ObtenerComprobantesGuardados()
     {
         if (EmpresaActivaId == null) return new List<ComprobanteContable>().AsReadOnly();
-        
-        return _comprobantesGuardados.Where(c => c.IdEmpresa == EmpresaActivaId.Value).ToList().AsReadOnly();
+
+        using var db = new ContabilidadDbContext();
+        return db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value)
+            .ToList()
+            .AsReadOnly();
     }
 
     public IReadOnlyList<ComprobanteContable> ObtenerComprobantesParaActualizar(DateTime? desde, DateTime? hasta, string tipo)
     {
         if (EmpresaActivaId == null) return new List<ComprobanteContable>().AsReadOnly();
 
-        var query = _comprobantesGuardados.Where(c => c.IdEmpresa == EmpresaActivaId.Value);
+        using var db = new ContabilidadDbContext();
+        var query = db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value);
 
         if (desde.HasValue)
             query = query.Where(c => c.Fecha >= desde.Value);
@@ -345,20 +459,41 @@ public class ContabilidadService
 
     public void ActualizarEstadoComprobante(int idComprobante, string nuevoEstado)
     {
-        var comp = _comprobantesGuardados.FirstOrDefault(c => c.IdComprobante == idComprobante);
-        if (comp == null) throw new InvalidOperationException($"Comprobante #{idComprobante} no encontrado.");
+        using var db = new ContabilidadDbContext();
+        var comp = db.ComprobantesContables.FirstOrDefault(c => c.IdComprobante == idComprobante)
+            ?? throw new InvalidOperationException($"Comprobante #{idComprobante} no encontrado.");
 
         comp.Estado = nuevoEstado;
-        GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        db.SaveChanges();
+    }
+
+    public void EliminarComprobante(int idComprobante)
+    {
+        using var db = new ContabilidadDbContext();
+        var existente = db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .FirstOrDefault(c => c.IdComprobante == idComprobante);
+
+        if (existente != null)
+        {
+            db.ComprobantesContables.Remove(existente);
+            db.SaveChanges();
+        }
     }
 
     public ComprobanteContable ReversarComprobante(int idComprobante, DateTime fechaReversion, string motivo)
     {
         if (EmpresaActivaId == null) throw new InvalidOperationException("No hay una empresa activa seleccionada.");
 
-        var original = _comprobantesGuardados.FirstOrDefault(c => c.IdComprobante == idComprobante);
-        if (original == null) throw new InvalidOperationException($"Comprobante #{idComprobante} no encontrado.");
-        if (original.Estado == "Reversado") throw new InvalidOperationException("El comprobante ya fue reversado.");
+        using var db = new ContabilidadDbContext();
+
+        var original = db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .FirstOrDefault(c => c.IdComprobante == idComprobante)
+            ?? throw new InvalidOperationException($"Comprobante #{idComprobante} no encontrado.");
+
+        if (original.Estado == "Reversado")
+            throw new InvalidOperationException("El comprobante ya fue reversado.");
 
         var contraAsiento = new ComprobanteContable
         {
@@ -380,12 +515,12 @@ public class ContabilidadService
             });
         }
 
-        contraAsiento.IdComprobante = _comprobantesGuardados.Count > 0
-            ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1;
-
         original.Estado = "Reversado";
-        _comprobantesGuardados.Add(contraAsiento);
-        GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        db.ComprobantesContables.Add(contraAsiento);
+        db.SaveChanges();
+
+        _ = SincronizarComprobanteAsync(original);
+        _ = SincronizarComprobanteAsync(contraAsiento);
 
         return contraAsiento;
     }
@@ -394,7 +529,9 @@ public class ContabilidadService
     {
         if (EmpresaActivaId == null) return new ResumenEjercicio();
 
-        var comprobantes = _comprobantesGuardados
+        using var db = new ContabilidadDbContext();
+        var comprobantes = db.ComprobantesContables
+            .Include(c => c.Lineas)
             .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Year == anio)
             .ToList();
 
@@ -429,7 +566,10 @@ public class ContabilidadService
     public void CerrarEjercicio(int anio)
     {
         if (EmpresaActivaId == null) throw new InvalidOperationException("No hay una empresa activa seleccionada.");
-        if (_periodosFiscales.Any(p => p.Anio == anio && p.Cerrado))
+
+        using var db = new ContabilidadDbContext();
+
+        if (db.PeriodosFiscales.Any(p => p.Anio == anio && p.Cerrado))
             throw new InvalidOperationException($"El ejercicio {anio} ya está cerrado.");
 
         var resumen = ObtenerResumenEjercicio(anio);
@@ -440,79 +580,47 @@ public class ContabilidadService
             Fecha = new DateTime(anio, 12, 31),
             Descripcion = $"Cierre del ejercicio fiscal {anio}",
             TipoComprobante = "Cierre",
-            Estado = "Registrado",
-            IdComprobante = _comprobantesGuardados.Count > 0
-                ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1
+            Estado = "Registrado"
         };
 
         if (resumen.Resultado >= 0)
         {
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "4.0.00.00",
-                DescripcionCuenta = "Cierre de Ingresos",
-                Debe = resumen.TotalIngresos,
-                Haber = 0
-            });
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "3.1.00.00",
-                DescripcionCuenta = "Resultado del Ejercicio (Utilidad)",
-                Debe = 0,
-                Haber = resumen.Resultado
-            });
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "5.0.00.00",
-                DescripcionCuenta = "Cierre de Egresos",
-                Debe = 0,
-                Haber = resumen.TotalEgresos
-            });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "4.0.00.00", DescripcionCuenta = "Cierre de Ingresos", Debe = resumen.TotalIngresos, Haber = 0 });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "3.1.00.00", DescripcionCuenta = "Resultado del Ejercicio (Utilidad)", Debe = 0, Haber = resumen.Resultado });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "5.0.00.00", DescripcionCuenta = "Cierre de Egresos", Debe = 0, Haber = resumen.TotalEgresos });
         }
         else
         {
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "4.0.00.00",
-                DescripcionCuenta = "Cierre de Ingresos",
-                Debe = resumen.TotalIngresos,
-                Haber = 0
-            });
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "5.0.00.00",
-                DescripcionCuenta = "Cierre de Egresos",
-                Debe = 0,
-                Haber = resumen.TotalEgresos
-            });
-            asientoCierre.Lineas.Add(new AsientoLinea
-            {
-                CodigoCuenta = "3.1.00.00",
-                DescripcionCuenta = "Resultado del Ejercicio (Pérdida)",
-                Debe = Math.Abs(resumen.Resultado),
-                Haber = 0
-            });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "4.0.00.00", DescripcionCuenta = "Cierre de Ingresos", Debe = resumen.TotalIngresos, Haber = 0 });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "5.0.00.00", DescripcionCuenta = "Cierre de Egresos", Debe = 0, Haber = resumen.TotalEgresos });
+            asientoCierre.Lineas.Add(new AsientoLinea { CodigoCuenta = "3.1.00.00", DescripcionCuenta = "Resultado del Ejercicio (Pérdida)", Debe = Math.Abs(resumen.Resultado), Haber = 0 });
         }
 
-        _comprobantesGuardados.Add(asientoCierre);
+        db.ComprobantesContables.Add(asientoCierre);
 
-        var periodo = _periodosFiscales.FirstOrDefault(p => p.Anio == anio);
+        var periodo = db.PeriodosFiscales.FirstOrDefault(p => p.Anio == anio);
         if (periodo == null)
         {
             periodo = new PeriodoFiscal { Anio = anio };
-            _periodosFiscales.Add(periodo);
+            db.PeriodosFiscales.Add(periodo);
         }
         periodo.Cerrado = true;
+        periodo.FechaCierre = DateTime.Now;
 
-        GuardarLista(_comprobantesGuardados, _comprobantesFile);
-        GuardarLista(_periodosFiscales, _periodosFile);
+        db.SaveChanges();
     }
 
     public bool EjercicioCerrado(int anio)
-        => _periodosFiscales.Any(p => p.Anio == anio && p.Cerrado);
+    {
+        using var db = new ContabilidadDbContext();
+        return db.PeriodosFiscales.Any(p => p.Anio == anio && p.Cerrado);
+    }
 
     public List<PeriodoFiscal> ObtenerPeriodosFiscales()
-        => _periodosFiscales.ToList();
+    {
+        using var db = new ContabilidadDbContext();
+        return db.PeriodosFiscales.ToList();
+    }
 
     // ─── Cobranza ─────────────────────────────────────────────────────────────
 
@@ -520,19 +628,22 @@ public class ContabilidadService
     {
         if (EmpresaActivaId == null) return new List<FacturaCobranza>();
 
+        using var db = new ContabilidadDbContext();
         var hoy = DateTime.Now.Date;
-        bool huboActualizacion = false;
-        foreach (var f in _facturasCobranza
+
+        var vencidas = db.FacturasCobranza
             .Where(f => f.IdEmpresa == EmpresaActivaId.Value
                      && f.Estado == "Pendiente"
-                     && f.FechaVencimiento.Date < hoy))
-        {
-            f.Estado = "Vencida";
-            huboActualizacion = true;
-        }
-        if (huboActualizacion) GuardarFacturas();
+                     && f.FechaVencimiento.Date < hoy)
+            .ToList();
 
-        return _facturasCobranza
+        foreach (var f in vencidas)
+            f.Estado = "Vencida";
+
+        if (vencidas.Count > 0)
+            db.SaveChanges();
+
+        return db.FacturasCobranza
             .Where(f => f.IdEmpresa == EmpresaActivaId.Value)
             .OrderByDescending(f => f.FechaEmision)
             .ToList();
@@ -542,152 +653,165 @@ public class ContabilidadService
     {
         if (EmpresaActivaId == null) throw new InvalidOperationException("No hay empresa activa seleccionada.");
 
+        using var db = new ContabilidadDbContext();
         factura.IdEmpresa = EmpresaActivaId.Value;
         bool esNueva = factura.Id == 0;
 
         if (esNueva)
         {
-            factura.Id = _facturasCobranza.Count > 0 ? _facturasCobranza.Max(f => f.Id) + 1 : 1;
-            factura.NumeroFactura = $"FAC-{EmpresaActivaId:D3}-{factura.Id:D4}";
-
-            var idComp = _comprobantesGuardados.Count > 0
-                ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1;
+            var siguienteId = db.FacturasCobranza.Any()
+                ? db.FacturasCobranza.Max(f => f.Id) + 1 : 1;
+            factura.NumeroFactura = $"FAC-{EmpresaActivaId:D3}-{siguienteId:D4}";
 
             var compEmision = new ComprobanteContable
             {
-                IdComprobante   = idComp,
-                IdEmpresa       = EmpresaActivaId.Value,
-                Fecha           = factura.FechaEmision,
-                Descripcion     = $"Factura {factura.NumeroFactura} – {factura.NombreCliente}",
+                IdEmpresa = EmpresaActivaId.Value,
+                Fecha = factura.FechaEmision,
+                Descripcion = $"Factura {factura.NumeroFactura} – {factura.NombreCliente}",
                 TipoComprobante = "Ingreso",
-                Estado          = "Registrado"
+                Estado = "Registrado"
             };
             compEmision.Lineas.Add(new AsientoLinea
             {
-                CodigoCuenta     = "1.1.02.01",
+                CodigoCuenta = "1.1.02.01",
                 DescripcionCuenta = "Clientes Nacionales",
-                Debe  = factura.Monto,
+                Debe = factura.Monto,
                 Haber = 0
             });
             compEmision.Lineas.Add(new AsientoLinea
             {
-                CodigoCuenta     = "4.1.01.01",
+                CodigoCuenta = "4.1.01.01",
                 DescripcionCuenta = "Ventas de Bienes / Servicios",
-                Debe  = 0,
+                Debe = 0,
                 Haber = factura.Monto
             });
 
-            _comprobantesGuardados.Add(compEmision);
-            GuardarLista(_comprobantesGuardados, _comprobantesFile);
-            factura.IdComprobanteEmision = idComp;
-        }
+            db.ComprobantesContables.Add(compEmision);
+            db.FacturasCobranza.Add(factura);
+            db.SaveChanges();
 
-        var existente = _facturasCobranza.FirstOrDefault(f => f.Id == factura.Id);
-        if (existente != null) _facturasCobranza.Remove(existente);
-        _facturasCobranza.Add(factura);
-        GuardarFacturas();
+            factura.IdComprobanteEmision = compEmision.IdComprobante;
+            db.SaveChanges();
+
+            _ = SincronizarFacturaAsync(factura);
+            _ = SincronizarComprobanteAsync(compEmision);
+        }
+        else
+        {
+            var existente = db.FacturasCobranza.FirstOrDefault(f => f.Id == factura.Id);
+            if (existente != null)
+            {
+                db.Entry(existente).CurrentValues.SetValues(factura);
+            }
+            else
+            {
+                db.FacturasCobranza.Add(factura);
+            }
+            db.SaveChanges();
+
+            _ = SincronizarFacturaAsync(factura);
+        }
     }
 
     public void MarcarFacturaPagada(int idFactura)
     {
         if (EmpresaActivaId == null) throw new InvalidOperationException("No hay empresa activa seleccionada.");
 
-        var factura = _facturasCobranza.FirstOrDefault(f => f.Id == idFactura)
+        using var db = new ContabilidadDbContext();
+
+        var factura = db.FacturasCobranza.FirstOrDefault(f => f.Id == idFactura)
             ?? throw new InvalidOperationException("Factura no encontrada.");
 
-        if (factura.Estado == "Pagada")  throw new InvalidOperationException("La factura ya está pagada.");
+        if (factura.Estado == "Pagada") throw new InvalidOperationException("La factura ya está pagada.");
         if (factura.Estado == "Anulada") throw new InvalidOperationException("No se puede cobrar una factura anulada.");
-
-        var idComp = _comprobantesGuardados.Count > 0
-            ? _comprobantesGuardados.Max(c => c.IdComprobante) + 1 : 1;
 
         var compPago = new ComprobanteContable
         {
-            IdComprobante   = idComp,
-            IdEmpresa       = EmpresaActivaId.Value,
-            Fecha           = DateTime.Now,
-            Descripcion     = $"Cobro {factura.NumeroFactura} – {factura.NombreCliente}",
+            IdEmpresa = EmpresaActivaId.Value,
+            Fecha = DateTime.Now,
+            Descripcion = $"Cobro {factura.NumeroFactura} – {factura.NombreCliente}",
             TipoComprobante = "Ingreso",
-            Estado          = "Registrado"
+            Estado = "Registrado"
         };
         compPago.Lineas.Add(new AsientoLinea
         {
-            CodigoCuenta     = "1.1.01.01",
+            CodigoCuenta = "1.1.01.01",
             DescripcionCuenta = "Caja General",
-            Debe  = factura.Monto,
+            Debe = factura.Monto,
             Haber = 0
         });
         compPago.Lineas.Add(new AsientoLinea
         {
-            CodigoCuenta     = "1.1.02.01",
+            CodigoCuenta = "1.1.02.01",
             DescripcionCuenta = "Clientes Nacionales",
-            Debe  = 0,
+            Debe = 0,
             Haber = factura.Monto
         });
 
-        _comprobantesGuardados.Add(compPago);
-        GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        db.ComprobantesContables.Add(compPago);
+        db.SaveChanges();
 
-        factura.Estado            = "Pagada";
-        factura.FechaPago         = DateTime.Now;
-        factura.IdComprobantePago = idComp;
-        GuardarFacturas();
+        factura.Estado = "Pagada";
+        factura.FechaPago = DateTime.Now;
+        factura.IdComprobantePago = compPago.IdComprobante;
+        db.SaveChanges();
+
+        _ = SincronizarFacturaAsync(factura);
+        _ = SincronizarComprobanteAsync(compPago);
     }
 
     public void AnularFactura(int idFactura)
     {
         if (EmpresaActivaId == null) throw new InvalidOperationException("No hay empresa activa seleccionada.");
 
-        var factura = _facturasCobranza.FirstOrDefault(f => f.Id == idFactura)
+        using var db = new ContabilidadDbContext();
+
+        var factura = db.FacturasCobranza.FirstOrDefault(f => f.Id == idFactura)
             ?? throw new InvalidOperationException("Factura no encontrada.");
 
-        if (factura.Estado == "Pagada")  throw new InvalidOperationException("No se puede anular una factura pagada. Use Reversión de comprobante.");
+        if (factura.Estado == "Pagada") throw new InvalidOperationException("No se puede anular una factura pagada. Use Reversión de comprobante.");
         if (factura.Estado == "Anulada") throw new InvalidOperationException("La factura ya está anulada.");
+
+        ComprobanteContable compAnulacion = null;
 
         if (factura.IdComprobanteEmision > 0)
         {
-            var compOriginal = _comprobantesGuardados
+            var compOriginal = db.ComprobantesContables
+                .Include(c => c.Lineas)
                 .FirstOrDefault(c => c.IdComprobante == factura.IdComprobanteEmision);
 
             if (compOriginal != null)
             {
-                var idComp = _comprobantesGuardados.Max(c => c.IdComprobante) + 1;
-                var compAnulacion = new ComprobanteContable
+                compAnulacion = new ComprobanteContable
                 {
-                    IdComprobante   = idComp,
-                    IdEmpresa       = EmpresaActivaId.Value,
-                    Fecha           = DateTime.Now,
-                    Descripcion     = $"Anulación {factura.NumeroFactura} – {factura.NombreCliente}",
+                    IdEmpresa = EmpresaActivaId.Value,
+                    Fecha = DateTime.Now,
+                    Descripcion = $"Anulación {factura.NumeroFactura} – {factura.NombreCliente}",
                     TipoComprobante = "Egreso",
-                    Estado          = "Registrado"
+                    Estado = "Registrado"
                 };
                 foreach (var linea in compOriginal.Lineas)
                     compAnulacion.Lineas.Add(new AsientoLinea
                     {
-                        CodigoCuenta     = linea.CodigoCuenta,
+                        CodigoCuenta = linea.CodigoCuenta,
                         DescripcionCuenta = $"Anulación – {linea.DescripcionCuenta}",
-                        Debe  = linea.Haber,
+                        Debe = linea.Haber,
                         Haber = linea.Debe
                     });
 
                 compOriginal.Estado = "Anulado";
-                _comprobantesGuardados.Add(compAnulacion);
-                GuardarLista(_comprobantesGuardados, _comprobantesFile);
+                db.ComprobantesContables.Add(compAnulacion);
+                db.SaveChanges();
+
+                _ = SincronizarComprobanteAsync(compOriginal);
+                _ = SincronizarComprobanteAsync(compAnulacion);
             }
         }
 
         factura.Estado = "Anulada";
-        GuardarFacturas();
-    }
+        db.SaveChanges();
 
-    public void EliminarComprobante(int idComprobante)
-    {
-        var existente = _comprobantesGuardados.FirstOrDefault(c => c.IdComprobante == idComprobante);
-        if (existente != null)
-        {
-            _comprobantesGuardados.Remove(existente);
-            GuardarLista(_comprobantesGuardados, _comprobantesFile);
-        }
+        _ = SincronizarFacturaAsync(factura);
     }
 
     public string EjecutarRespaldoAutomatico() => EjecutarBackup("Respaldo_Reexpresion");
@@ -780,7 +904,11 @@ public class ContabilidadService
         var cuenta = _cuentasGuardadas.FirstOrDefault(c => c.Codigo == codigoCuenta);
         if (cuenta == null) return 0m;
 
-        var query = _comprobantesGuardados.Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaFin.Date);
+        using var db = new ContabilidadDbContext();
+        var query = db.ComprobantesContables
+            .Include(c => c.Lineas)
+            .Where(c => c.IdEmpresa == EmpresaActivaId.Value && c.Fecha.Date <= fechaFin.Date);
+
         if (fechaInicio.HasValue)
         {
             query = query.Where(c => c.Fecha.Date >= fechaInicio.Value.Date);
@@ -801,14 +929,10 @@ public class ContabilidadService
         }
 
         if (cuenta.Tipo == "Activo" || cuenta.Tipo == "Egreso")
-        {
             return totalDebe - totalHaber;
-        }
-        
+
         if (cuenta.Tipo == "Pasivo" || cuenta.Tipo == "Patrimonio" || cuenta.Tipo == "Ingreso")
-        {
             return totalHaber - totalDebe;
-        }
 
         return 0m;
     }
@@ -874,5 +998,51 @@ public class ContabilidadService
             historial.IdComprobanteAsociado = 0;
             GuardarLista(_historialReexpresiones, _historialReexpresionesFile);
         }
+    }
+
+    public async Task ProcesarColaPendienteAsync()
+    {
+        using var db = new ContabilidadDbContext();
+        var pendientes = db.ColaSincronizacion.OrderBy(c => c.FechaCreacion).ToList();
+
+        foreach (var item in pendientes)
+        {
+            var tabla = item.TipoEntidad == "FacturaCobranza" ? "facturas_cobranza" : "comprobantes_contables";
+            var payload = JsonSerializer.Deserialize<object>(item.PayloadJson);
+
+            bool ok = await _syncService.UpsertAsync(tabla, payload);
+            if (ok)
+                db.ColaSincronizacion.Remove(item);
+            else
+                item.Intentos++;
+        }
+        db.SaveChanges();
+    }
+
+    public void IniciarSincronizacionPeriodica(double intervaloMinutos = 5)
+    {
+        if (_timerSincronizacion != null) return; // evita duplicar el timer si se llama dos veces
+
+        _timerSincronizacion = new System.Timers.Timer(intervaloMinutos * 60 * 1000);
+        _timerSincronizacion.Elapsed += async (sender, e) =>
+        {
+            try
+            {
+                await ProcesarColaPendienteAsync();
+            }
+            catch
+            {
+                // Silencioso: si falla un intento, el timer vuelve a correr en el siguiente ciclo.
+            }
+        };
+        _timerSincronizacion.AutoReset = true;
+        _timerSincronizacion.Start();
+    }
+
+    public void DetenerSincronizacionPeriodica()
+    {
+        _timerSincronizacion?.Stop();
+        _timerSincronizacion?.Dispose();
+        _timerSincronizacion = null;
     }
 }
