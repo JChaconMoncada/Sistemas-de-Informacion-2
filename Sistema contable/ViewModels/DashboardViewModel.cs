@@ -333,7 +333,9 @@ namespace Sistema_contable.ViewModels
                     Labeler = value => $"Bs. {value:N0}",
                     TextSize = 12,
                     LabelsPaint = new SolidColorPaint(new SKColor(150, 150, 150)),
-                    SeparatorsPaint = new SolidColorPaint(new SKColor(230, 230, 230)) { StrokeThickness = 1 }
+                    SeparatorsPaint = new SolidColorPaint(new SKColor(230, 230, 230)) { StrokeThickness = 1 },
+                    MinLimit = 0,
+                    MinStep = 100
                 });
             }
             else

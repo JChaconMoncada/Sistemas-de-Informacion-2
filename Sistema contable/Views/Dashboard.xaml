@@ -210,7 +210,7 @@
                         XAxes="{Binding XAxes}"
                         YAxes="{Binding YAxes}"
                         Margin="10"
-                        Height="200"/>
+                        Height="350"/>
                 </GroupBox>
 
                 <!-- Alertas Activas -->
