@@ -69,8 +69,8 @@
 
         <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,12">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" />
-                <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding NombreCuenta}" />
+                <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Cuenta"  Width="*" Binding="{Binding NombreCuenta}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Debe" Width="150" Binding="{Binding Debe, StringFormat=N2}" />
                 <DataGridTextColumn Header="Haber" Width="150" Binding="{Binding Haber, StringFormat=N2}" />
                 <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />

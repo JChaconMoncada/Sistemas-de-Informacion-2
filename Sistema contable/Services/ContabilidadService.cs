@@ -693,18 +693,7 @@ public class ContabilidadService
         }
     }
 
-public void LimpiarComprobantes()
-{
-    System.Windows.MessageBox.Show(
-        $"Antes: {_comprobantesGuardados.Count} comprobantes");
 
-    _comprobantesGuardados.Clear();
-
-    GuardarLista(_comprobantesGuardados, _comprobantesFile);
-
-    System.Windows.MessageBox.Show(
-        $"Después: {_comprobantesGuardados.Count} comprobantes\n\nArchivo:\n{_comprobantesFile}");
-}
 
     public string EjecutarRespaldoAutomatico() => EjecutarBackup("Respaldo_Reexpresion");
 
