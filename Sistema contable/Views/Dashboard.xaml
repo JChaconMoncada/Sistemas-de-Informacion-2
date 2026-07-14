@@ -208,6 +208,8 @@
                     <lvc:CartesianChart
                         Series="{Binding Series}"
                         XAxes="{Binding XAxes}"
+                        YAxes="{Binding YAxes}"
+                        Margin="10"
                         Height="200"/>
                 </GroupBox>
 

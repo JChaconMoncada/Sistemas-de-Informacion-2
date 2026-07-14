@@ -9,6 +9,8 @@ using SistemaContableZulay.UI.Services;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.Measure;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace Sistema_contable.ViewModels
 {
@@ -136,6 +138,7 @@ namespace Sistema_contable.ViewModels
 
         public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
         public ObservableCollection<Axis> XAxes { get; set; } = new ObservableCollection<Axis>();
+        public ObservableCollection<Axis> YAxes { get; set; } = new ObservableCollection<Axis>();
 
         // ── Comandos ──────────────────────────────────────────────────────────────
         public ICommand RefrescarCommand           { get; }
@@ -293,25 +296,54 @@ namespace Sistema_contable.ViewModels
             {
                 Series.Add(new ColumnSeries<double>
                 {
-                    Name = "Monto",
-                    Values = new ObservableCollection<double> { (double)IngresosMes, (double)GastosMes }
+                    Name = "Ingresos",
+                    Values = new ObservableCollection<double> { (double)IngresosMes },
+                    Fill = new SolidColorPaint(new SKColor(76, 175, 80)), // Verde Material
+                    MaxBarWidth = 60,
+                    Rx = 6,
+                    Ry = 6,
+                    DataLabelsPaint = new SolidColorPaint(new SKColor(60, 60, 60)),
+                    DataLabelsPosition = DataLabelsPosition.Top,
+                    DataLabelsFormatter = point => $"Bs. {point.Model:N0}"
+                });
+
+                Series.Add(new ColumnSeries<double>
+                {
+                    Name = "Gastos",
+                    Values = new ObservableCollection<double> { (double)GastosMes },
+                    Fill = new SolidColorPaint(new SKColor(244, 67, 54)), // Rojo Material
+                    MaxBarWidth = 60,
+                    Rx = 6,
+                    Ry = 6,
+                    DataLabelsPaint = new SolidColorPaint(new SKColor(60, 60, 60)),
+                    DataLabelsPosition = DataLabelsPosition.Top,
+                    DataLabelsFormatter = point => $"Bs. {point.Model:N0}"
                 });
 
                 XAxes.Add(new Axis
                 {
-                    Labels = new[] { "Ingresos", "Gastos" },
-                    LabelsRotation = 0
+                    Labels = new[] { "Total del Período" },
+                    LabelsRotation = 0,
+                    TextSize = 13,
+                    LabelsPaint = new SolidColorPaint(new SKColor(120, 120, 120))
+                });
+
+                YAxes.Add(new Axis
+                {
+                    Labeler = value => $"Bs. {value:N0}",
+                    TextSize = 12,
+                    LabelsPaint = new SolidColorPaint(new SKColor(150, 150, 150)),
+                    SeparatorsPaint = new SolidColorPaint(new SKColor(230, 230, 230)) { StrokeThickness = 1 }
                 });
             }
             else
             {
-                if (Series[0] is ColumnSeries<double> colSeries && colSeries.Values is ObservableCollection<double> values)
+                if (Series.Count >= 2 && 
+                    Series[0] is ColumnSeries<double> s1 && s1.Values is ObservableCollection<double> v1 &&
+                    Series[1] is ColumnSeries<double> s2 && s2.Values is ObservableCollection<double> v2)
                 {
-                    if (values.Count >= 2)
-                    {
-                        values[0] = (double)IngresosMes;
-                        values[1] = (double)GastosMes;
-                    }
+                    if (v1.Count > 0) v1[0] = (double)IngresosMes;
+                    if (v2.Count > 0) v2[0] = (double)GastosMes;
                 }
             }
 
