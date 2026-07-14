@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:lvc="http://livecharts.com"
       mc:Ignorable="d" 
       d:DesignHeight="750" d:DesignWidth="1100"
       Title="Dashboard">
@@ -188,45 +189,15 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Alertas reales -->
-                <GroupBox Grid.Column="0" Header="Alertas Activas">
-                    <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
-                              ItemsSource="{Binding Alertas}" MaxHeight="200">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header=""           Width="28"  Binding="{Binding Icono}" />
-                            <DataGridTextColumn Header="Tipo"       Width="160" Binding="{Binding Tipo}" />
-                            <DataGridTextColumn Header="Descripción" Width="*"  Binding="{Binding Descripcion}" />
-                            <DataGridTextColumn Header="Fecha"      Width="90"  Binding="{Binding Fecha}" />
-                            <DataGridTemplateColumn Header="Estado" Width="90">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Style="{StaticResource StatusBadgeWarning}" Padding="5,2">
-                                            <TextBlock Text="{Binding Estado}" FontSize="10" Foreground="#FF9800" />
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                        <DataGrid.Style>
-                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
-                                <Style.Triggers>
-                                    <Trigger Property="HasItems" Value="False">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="DataGrid">
-                                                    <Border Height="80" Background="{StaticResource WindowBackgroundBrush}">
-                                                        <TextBlock Text="✅  No hay alertas activas"
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   Foreground="#4CAF50" FontSize="13" />
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.Style>
-                    </DataGrid>
+
+                <GroupBox Grid.Column="0" Header="Ingresos vs Gastos">
+                            <lvc:CartesianChart
+                    Series="{Binding Series}"
+                    XAxes="{Binding XAxes}"
+                    Height="200"
+                    Margin="8"/>    
                 </GroupBox>
+
 
                 <!-- Acciones Rápidas -->
                 <GroupBox Grid.Column="2" Header="Acciones Rápidas">

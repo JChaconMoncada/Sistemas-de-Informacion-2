@@ -56,4 +56,35 @@
       </AsientoLinea>
     </Lineas>
   </ComprobanteContable>
+  <ComprobanteContable>
+    <IdComprobante>3</IdComprobante>
+    <Fecha>2026-07-13T20:16:09.9946424-04:00</Fecha>
+    <Descripcion>prueba</Descripcion>
+    <TipoComprobante>Manual</TipoComprobante>
+    <IdEmpresa>2</IdEmpresa>
+    <Estado>Pendiente de Validación</Estado>
+    <MontoTotal>2504</MontoTotal>
+    <Moneda>Bs</Moneda>
+    <CuentaAsociada />
+    <Lineas>
+      <AsientoLinea>
+        <CodigoCuenta>1</CodigoCuenta>
+        <DescripcionCuenta>yeah amigo</DescripcionCuenta>
+        <Debe>1200</Debe>
+        <Haber>1200</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>2</CodigoCuenta>
+        <DescripcionCuenta>sisa</DescripcionCuenta>
+        <Debe>70</Debe>
+        <Haber>70</Haber>
+      </AsientoLinea>
+      <AsientoLinea>
+        <CodigoCuenta>3</CodigoCuenta>
+        <DescripcionCuenta>prueba</DescripcionCuenta>
+        <Debe>1234</Debe>
+        <Haber>1234</Haber>
+      </AsientoLinea>
+    </Lineas>
+  </ComprobanteContable>
 </ArrayOfComprobanteContable>

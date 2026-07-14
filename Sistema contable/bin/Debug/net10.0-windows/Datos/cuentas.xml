@@ -721,88 +721,7 @@
     <CuentaPadre />
     <AceptaMovimiento>false</AceptaMovimiento>
     <Activo>true</Activo>
-    <Hijos>
-      <CuentaContable>
-        <Codigo>5.1.00.00</Codigo>
-        <Nombre>Gastos de Operación</Nombre>
-        <Tipo>Egreso</Tipo>
-        <Nivel>2</Nivel>
-        <CuentaPadre>5.0.00.00</CuentaPadre>
-        <AceptaMovimiento>false</AceptaMovimiento>
-        <Activo>true</Activo>
-        <Hijos>
-          <CuentaContable>
-            <Codigo>5.1.01.00</Codigo>
-            <Nombre>Gastos Administrativos</Nombre>
-            <Tipo>Egreso</Tipo>
-            <Nivel>3</Nivel>
-            <CuentaPadre>5.1.00.00</CuentaPadre>
-            <AceptaMovimiento>false</AceptaMovimiento>
-            <Activo>true</Activo>
-            <Hijos>
-              <CuentaContable>
-                <Codigo>5.1.01.01</Codigo>
-                <Nombre>Gastos de Alquiler</Nombre>
-                <Tipo>Egreso</Tipo>
-                <Nivel>4</Nivel>
-                <CuentaPadre>5.1.01.00</CuentaPadre>
-                <AceptaMovimiento>true</AceptaMovimiento>
-                <Activo>true</Activo>
-                <Hijos />
-                <Descripcion />
-                <IsVisible>true</IsVisible>
-                <IsExpanded>false</IsExpanded>
-              </CuentaContable>
-              <CuentaContable>
-                <Codigo>5.1.01.02</Codigo>
-                <Nombre>Gastos de Servicios Públicos</Nombre>
-                <Tipo>Egreso</Tipo>
-                <Nivel>4</Nivel>
-                <CuentaPadre>5.1.01.00</CuentaPadre>
-                <AceptaMovimiento>true</AceptaMovimiento>
-                <Activo>true</Activo>
-                <Hijos />
-                <Descripcion />
-                <IsVisible>true</IsVisible>
-                <IsExpanded>false</IsExpanded>
-              </CuentaContable>
-              <CuentaContable>
-                <Codigo>5.1.01.03</Codigo>
-                <Nombre>Comisiones Bancarias</Nombre>
-                <Tipo>Egreso</Tipo>
-                <Nivel>4</Nivel>
-                <CuentaPadre>5.1.01.00</CuentaPadre>
-                <AceptaMovimiento>true</AceptaMovimiento>
-                <Activo>true</Activo>
-                <Hijos />
-                <Descripcion />
-                <IsVisible>true</IsVisible>
-                <IsExpanded>false</IsExpanded>
-              </CuentaContable>
-              <CuentaContable>
-                <Codigo>5.1.01.04</Codigo>
-                <Nombre>Gastos de Honorarios Profesionales</Nombre>
-                <Tipo>Egreso</Tipo>
-                <Nivel>4</Nivel>
-                <CuentaPadre>5.1.01.00</CuentaPadre>
-                <AceptaMovimiento>true</AceptaMovimiento>
-                <Activo>true</Activo>
-                <Hijos />
-                <Descripcion />
-                <IsVisible>true</IsVisible>
-                <IsExpanded>false</IsExpanded>
-              </CuentaContable>
-            </Hijos>
-            <Descripcion />
-            <IsVisible>true</IsVisible>
-            <IsExpanded>false</IsExpanded>
-          </CuentaContable>
-        </Hijos>
-        <Descripcion />
-        <IsVisible>true</IsVisible>
-        <IsExpanded>false</IsExpanded>
-      </CuentaContable>
-    </Hijos>
+    <Hijos />
     <Descripcion />
     <IsVisible>true</IsVisible>
     <IsExpanded>false</IsExpanded>
@@ -933,8 +852,88 @@
     <CuentaPadre />
     <AceptaMovimiento>true</AceptaMovimiento>
     <Activo>true</Activo>
-    <Hijos />
+    <Hijos>
+      <CuentaContable>
+        <Codigo>5.1.01.00</Codigo>
+        <Nombre>Gastos Administrativos</Nombre>
+        <Tipo>Egreso</Tipo>
+        <Nivel>3</Nivel>
+        <CuentaPadre>5.1.00.00</CuentaPadre>
+        <AceptaMovimiento>false</AceptaMovimiento>
+        <Activo>true</Activo>
+        <Hijos>
+          <CuentaContable>
+            <Codigo>5.1.01.01</Codigo>
+            <Nombre>Gastos de Alquiler</Nombre>
+            <Tipo>Egreso</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>5.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>5.1.01.02</Codigo>
+            <Nombre>Gastos de Servicios Públicos</Nombre>
+            <Tipo>Egreso</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>5.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>5.1.01.03</Codigo>
+            <Nombre>Comisiones Bancarias</Nombre>
+            <Tipo>Egreso</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>5.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+          <CuentaContable>
+            <Codigo>5.1.01.04</Codigo>
+            <Nombre>Gastos de Honorarios Profesionales</Nombre>
+            <Tipo>Egreso</Tipo>
+            <Nivel>4</Nivel>
+            <CuentaPadre>5.1.01.00</CuentaPadre>
+            <AceptaMovimiento>true</AceptaMovimiento>
+            <Activo>true</Activo>
+            <Hijos />
+            <Descripcion />
+            <IsVisible>true</IsVisible>
+            <IsExpanded>false</IsExpanded>
+          </CuentaContable>
+        </Hijos>
+        <Descripcion />
+        <IsVisible>true</IsVisible>
+        <IsExpanded>false</IsExpanded>
+      </CuentaContable>
+    </Hijos>
     <Descripcion>sisa</Descripcion>
+    <IsVisible>true</IsVisible>
+    <IsExpanded>false</IsExpanded>
+  </CuentaContable>
+  <CuentaContable>
+    <Codigo>6.00.00.00</Codigo>
+    <Nombre>Nueva Cuenta2</Nombre>
+    <Tipo>Activo</Tipo>
+    <Nivel>1</Nivel>
+    <CuentaPadre />
+    <AceptaMovimiento>true</AceptaMovimiento>
+    <Activo>true</Activo>
+    <Hijos />
+    <Descripcion>rearea</Descripcion>
     <IsVisible>true</IsVisible>
     <IsExpanded>false</IsExpanded>
   </CuentaContable>
