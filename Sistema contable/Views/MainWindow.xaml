@@ -11,6 +11,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="{StaticResource HeaderBackgroundBrush}" Padding="4">
             <MenuItem Header="_Archivo">
+                <Separator />
                 <MenuItem Header="Salir" Click="MenuSalir_Click" />
             </MenuItem>
             <MenuItem Header="_Empresas">

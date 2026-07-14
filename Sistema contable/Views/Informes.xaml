@@ -15,7 +15,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Estados Financieros e Informes" Style="{StaticResource TitleTextBlock}" />
+        <TextBlock Grid.Row="0" Text="Informes" Style="{StaticResource TitleTextBlock}" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
             <Button Content="Generar Reporte" Command="{Binding GenerarReporteCommand}" Style="{StaticResource AccentButton}" Margin="0,0,6,0" />
@@ -81,14 +81,50 @@
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding EsEncabezado}" Value="True">
                                                 <Setter Property="TextElement.FontWeight" Value="Bold" />
+                                                <Setter Property="TextElement.FontSize" Value="14" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding EsTotal}" Value="True">
                                                 <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+                                                <Setter Property="TextElement.FontSize" Value="13" />
                                             </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <StackPanel Margin="0,24,0,0">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NotasExplicativas}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding NotasExplicativas}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="NOTAS EXPLICATIVAS" FontWeight="Bold" Margin="0,0,0,8" />
+                                <TextBlock Text="{Binding NotasExplicativas}" TextWrapping="Wrap" FontStyle="Italic" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,16,0,0">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ConclusionesRecomendaciones}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ConclusionesRecomendaciones}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="CONCLUSIONES Y RECOMENDACIONES" FontWeight="Bold" Margin="0,0,0,8" />
+                                <TextBlock Text="{Binding ConclusionesRecomendaciones}" TextWrapping="Wrap" />
+                            </StackPanel>
 
                             <TextBlock Text="No hay datos para el reporte y filtros seleccionados." 
                                        Margin="0,16,0,0" FontStyle="Italic" 
@@ -98,6 +134,25 @@
                         </StackPanel>
                     </Border>
                 </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Notas y Análisis">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Notas Explicativas:" FontWeight="Bold" Margin="0,0,0,8" />
+                    <TextBox Grid.Row="1" Text="{Binding NotasExplicativas, UpdateSourceTrigger=PropertyChanged}" 
+                             AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+                    <TextBlock Grid.Row="2" Text="Conclusiones y Recomendaciones:" FontWeight="Bold" Margin="0,0,0,8" />
+                    <TextBox Grid.Row="3" Text="{Binding ConclusionesRecomendaciones, UpdateSourceTrigger=PropertyChanged}" 
+                             AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" />
+                </Grid>
             </TabItem>
 
             <TabItem Header="Gráficos">

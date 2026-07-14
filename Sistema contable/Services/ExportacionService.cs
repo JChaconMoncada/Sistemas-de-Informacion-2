@@ -13,67 +13,87 @@ namespace SistemaContableZulay.UI.Services
 {
     public class ExportacionService
     {
+        public ExportacionService()
+        {
+            try
+            {
+                QuestPDF.Settings.License = LicenseType.Community;
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al inicializar licencias: {ex.Message}");
+            }
+        }
+
         public void ExportarLibroDiarioAPdf(List<LineaLibroDiario> lineas, string rutaArchivo, string nombreEmpresa)
         {
-            var document = Document.Create(container =>
+            try
             {
-                container.Page(page =>
+                var document = Document.Create(container =>
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(2, Unit.Centimetre);
-
-                    page.Header().Column(column =>
+                    container.Page(page =>
                     {
-                        column.Item().Text("LIBRO DIARIO").FontSize(16).Bold();
-                        column.Item().Text($"Empresa: {nombreEmpresa}").FontSize(10);
-                        column.Item().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
-                    });
+                        page.Size(PageSizes.A4);
+                        page.Margin(2, Unit.Centimetre);
 
-                    page.Content().Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
+                        page.Header().Column(column =>
                         {
-                            columns.ConstantColumn(70);
-                            columns.ConstantColumn(50);
-                            columns.ConstantColumn(80);
-                            columns.RelativeColumn();
-                            columns.RelativeColumn();
-                            columns.ConstantColumn(80);
-                            columns.ConstantColumn(80);
+                            column.Item().Text("LIBRO DIARIO").FontSize(16).Bold();
+                            column.Item().Text($"Empresa: {nombreEmpresa ?? ""}").FontSize(10);
+                            column.Item().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
                         });
 
-                        table.Header(header =>
+                        page.Content().Table(table =>
                         {
-                            header.Cell().Element(CellStyle).Text("Fecha").Bold();
-                            header.Cell().Element(CellStyle).Text("Nº").Bold();
-                            header.Cell().Element(CellStyle).Text("Código").Bold();
-                            header.Cell().Element(CellStyle).Text("Cuenta").Bold();
-                            header.Cell().Element(CellStyle).Text("Glosa").Bold();
-                            header.Cell().Element(CellStyle).Text("Debe").Bold();
-                            header.Cell().Element(CellStyle).Text("Haber").Bold();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(70);
+                                columns.ConstantColumn(50);
+                                columns.ConstantColumn(80);
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(80);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Element(CellStyle).Text("Fecha").Bold();
+                                header.Cell().Element(CellStyle).Text("Nº").Bold();
+                                header.Cell().Element(CellStyle).Text("Código").Bold();
+                                header.Cell().Element(CellStyle).Text("Cuenta").Bold();
+                                header.Cell().Element(CellStyle).Text("Glosa").Bold();
+                                header.Cell().Element(CellStyle).Text("Debe").Bold();
+                                header.Cell().Element(CellStyle).Text("Haber").Bold();
+                            });
+
+                            foreach (var linea in lineas)
+                            {
+                                table.Cell().Element(CellStyle).Text(linea.Fecha.ToString("dd/MM/yyyy"));
+                                table.Cell().Element(CellStyle).Text(linea.Numero.ToString());
+                                table.Cell().Element(CellStyle).Text(linea.CodigoCuenta ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.NombreCuenta ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.Descripcion ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.Debe.ToString("N2")).AlignRight();
+                                table.Cell().Element(CellStyle).Text(linea.Haber.ToString("N2")).AlignRight();
+                            }
                         });
 
-                        foreach (var linea in lineas)
+                        page.Footer().AlignRight().Text(x =>
                         {
-                            table.Cell().Element(CellStyle).Text(linea.Fecha.ToString("dd/MM/yyyy"));
-                            table.Cell().Element(CellStyle).Text(linea.Numero.ToString());
-                            table.Cell().Element(CellStyle).Text(linea.CodigoCuenta);
-                            table.Cell().Element(CellStyle).Text(linea.NombreCuenta);
-                            table.Cell().Element(CellStyle).Text(linea.Descripcion);
-                            table.Cell().Element(CellStyle).Text(linea.Debe.ToString("N2")).AlignRight();
-                            table.Cell().Element(CellStyle).Text(linea.Haber.ToString("N2")).AlignRight();
-                        }
-                    });
-
-                    page.Footer().AlignRight().Text(x =>
-                    {
-                        x.Span("Página ");
-                        x.CurrentPageNumber();
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                        });
                     });
                 });
-            });
 
-            document.GeneratePdf(rutaArchivo);
+                document.GeneratePdf(rutaArchivo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al generar el PDF: {ex.Message}. Asegúrese de que el archivo no esté abierto en otro programa.", ex);
+            }
         }
 
         static IContainer CellStyle(IContainer container)
@@ -88,137 +108,140 @@ namespace SistemaContableZulay.UI.Services
 
         public void ExportarLibroDiarioAExcel(List<LineaLibroDiario> lineas, string rutaArchivo, string nombreEmpresa)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var package = new ExcelPackage())
+            try
             {
-                var worksheet = package.Workbook.Worksheets.Add("Libro Diario");
-
-                // Encabezados
-                worksheet.Cells[1, 1].Value = "LIBRO DIARIO";
-                worksheet.Cells[1, 1].Style.Font.Bold = true;
-                worksheet.Cells[2, 1].Value = $"Empresa: {nombreEmpresa}";
-                worksheet.Cells[3, 1].Value = $"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}";
-
-                // Columnas
-                int row = 5;
-                worksheet.Cells[row, 1].Value = "Fecha";
-                worksheet.Cells[row, 2].Value = "Nº Asiento";
-                worksheet.Cells[row, 3].Value = "Código Cuenta";
-                worksheet.Cells[row, 4].Value = "Cuenta";
-                worksheet.Cells[row, 5].Value = "Glosa";
-                worksheet.Cells[row, 6].Value = "Debe";
-                worksheet.Cells[row, 7].Value = "Haber";
-
-                var headerRange = worksheet.Cells[row, 1, row, 7];
-                headerRange.Style.Font.Bold = true;
-                headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-
-                // Datos
-                row++;
-                foreach (var linea in lineas)
+                using (var package = new ExcelPackage())
                 {
-                    worksheet.Cells[row, 1].Value = linea.Fecha.ToString("dd/MM/yyyy");
-                    worksheet.Cells[row, 2].Value = linea.Numero;
-                    worksheet.Cells[row, 3].Value = linea.CodigoCuenta;
-                    worksheet.Cells[row, 4].Value = linea.NombreCuenta;
-                    worksheet.Cells[row, 5].Value = linea.Descripcion;
-                    worksheet.Cells[row, 6].Value = linea.Debe;
-                    worksheet.Cells[row, 7].Value = linea.Haber;
+                    var worksheet = package.Workbook.Worksheets.Add("Libro Diario");
+
+                    worksheet.Cells[1, 1].Value = "LIBRO DIARIO";
+                    worksheet.Cells[1, 1].Style.Font.Bold = true;
+                    worksheet.Cells[2, 1].Value = $"Empresa: {nombreEmpresa ?? ""}";
+                    worksheet.Cells[3, 1].Value = $"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}";
+
+                    int row = 5;
+                    worksheet.Cells[row, 1].Value = "Fecha";
+                    worksheet.Cells[row, 2].Value = "Nº Asiento";
+                    worksheet.Cells[row, 3].Value = "Código Cuenta";
+                    worksheet.Cells[row, 4].Value = "Cuenta";
+                    worksheet.Cells[row, 5].Value = "Glosa";
+                    worksheet.Cells[row, 6].Value = "Debe";
+                    worksheet.Cells[row, 7].Value = "Haber";
+
+                    var headerRange = worksheet.Cells[row, 1, row, 7];
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+
                     row++;
+                    foreach (var linea in lineas)
+                    {
+                        worksheet.Cells[row, 1].Value = linea.Fecha.ToString("dd/MM/yyyy");
+                        worksheet.Cells[row, 2].Value = linea.Numero;
+                        worksheet.Cells[row, 3].Value = linea.CodigoCuenta ?? "";
+                        worksheet.Cells[row, 4].Value = linea.NombreCuenta ?? "";
+                        worksheet.Cells[row, 5].Value = linea.Descripcion ?? "";
+                        worksheet.Cells[row, 6].Value = linea.Debe;
+                        worksheet.Cells[row, 7].Value = linea.Haber;
+                        row++;
+                    }
+
+                    row++;
+                    worksheet.Cells[row, 5].Value = "TOTALES:";
+                    worksheet.Cells[row, 5].Style.Font.Bold = true;
+                    worksheet.Cells[row, 6].Formula = $"SUM(F6:F{row - 1})";
+                    worksheet.Cells[row, 6].Style.Font.Bold = true;
+                    worksheet.Cells[row, 7].Formula = $"SUM(G6:G{row - 1})";
+                    worksheet.Cells[row, 7].Style.Font.Bold = true;
+
+                    worksheet.Columns[6].Style.Numberformat.Format = "#,##0.00";
+                    worksheet.Columns[7].Style.Numberformat.Format = "#,##0.00";
+                    worksheet.Columns.AutoFit();
+
+                    package.SaveAs(new FileInfo(rutaArchivo));
                 }
-
-                // Totales
-                row++;
-                worksheet.Cells[row, 5].Value = "TOTAL DEBE:";
-                worksheet.Cells[row, 5].Style.Font.Bold = true;
-                worksheet.Cells[row, 6].Formula = $"SUM(F6:F{row-1})";
-                worksheet.Cells[row, 6].Style.Font.Bold = true;
-                worksheet.Cells[row, 7].Value = "TOTAL HABER:";
-                worksheet.Cells[row, 7].Style.Font.Bold = true;
-                worksheet.Cells[row, 8].Formula = $"SUM(G6:G{row-1})";
-                worksheet.Cells[row, 8].Style.Font.Bold = true;
-
-                // Formato de columnas
-                worksheet.Columns[6].Style.Numberformat.Format = "#,##0.00";
-                worksheet.Columns[7].Style.Numberformat.Format = "#,##0.00";
-                worksheet.Columns.AutoFit();
-
-                package.SaveAs(new FileInfo(rutaArchivo));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al generar el Excel: {ex.Message}. Asegúrese de que el archivo no esté abierto en otro programa.", ex);
             }
         }
 
         public void ExportarLibroMayorAPdf(List<LineaLibroMayor> lineas, string rutaArchivo, string nombreEmpresa)
         {
-            var document = Document.Create(container =>
+            try
             {
-                container.Page(page =>
+                var document = Document.Create(container =>
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(2, Unit.Centimetre);
-
-                    page.Header().Column(column =>
+                    container.Page(page =>
                     {
-                        column.Item().Text("LIBRO MAYOR").FontSize(16).Bold();
-                        column.Item().Text($"Empresa: {nombreEmpresa}").FontSize(10);
-                        column.Item().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
-                    });
+                        page.Size(PageSizes.A4);
+                        page.Margin(2, Unit.Centimetre);
 
-                    page.Content().Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
+                        page.Header().Column(column =>
                         {
-                            columns.ConstantColumn(70);
-                            columns.ConstantColumn(50);
-                            columns.ConstantColumn(80);
-                            columns.RelativeColumn();
-                            columns.RelativeColumn();
-                            columns.ConstantColumn(80);
-                            columns.ConstantColumn(80);
-                            columns.ConstantColumn(80);
+                            column.Item().Text("LIBRO MAYOR").FontSize(16).Bold();
+                            column.Item().Text($"Empresa: {nombreEmpresa ?? ""}").FontSize(10);
+                            column.Item().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
                         });
 
-                        table.Header(header =>
+                        page.Content().Table(table =>
                         {
-                            header.Cell().Element(CellStyle).Text("Fecha").Bold();
-                            header.Cell().Element(CellStyle).Text("Nº").Bold();
-                            header.Cell().Element(CellStyle).Text("Código").Bold();
-                            header.Cell().Element(CellStyle).Text("Cuenta").Bold();
-                            header.Cell().Element(CellStyle).Text("Descripción").Bold();
-                            header.Cell().Element(CellStyle).Text("Debe").Bold();
-                            header.Cell().Element(CellStyle).Text("Haber").Bold();
-                            header.Cell().Element(CellStyle).Text("Saldo").Bold();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(70);
+                                columns.ConstantColumn(50);
+                                columns.ConstantColumn(80);
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(80);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Element(CellStyle).Text("Fecha").Bold();
+                                header.Cell().Element(CellStyle).Text("Nº").Bold();
+                                header.Cell().Element(CellStyle).Text("Código").Bold();
+                                header.Cell().Element(CellStyle).Text("Cuenta").Bold();
+                                header.Cell().Element(CellStyle).Text("Descripción").Bold();
+                                header.Cell().Element(CellStyle).Text("Debe").Bold();
+                                header.Cell().Element(CellStyle).Text("Haber").Bold();
+                                header.Cell().Element(CellStyle).Text("Saldo").Bold();
+                            });
+
+                            foreach (var linea in lineas)
+                            {
+                                table.Cell().Element(CellStyle).Text(linea.Fecha.ToString("dd/MM/yyyy"));
+                                table.Cell().Element(CellStyle).Text(linea.NumeroAsiento.ToString());
+                                table.Cell().Element(CellStyle).Text(linea.CodigoCuenta ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.NombreCuenta ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.Descripcion ?? "");
+                                table.Cell().Element(CellStyle).Text(linea.Debe.ToString("N2")).AlignRight();
+                                table.Cell().Element(CellStyle).Text(linea.Haber.ToString("N2")).AlignRight();
+                                table.Cell().Element(CellStyle).Text(linea.Saldo.ToString("N2")).AlignRight();
+                            }
                         });
 
-                        foreach (var linea in lineas)
+                        page.Footer().AlignRight().Text(x =>
                         {
-                            table.Cell().Element(CellStyle).Text(linea.Fecha.ToString("dd/MM/yyyy"));
-                            table.Cell().Element(CellStyle).Text(linea.NumeroAsiento.ToString());
-                            table.Cell().Element(CellStyle).Text(linea.CodigoCuenta);
-                            table.Cell().Element(CellStyle).Text(linea.NombreCuenta);
-                            table.Cell().Element(CellStyle).Text(linea.Descripcion);
-                            table.Cell().Element(CellStyle).Text(linea.Debe.ToString("N2")).AlignRight();
-                            table.Cell().Element(CellStyle).Text(linea.Haber.ToString("N2")).AlignRight();
-                            table.Cell().Element(CellStyle).Text(linea.Saldo.ToString("N2")).AlignRight();
-                        }
-                    });
-
-                    page.Footer().AlignRight().Text(x =>
-                    {
-                        x.Span("Página ");
-                        x.CurrentPageNumber();
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                        });
                     });
                 });
-            });
 
-            document.GeneratePdf(rutaArchivo);
+                document.GeneratePdf(rutaArchivo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al generar el PDF: {ex.Message}. Asegúrese de que el archivo no esté abierto en otro programa.", ex);
+            }
         }
 
         public void ExportarLibroMayorAExcel(List<LineaLibroMayor> lineas, string rutaArchivo, string nombreEmpresa)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             using (var package = new ExcelPackage())
             {
                 var worksheet = package.Workbook.Worksheets.Add("Libro Mayor");
@@ -264,7 +287,7 @@ namespace SistemaContableZulay.UI.Services
                 row++;
                 worksheet.Cells[row, 7].Value = "SALDO FINAL:";
                 worksheet.Cells[row, 7].Style.Font.Bold = true;
-                worksheet.Cells[row, 8].Formula = $"H6:H{row-1}";
+                worksheet.Cells[row, 8].Formula = $"H{row - 1}";
                 worksheet.Cells[row, 8].Style.Font.Bold = true;
 
                 // Formato de columnas
@@ -277,75 +300,101 @@ namespace SistemaContableZulay.UI.Services
             }
         }
 
-        public void ExportarInformeAPdf(List<LineaReporte> lineas, string titulo, string subtitulo, string rutaArchivo, string nombreEmpresa)
+        public void ExportarInformeAPdf(List<LineaReporte> lineas, string titulo, string subtitulo, string rutaArchivo, string nombreEmpresa, string notas = null, string conclusiones = null)
         {
-            var document = Document.Create(container =>
+            try
             {
-                container.Page(page =>
+                var document = Document.Create(container =>
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(2, Unit.Centimetre);
-
-                    page.Header().Column(column =>
+                    container.Page(page =>
                     {
-                        column.Item().Text(titulo).FontSize(16).Bold();
-                        column.Item().Text(subtitulo).FontSize(10);
-                        column.Item().Text($"Empresa: {nombreEmpresa}").FontSize(10);
-                        column.Item().Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
-                    });
+                        page.Size(PageSizes.A4);
+                        page.Margin(2, Unit.Centimetre);
 
-                    page.Content().Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
+                        page.Header().Column(column =>
                         {
-                            columns.ConstantColumn(80);
-                            columns.RelativeColumn();
-                            columns.ConstantColumn(100);
+                            column.Item().Text(titulo ?? "INFORME").FontSize(16).Bold();
+                            column.Item().Text(subtitulo ?? "").FontSize(10);
+                            column.Item().Text($"Empresa: {nombreEmpresa ?? ""}").FontSize(10);
+                            column.Item().Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10);
                         });
 
-                        table.Header(header =>
+                        page.Content().Column(col =>
                         {
-                            header.Cell().Element(CellStyle).Text("Código").Bold();
-                            header.Cell().Element(CellStyle).Text("Cuenta").Bold();
-                            header.Cell().Element(CellStyle).Text("Monto").Bold();
+                            col.Item().Table(table =>
+                            {
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.ConstantColumn(80);
+                                    columns.RelativeColumn();
+                                    columns.ConstantColumn(100);
+                                });
+
+                                table.Header(header =>
+                                {
+                                    header.Cell().Element(CellStyle).Text("Código").Bold();
+                                    header.Cell().Element(CellStyle).Text("Cuenta").Bold();
+                                    header.Cell().Element(CellStyle).Text("Monto").Bold();
+                                });
+
+                                foreach (var linea in lineas)
+                                {
+                                    if (linea.EsEncabezado)
+                                    {
+                                        table.Cell().ColumnSpan(3).Element(CellStyle).Text(linea.Nombre ?? "").Bold();
+                                    }
+                                    else if (linea.EsTotal)
+                                    {
+                                        table.Cell().Element(CellStyle).Text("");
+                                        table.Cell().Element(CellStyle).Text(linea.Nombre ?? "").Bold();
+                                        table.Cell().Element(CellStyle).Text(linea.Monto.ToString("N2")).AlignRight().Bold();
+                                    }
+                                    else
+                                    {
+                                        table.Cell().Element(CellStyle).Text(linea.Codigo ?? "");
+                                        table.Cell().Element(CellStyle).Text(linea.Nombre ?? "");
+                                        table.Cell().Element(CellStyle).Text(linea.Monto.ToString("N2")).AlignRight();
+                                    }
+                                }
+                            });
+
+                            if (!string.IsNullOrEmpty(notas))
+                            {
+                                col.Item().PaddingTop(15).Column(c =>
+                                {
+                                    c.Item().Text("NOTAS EXPLICATIVAS").Bold();
+                                    c.Item().Text(notas).Italic();
+                                });
+                            }
+
+                            if (!string.IsNullOrEmpty(conclusiones))
+                            {
+                                col.Item().PaddingTop(15).Column(c =>
+                                {
+                                    c.Item().Text("CONCLUSIONES Y RECOMENDACIONES").Bold();
+                                    c.Item().Text(conclusiones);
+                                });
+                            }
                         });
 
-                        foreach (var linea in lineas)
+                        page.Footer().AlignRight().Text(x =>
                         {
-                            if (linea.EsEncabezado)
-                            {
-                                table.Cell().ColumnSpan(3).Element(CellStyle).Text(linea.Nombre).Bold();
-                            }
-                            else if (linea.EsTotal)
-                            {
-                                table.Cell().Element(CellStyle).Text("");
-                                table.Cell().Element(CellStyle).Text(linea.Nombre).Bold();
-                                table.Cell().Element(CellStyle).Text(linea.Monto.ToString("N2")).AlignRight().Bold();
-                            }
-                            else
-                            {
-                                table.Cell().Element(CellStyle).Text(linea.Codigo);
-                                table.Cell().Element(CellStyle).Text(linea.Nombre);
-                                table.Cell().Element(CellStyle).Text(linea.Monto.ToString("N2")).AlignRight();
-                            }
-                        }
-                    });
-
-                    page.Footer().AlignRight().Text(x =>
-                    {
-                        x.Span("Página ");
-                        x.CurrentPageNumber();
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                        });
                     });
                 });
-            });
 
-            document.GeneratePdf(rutaArchivo);
+                document.GeneratePdf(rutaArchivo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al generar el PDF: {ex.Message}. Asegúrese de que el archivo no esté abierto en otro programa.", ex);
+            }
         }
 
-        public void ExportarInformeAExcel(List<LineaReporte> lineas, string titulo, string subtitulo, string rutaArchivo, string nombreEmpresa)
+        public void ExportarInformeAExcel(List<LineaReporte> lineas, string titulo, string subtitulo, string rutaArchivo, string nombreEmpresa, string notas = null, string conclusiones = null)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             using (var package = new ExcelPackage())
             {
                 var worksheet = package.Workbook.Worksheets.Add("Informe");
@@ -395,6 +444,24 @@ namespace SistemaContableZulay.UI.Services
                     }
                 }
 
+                if (!string.IsNullOrEmpty(notas))
+                {
+                    row += 2;
+                    worksheet.Cells[row, 1].Value = "NOTAS EXPLICATIVAS";
+                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                    row++;
+                    worksheet.Cells[row, 1].Value = notas;
+                    worksheet.Cells[row, 1].Style.Font.Italic = true;
+                }
+
+                if (!string.IsNullOrEmpty(conclusiones))
+                {
+                    row += 2;
+                    worksheet.Cells[row, 1].Value = "CONCLUSIONES Y RECOMENDACIONES";
+                    worksheet.Cells[row, 1].Style.Font.Bold = true;
+                    row++;
+                    worksheet.Cells[row, 1].Value = conclusiones;
+                }
                 // Formato de columnas
                 worksheet.Columns[3].Style.Numberformat.Format = "#,##0.00";
                 worksheet.Columns.AutoFit();

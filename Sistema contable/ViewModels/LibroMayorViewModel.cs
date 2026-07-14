@@ -92,6 +92,7 @@ namespace Sistema_contable.ViewModels
             CuentasDisponibles = new ObservableCollection<CuentaContable>();
             
             _contabilidadService.OnEmpresaCambiada += CargarDatos;
+            _contabilidadService.OnDatosModificados += CargarDatos;
             CargarDatos();
 
             ExportarPdfCommand = new RelayCommand(() => ExportarConValidacion("PDF"));

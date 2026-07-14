@@ -1,3 +1,4 @@
+using System;
 using Sistema_contable.Models;
 using System;
 using System.Collections.ObjectModel;
@@ -66,6 +67,9 @@ namespace Sistema_contable.ViewModels
             AbrirBackupsCommand = new RelayCommand(AbrirCarpetaBackups);
 
             _contabilidadService.OnEmpresasModificadas += CargarEmpresas;
+            _contabilidadService.OnDatosModificados += CargarEmpresas;
+            _contabilidadService.OnDatosModificados += ActualizarEstadoBackup;
+
             CargarEmpresas();
             ActualizarEstadoBackup();
         }
@@ -90,12 +94,8 @@ namespace Sistema_contable.ViewModels
                 var ruta = _contabilidadService.EjecutarBackupManual();
                 if (!string.IsNullOrEmpty(ruta))
                 {
-                    ActualizarEstadoBackup();
                     System.Windows.MessageBox.Show($"Backup creado exitosamente en:\n{ruta}", "Backup Exitoso", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("No se pudo crear el backup.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    ActualizarEstadoBackup();
                 }
             }
             catch (Exception ex)

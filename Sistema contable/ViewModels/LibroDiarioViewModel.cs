@@ -95,6 +95,7 @@ namespace Sistema_contable.ViewModels
             Lineas = new ObservableCollection<LineaLibroDiario>();
             
             _contabilidadService.OnEmpresaCambiada += CargarLibroDiario;
+            _contabilidadService.OnDatosModificados += CargarLibroDiario;
             CargarLibroDiario();
 
             ExportarPdfCommand = new RelayCommand(() => ExportarConValidacion("PDF"));

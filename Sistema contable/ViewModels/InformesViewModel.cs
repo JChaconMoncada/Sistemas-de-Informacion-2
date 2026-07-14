@@ -34,9 +34,38 @@ namespace Sistema_contable.ViewModels
             set => SetProperty(ref _lineas, value);
         }
 
+        private string _notasExplicativas;
+        private string _conclusionesRecomendaciones;
+        private string _nombreEmpresa;
+        private string _periodoCubierto;
+
+        public string NotasExplicativas
+        {
+            get => _notasExplicativas;
+            set => SetProperty(ref _notasExplicativas, value);
+        }
+
+        public string ConclusionesRecomendaciones
+        {
+            get => _conclusionesRecomendaciones;
+            set => SetProperty(ref _conclusionesRecomendaciones, value);
+        }
+
+        public string NombreEmpresa
+        {
+            get => _nombreEmpresa;
+            set => SetProperty(ref _nombreEmpresa, value);
+        }
+
+        public string PeriodoCubierto
+        {
+            get => _periodoCubierto;
+            set => SetProperty(ref _periodoCubierto, value);
+        }
+
         public ObservableCollection<string> TiposReporte { get; } = new ObservableCollection<string>
         {
-            "Balance General", "Estado de Resultados", "Flujo de Efectivo (simplificado)"
+            "Balance General", "Estado de Resultados", "Estado de Flujo de Caja", "Notas y Conclusiones"
         };
 
         public ObservableCollection<int> EjerciciosDisponibles { get; } = new ObservableCollection<int>();
@@ -107,6 +136,7 @@ namespace Sistema_contable.ViewModels
             _tipoReporteSeleccionado = TiposReporte.First();
 
             _contabilidadService.OnEmpresaCambiada += GenerarReporte;
+            _contabilidadService.OnDatosModificados += GenerarReporte;
 
             GenerarReporteCommand = new RelayCommand(GenerarReporte);
             ExportarPdfCommand = new RelayCommand(() => ExportarConValidacion("PDF"));
@@ -153,11 +183,11 @@ namespace Sistema_contable.ViewModels
                 {
                     if (destino == "PDF")
                     {
-                        exportacionService.ExportarInformeAPdf(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa);
+                        exportacionService.ExportarInformeAPdf(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa, NotasExplicativas, ConclusionesRecomendaciones);
                     }
                     else if (destino == "Excel")
                     {
-                        exportacionService.ExportarInformeAExcel(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa);
+                        exportacionService.ExportarInformeAExcel(Lineas.ToList(), TituloReporte, SubtituloReporte, saveFileDialog.FileName, nombreEmpresa, NotasExplicativas, ConclusionesRecomendaciones);
                     }
 
                     System.Windows.MessageBox.Show($"Archivo exportado exitosamente a:\n{saveFileDialog.FileName}", "Exportación Exitosa", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
@@ -185,8 +215,11 @@ namespace Sistema_contable.ViewModels
                 case "Estado de Resultados":
                     GenerarEstadoResultados();
                     break;
-                case "Flujo de Efectivo (simplificado)":
-                    GenerarFlujoEfectivo();
+                case "Estado de Flujo de Caja":
+                    GenerarFlujoCaja();
+                    break;
+                case "Notas y Conclusiones":
+                    GenerarNotasConclusiones();
                     break;
                 default:
                     GenerarBalanceGeneral();
@@ -194,8 +227,35 @@ namespace Sistema_contable.ViewModels
             }
         }
 
+        private void GenerarNotasConclusiones()
+        {
+            Lineas = new ObservableCollection<LineaReporte>();
+            TituloReporte = "NOTAS, CONCLUSIONES Y RECOMENDACIONES";
+            ActualizarEncabezado();
+            TieneDatos = !string.IsNullOrEmpty(NotasExplicativas) || !string.IsNullOrEmpty(ConclusionesRecomendaciones);
+        }
+
+        private void ActualizarEncabezado()
+        {
+            var empresa = _contabilidadService.ObtenerEmpresas()
+                .FirstOrDefault(e => e.Id == _contabilidadService.EmpresaActivaId);
+            NombreEmpresa = empresa?.NombreEmpresa ?? "Sin Empresa";
+            
+            if (TipoReporteSeleccionado == "Estado de Resultados")
+            {
+                PeriodoCubierto = $"Ejercicio Fiscal {EjercicioSeleccionado}";
+            }
+            else
+            {
+                PeriodoCubierto = $"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
+            }
+
+            SubtituloReporte = $"{NombreEmpresa} - {PeriodoCubierto}";
+        }
+
         private void GenerarBalanceGeneral()
         {
+            ActualizarEncabezado();
             var cuentas = _contabilidadService.ObtenerCuentasContables()
                 .Where(c => c.AceptaMovimiento)
                 .OrderBy(c => c.Codigo)
@@ -231,7 +291,6 @@ namespace Sistema_contable.ViewModels
 
             Lineas = resultado;
             TituloReporte = "BALANCE GENERAL";
-            SubtituloReporte = $"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
             TieneDatos = resultado.Any(l => !l.EsEncabezado);
 
             if (totalActivo != totalPasivo + totalPatrimonio)
@@ -246,6 +305,7 @@ namespace Sistema_contable.ViewModels
 
         private void GenerarEstadoResultados()
         {
+            ActualizarEncabezado();
             var resumen = _contabilidadService.ObtenerResumenEjercicio(EjercicioSeleccionado);
             var resultado = new ObservableCollection<LineaReporte>
             {
@@ -263,36 +323,42 @@ namespace Sistema_contable.ViewModels
 
             Lineas = resultado;
             TituloReporte = "ESTADO DE RESULTADOS";
-            SubtituloReporte = $"Ejercicio fiscal {EjercicioSeleccionado}";
             TieneDatos = resumen.TotalIngresos != 0 || resumen.TotalEgresos != 0;
         }
 
-        private void GenerarFlujoEfectivo()
+        private void GenerarFlujoCaja()
         {
-            var cuentas = _contabilidadService.ObtenerCuentasContables()
-                .Where(c => c.AceptaMovimiento && c.Codigo.StartsWith("1.1.01"))
-                .OrderBy(c => c.Codigo)
+            ActualizarEncabezado();
+            var comprobantes = _contabilidadService.ObtenerComprobantesGuardados()
+                .Where(c => c.Fecha.Year == EjercicioSeleccionado)
                 .ToList();
+
+            decimal entradas = 0;
+            decimal salidas = 0;
+
+            foreach (var comp in comprobantes)
+            {
+                if (comp.TipoComprobante == "Ingreso")
+                {
+                    entradas += comp.Lineas.Sum(l => l.Debe);
+                }
+                else if (comp.TipoComprobante == "Egreso")
+                {
+                    salidas += comp.Lineas.Sum(l => l.Haber);
+                }
+            }
 
             var resultado = new ObservableCollection<LineaReporte>
             {
-                new LineaReporte { Nombre = "EFECTIVO Y EQUIVALENTES", EsEncabezado = true }
+                new LineaReporte { Nombre = "ACTIVIDADES OPERATIVAS Y OTROS", EsEncabezado = true },
+                new LineaReporte { Nombre = "Entradas de Efectivo (Ingresos)", Monto = entradas },
+                new LineaReporte { Nombre = "Salidas de Efectivo (Egresos)", Monto = -salidas },
+                new LineaReporte { Nombre = "FLUJO NETO DE EFECTIVO", Monto = entradas - salidas, EsTotal = true }
             };
 
-            decimal total = 0;
-            foreach (var c in cuentas)
-            {
-                var saldo = _contabilidadService.ObtenerSaldoCuentaAFecha(c.Codigo, FechaCorte);
-                resultado.Add(new LineaReporte { Codigo = c.Codigo, Nombre = c.Nombre, Monto = saldo });
-                total += saldo;
-            }
-            resultado.Add(new LineaReporte { Nombre = "Total Efectivo Disponible", Monto = total, EsTotal = true });
-            resultado.Add(new LineaReporte { Nombre = "Nota: cálculo simplificado con saldos a la fecha de corte. No incluye clasificación por actividades." });
-
             Lineas = resultado;
-            TituloReporte = "FLUJO DE EFECTIVO (SIMPLIFICADO)";
-            SubtituloReporte = $"Al {FechaCorte:dd/MM/yyyy}";
-            TieneDatos = cuentas.Count > 0;
+            TituloReporte = "ESTADO DE FLUJO DE CAJA";
+            TieneDatos = entradas != 0 || salidas != 0;
         }
     }
 }

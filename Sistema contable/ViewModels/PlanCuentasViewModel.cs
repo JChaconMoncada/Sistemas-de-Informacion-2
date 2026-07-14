@@ -33,6 +33,9 @@ namespace Sistema_contable.ViewModels
             EliminarCommand = new RelayCommand(() => EliminarCuenta(), () => CuentaSeleccionada != null);
             CancelarCommand = new RelayCommand(() => { CuentaSeleccionada = null; CargarCuentas(); });
 
+            _contabilidadService.OnEmpresaCambiada += CargarCuentas;
+            _contabilidadService.OnDatosModificados += CargarCuentas;
+
             CargarCuentas();
         }
 

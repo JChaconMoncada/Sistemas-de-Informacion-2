@@ -18,6 +18,7 @@ public class ContabilidadService
     public int? EmpresaActivaId { get; set; }
     public event Action OnEmpresaCambiada;
     public event Action OnEmpresasModificadas;
+    public event Action OnDatosModificados;
     public event Action OnFacturasModificadas;
 
     public void SeleccionarEmpresa(int? id)
@@ -103,6 +104,7 @@ public class ContabilidadService
         var serializer = new XmlSerializer(typeof(ConfiguracionSistema));
         using var stream = new FileStream(_configuracionFile, FileMode.Create);
         serializer.Serialize(stream, _configuracion);
+        OnDatosModificados?.Invoke();
     }
 
     // ─── Documentos ───────────────────────────────────────────────────────────
@@ -128,6 +130,7 @@ public class ContabilidadService
 
         _documentosGuardados.Add(documento);
         GuardarLista(_documentosGuardados, _documentosFile);
+        OnDatosModificados?.Invoke();
     }
 
     public void EliminarDocumento(int id)
@@ -137,6 +140,7 @@ public class ContabilidadService
         {
             _documentosGuardados.Remove(existente);
             GuardarLista(_documentosGuardados, _documentosFile);
+            OnDatosModificados?.Invoke();
         }
     }
 
@@ -224,6 +228,7 @@ public class ContabilidadService
         GuardarEmpresas();
 
         OnEmpresasModificadas?.Invoke();
+        OnDatosModificados?.Invoke();
 
         // Si se editó la empresa activa, disparamos el evento para que la interfaz se refresque
         if (EmpresaActivaId == empresa.Id)
@@ -241,6 +246,7 @@ public class ContabilidadService
             GuardarEmpresas();
 
             OnEmpresasModificadas?.Invoke();
+            OnDatosModificados?.Invoke();
 
             if (EmpresaActivaId == id)
             {
@@ -258,6 +264,7 @@ public class ContabilidadService
         }
         _cuentasGuardadas.Add(cuenta);
         GuardarCuentas();
+        OnDatosModificados?.Invoke();
     }
 
     public void EliminarCuenta(string codigo)
@@ -267,6 +274,7 @@ public class ContabilidadService
         {
             _cuentasGuardadas.Remove(existente);
             GuardarCuentas();
+            OnDatosModificados?.Invoke();
         }
     }
 
@@ -293,6 +301,7 @@ public class ContabilidadService
         
         _comprobantesGuardados.Add(comprobante);
         GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        OnDatosModificados?.Invoke();
     }
 
     public IReadOnlyList<ComprobanteContable> ObtenerComprobantesGuardados() 
@@ -325,6 +334,7 @@ public class ContabilidadService
 
         comp.Estado = nuevoEstado;
         GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        OnDatosModificados?.Invoke();
     }
 
     public ComprobanteContable ReversarComprobante(int idComprobante, DateTime fechaReversion, string motivo)
@@ -361,6 +371,7 @@ public class ContabilidadService
         original.Estado = "Reversado";
         _comprobantesGuardados.Add(contraAsiento);
         GuardarLista(_comprobantesGuardados, _comprobantesFile);
+        OnDatosModificados?.Invoke();
 
         return contraAsiento;
     }
@@ -481,6 +492,7 @@ public class ContabilidadService
 
         GuardarLista(_comprobantesGuardados, _comprobantesFile);
         GuardarLista(_periodosFiscales, _periodosFile);
+        OnDatosModificados?.Invoke();
     }
 
     public bool EjercicioCerrado(int anio)
@@ -561,6 +573,7 @@ public class ContabilidadService
         if (existente != null) _facturasCobranza.Remove(existente);
         _facturasCobranza.Add(factura);
         GuardarFacturas();
+        OnDatosModificados?.Invoke();
     }
 
     public void MarcarFacturaPagada(int idFactura)
@@ -608,6 +621,7 @@ public class ContabilidadService
         factura.IdComprobantePago = idComp;
         GuardarFacturas();
         OnFacturasModificadas?.Invoke();
+        OnDatosModificados?.Invoke();
     }
 
     public void AnularFactura(int idFactura)
@@ -655,6 +669,7 @@ public class ContabilidadService
         factura.Estado = "Anulada";
         GuardarFacturas();
         OnFacturasModificadas?.Invoke();
+        OnDatosModificados?.Invoke();
     }
 
     public void EliminarComprobante(int idComprobante)
@@ -664,6 +679,7 @@ public class ContabilidadService
         {
             _comprobantesGuardados.Remove(existente);
             GuardarLista(_comprobantesGuardados, _comprobantesFile);
+            OnDatosModificados?.Invoke();
         }
     }
 
@@ -737,6 +753,9 @@ public class ContabilidadService
             }
 
             CargarDatos();
+            OnDatosModificados?.Invoke();
+            OnEmpresasModificadas?.Invoke();
+            OnEmpresaCambiada?.Invoke();
         }
         finally
         {
