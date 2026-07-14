@@ -132,13 +132,10 @@ namespace Sistema_contable.ViewModels
         {
             get => _ultimosMovimientos;
             set => SetProperty(ref _ultimosMovimientos, value);
-
         }
 
-
-        public ISeries[] Series { get; set; } = Array.Empty<ISeries>();
-
-        public Axis[] XAxes { get; set; } = Array.Empty<Axis>();
+        public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
+        public ObservableCollection<Axis> XAxes { get; set; } = new ObservableCollection<Axis>();
 
         // ── Comandos ──────────────────────────────────────────────────────────────
         public ICommand RefrescarCommand           { get; }
@@ -308,34 +305,31 @@ namespace Sistema_contable.ViewModels
             // =========================
             // Gráfico Ingresos vs Gastos
             // =========================
-            Series = new ISeries[]
+            if (Series.Count == 0)
             {
-    new ColumnSeries<double>
-    {
-        Name = "Monto",
-        Values = new double[]
-        {
-            (double)IngresosMes,
-            (double)GastosMes
-        }
-    }
-            };
+                Series.Add(new ColumnSeries<double>
+                {
+                    Name = "Monto",
+                    Values = new ObservableCollection<double> { (double)IngresosMes, (double)GastosMes }
+                });
 
-            XAxes = new Axis[]
+                XAxes.Add(new Axis
+                {
+                    Labels = new[] { "Ingresos", "Gastos" },
+                    LabelsRotation = 0
+                });
+            }
+            else
             {
-    new Axis
-    {
-        Labels = new[]
-        {
-            "Ingresos",
-            "Gastos"
-        },
-        LabelsRotation = 0
-    }
-            };
-
-            OnPropertyChanged(nameof(Series));
-            OnPropertyChanged(nameof(XAxes));
+                if (Series[0] is ColumnSeries<double> colSeries && colSeries.Values is ObservableCollection<double> values)
+                {
+                    if (values.Count >= 2)
+                    {
+                        values[0] = (double)IngresosMes;
+                        values[1] = (double)GastosMes;
+                    }
+                }
+            }
 
             // ── Movimientos ────────────────────────────────────────────────────────
             TotalMovimientos = todosComprobantes.Count;
