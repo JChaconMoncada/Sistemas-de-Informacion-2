@@ -1,0 +1,262 @@
+<Page x:Class="Sistema_contable.Views.EstadoFinanciero"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:viewmodels="clr-namespace:Sistema_contable.ViewModels"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="900"
+      Title="Estado Financiero">
+
+    <Page.DataContext>
+        <viewmodels:EstadoFinancieroViewModel />
+    </Page.DataContext>
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
+
+    <Grid Background="{StaticResource WindowBackgroundBrush}" Margin="16" MaxWidth="1200" HorizontalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="380" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Right Column: Configuración de Tasa Cambiaria -->
+        <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource ControlBackgroundBrush}" 
+                CornerRadius="12" Padding="24" Margin="16,0,0,0"
+                BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1">
+            <StackPanel>
+                
+                <TextBlock Text="Configuración de Tasa Cambiaria" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,24" Foreground="{StaticResource TextPrimaryBrush}" TextAlignment="Center" TextWrapping="Wrap"/>
+                
+                <!-- Moneda -->
+                <TextBlock Text="Moneda a Expresar:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                <ComboBox ItemsSource="{Binding OpcionesMoneda}" SelectedItem="{Binding MonedaSeleccionada}" Height="36" Padding="6,0" FontSize="14" Margin="0,0,0,16" />
+
+                <!-- Tasa -->
+                <StackPanel Visibility="{Binding MostrarTasaCambio}">
+                    <TextBlock Text="Tasa con la cual Operar:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBox Text="{Binding TasaCambioTexto, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="8,0" VerticalContentAlignment="Center" FontSize="14" Margin="0,0,0,16"/>
+                </StackPanel>
+
+                <!-- Fechas -->
+                <TextBlock Text="Fecha de Inicio:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                <DatePicker SelectedDate="{Binding FechaInicio, UpdateSourceTrigger=PropertyChanged}" KeyUp="DatePicker_KeyUp" Height="36" FontSize="14" Margin="0,0,0,16" />
+
+                <TextBlock Text="Fecha Final:" FontWeight="Medium" Margin="0,0,0,8" Foreground="{StaticResource TextSecondaryBrush}" />
+                <DatePicker SelectedDate="{Binding FechaCorte, UpdateSourceTrigger=PropertyChanged}" KeyUp="DatePicker_KeyUp" Height="36" FontSize="14" Margin="0,0,0,24" />
+
+                <Border BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="0,1,0,0" Margin="-24,0,-24,20" />
+
+                <!-- Botones de Exportación -->
+                <TextBlock Text="Exportar Reporte:" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,16,0" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="📄 Guardar PDF" Margin="0,0,12,0" Width="130" Height="36"
+                            Background="#D32F2F" Foreground="White" BorderThickness="0" FontWeight="Medium"
+                            Command="{Binding ExportarPdfCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#B71C1C" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="📊 Guardar Excel" Width="130" Height="36"
+                            Background="#2E7D32" Foreground="White" BorderThickness="0" FontWeight="Medium"
+                            Command="{Binding ExportarExcelCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#1B5E20" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Left Column: Estado Financiero -->
+        <Border Grid.Column="0" Background="{StaticResource ControlBackgroundBrush}" CornerRadius="12" 
+                BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding TituloReporte}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding SubtituloReporte}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                    <!-- Cabeceras de la tabla visual -->
+                    <Grid Grid.Row="1" Margin="24,0,0,0" Grid.IsSharedSizeScope="True" x:Name="TreeScope">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Cabecera manual -->
+                        <Grid Grid.Row="0" Margin="0,0,16,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" SharedSizeGroup="ColNombre" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="ColAccion" />
+                                <ColumnDefinition Width="150" SharedSizeGroup="ColMonto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="CUENTA" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Column="2" Text="MONTO" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right" />
+                        </Grid>
+
+                        <TreeView Grid.Row="1" ItemsSource="{Binding Nodos}" BorderThickness="0" Background="Transparent">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding EstaExpandido, Mode=TwoWay}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <!-- Aumentar el padding por defecto para mejor visualización -->
+                                    <Setter Property="Padding" Value="4" />
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type viewmodels:NodoEstadoFinanciero}" ItemsSource="{Binding SubNodos}">
+                                    <Border Margin="0,2" Padding="4,4">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="CornerRadius" Value="2" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Nombre}" Value="ACTIVO">
+                                                        <Setter Property="Background" Value="#D9E1F2" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Nombre}" Value="PASIVO">
+                                                        <Setter Property="Background" Value="#FCE4D6" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Nombre}" Value="PATRIMONIO">
+                                                        <Setter Property="Background" Value="#FCE4D6" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Nombre}" Value="TOTAL PASIVO + PATRIMONIO">
+                                                        <Setter Property="Background" Value="#FCE4D6" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="ColNombre" />
+                                                <ColumnDefinition SharedSizeGroup="ColAccion" />
+                                                <ColumnDefinition SharedSizeGroup="ColMonto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Nombre}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EsEncabezado}" Value="True">
+                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EsCuentaPadre}" Value="True">
+                                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EsTotal}" Value="True">
+                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                                <Setter Property="Foreground" Value="#1A1A1A" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EsDetalleReexpresion}" Value="True">
+                                                                <Setter Property="Foreground" Value="#2F7642" />
+                                                                <Setter Property="FontStyle" Value="Italic" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            
+                                            <!-- Descripción opcional -->
+                                            <TextBlock Margin="6,0,0,0" Foreground="#E03A3E" FontStyle="Italic">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Setter Property="Text" Value="{Binding Descripcion, StringFormat='({0})'}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding TieneDescripcion}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </WrapPanel>
+
+                                            <!-- Indicador Visual de Reexpresión -->
+                                            <Border Grid.Column="1" Background="#FFF3E0" BorderBrush="#FFCC80" BorderThickness="1" 
+                                                    CornerRadius="4" Padding="6,2" Margin="0,0,16,0" VerticalAlignment="Center"
+                                                    ToolTip="Esta cuenta ha sido reexpresada por inflación.">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding PuedeDeshacer}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="REEXPRESADO" Foreground="#E65100" FontSize="10" FontWeight="Bold" />
+                                            </Border>
+
+                                            <TextBlock Grid.Column="2" Text="{Binding MontoFormateado}" TextAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EsEncabezado}" Value="True">
+                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EsTotal}" Value="True">
+                                                                <Setter Property="FontWeight" Value="Bold" />
+                                                                <Setter Property="Foreground" Value="#1A1A1A" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                    </Border>
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+                    </Grid>
+
+                    <TextBlock Grid.Row="1" Text="No hay datos para mostrar" 
+                               Visibility="{Binding SinDatosVisibility}" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center" 
+                               Foreground="{StaticResource TextSecondaryBrush}" />
+                </Grid>
+            </Border>
+    </Grid>
+</Page>

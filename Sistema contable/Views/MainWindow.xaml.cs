@@ -12,6 +12,13 @@ namespace Sistema_contable.Views
             LoadPages();
         }
 
+        protected override void OnClosed(System.EventArgs e)
+        {
+            base.OnClosed(e);
+            Application.Current.Shutdown();
+            System.Environment.Exit(0);
+        }
+
         private void LoadPages()
         {
             FrameDashboard.Navigate(new Dashboard());
@@ -20,6 +27,7 @@ namespace Sistema_contable.Views
             FramePlanCuentas.Navigate(new PlanCuentas());
             FrameLibroDiario.Navigate(new LibroDiario());
             FrameLibroMayor.Navigate(new LibroMayor());
+            FrameEstadoFinanciero.Navigate(new EstadoFinanciero());
             FrameInformes.Navigate(new Informes());
             FrameCobranza.Navigate(new Cobranza());
             FrameDocumentos.Navigate(new Documentos());
@@ -39,12 +47,12 @@ namespace Sistema_contable.Views
         // Menu Handlers
         internal void MenuBackup_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 10;
+            MainTabControl.SelectedIndex = 11;
         }
 
         private void MenuRestore_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 10;
+            MainTabControl.SelectedIndex = 11;
         }
 
         private void MenuSalir_Click(object sender, RoutedEventArgs e)
@@ -84,24 +92,29 @@ namespace Sistema_contable.Views
             LibrosTabControl.SelectedIndex = 1;
         }
 
-        private void MenuInformes_Click(object sender, RoutedEventArgs e)
+        private void MenuEstadoFinanciero_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 5;
         }
 
-        private void MenuReexpresion_Click(object sender, RoutedEventArgs e)
+        private void MenuInformes_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 8;
+            MainTabControl.SelectedIndex = 6;
         }
 
-        private void MenuBancos_Click(object sender, RoutedEventArgs e)
+        private void MenuReexpresion_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 9;
         }
 
-        private void MenuConfiguracion_Click(object sender, RoutedEventArgs e)
+        private void MenuBancos_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 10;
+        }
+
+        private void MenuConfiguracion_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 11;
         }
 
         // ─── Menú Procesos ───────────────────────────────────────────────────────
@@ -158,17 +171,13 @@ namespace Sistema_contable.Views
 
         private void MenuReconversion2021_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 8;
-            if (FrameReexpresion.Content is Reexpresion page)
-            {
-                page.ActivarModoReconversion2021();
-            }
+            MessageBox.Show("El modo de reconversión ha sido deshabilitado.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // ─── Ayuda ───────────────────────────────────────────────────────────────
         private void MenuAyuda_Click(object sender, RoutedEventArgs e)
         {
-            MainTabControl.SelectedIndex = 11;
+            MainTabControl.SelectedIndex = 12;
         }
 
         private void MenuAcercaDe_Click(object sender, RoutedEventArgs e)

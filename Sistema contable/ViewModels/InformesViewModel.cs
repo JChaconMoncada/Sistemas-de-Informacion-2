@@ -14,6 +14,8 @@ namespace Sistema_contable.ViewModels
         public decimal Monto { get; set; }
         public bool EsTotal { get; set; }
         public bool EsEncabezado { get; set; }
+        public bool EsCuentaPadre { get; set; }
+        public System.Windows.Thickness Margen { get; set; }
     }
 
     public class InformesViewModel : ViewModelBase
@@ -36,7 +38,7 @@ namespace Sistema_contable.ViewModels
 
         public ObservableCollection<string> TiposReporte { get; } = new ObservableCollection<string>
         {
-            "Balance General", "Estado de Resultados", "Flujo de Efectivo (simplificado)"
+            "Estado de Resultados", "Flujo de Efectivo (simplificado)"
         };
 
         public ObservableCollection<int> EjerciciosDisponibles { get; } = new ObservableCollection<int>();
@@ -145,61 +147,10 @@ namespace Sistema_contable.ViewModels
                 case "Flujo de Efectivo (simplificado)":
                     GenerarFlujoEfectivo();
                     break;
-                default:
-                    GenerarBalanceGeneral();
-                    break;
             }
         }
 
-        private void GenerarBalanceGeneral()
-        {
-            var cuentas = _contabilidadService.ObtenerCuentasContables()
-                .Where(c => c.AceptaMovimiento)
-                .OrderBy(c => c.Codigo)
-                .ToList();
 
-            var resultado = new ObservableCollection<LineaReporte>();
-            decimal totalActivo = 0, totalPasivo = 0, totalPatrimonio = 0;
-
-            void AgregarGrupo(string tipo, string encabezado, ref decimal totalGrupo)
-            {
-                resultado.Add(new LineaReporte { Nombre = encabezado, EsEncabezado = true });
-                var cuentasTipo = cuentas.Where(c => c.Tipo == tipo).ToList();
-                foreach (var c in cuentasTipo)
-                {
-                    var saldo = _contabilidadService.ObtenerSaldoCuentaAFecha(c.Codigo, FechaCorte);
-                    if (saldo == 0) continue;
-                    resultado.Add(new LineaReporte { Codigo = c.Codigo, Nombre = c.Nombre, Monto = saldo });
-                    totalGrupo += saldo;
-                }
-                resultado.Add(new LineaReporte { Nombre = $"Total {encabezado}", Monto = totalGrupo, EsTotal = true });
-            }
-
-            AgregarGrupo("Activo", "ACTIVO", ref totalActivo);
-            AgregarGrupo("Pasivo", "PASIVO", ref totalPasivo);
-            AgregarGrupo("Patrimonio", "PATRIMONIO", ref totalPatrimonio);
-
-            resultado.Add(new LineaReporte
-            {
-                Nombre = "TOTAL PASIVO + PATRIMONIO",
-                Monto = totalPasivo + totalPatrimonio,
-                EsTotal = true
-            });
-
-            Lineas = resultado;
-            TituloReporte = "BALANCE GENERAL";
-            SubtituloReporte = $"Al {FechaCorte:dd 'de' MMMM 'de' yyyy}";
-            TieneDatos = resultado.Any(l => !l.EsEncabezado);
-
-            if (totalActivo != totalPasivo + totalPatrimonio)
-            {
-                resultado.Add(new LineaReporte
-                {
-                    Nombre = "⚠ Diferencia (revise resultados no cerrados del ejercicio)",
-                    Monto = totalActivo - (totalPasivo + totalPatrimonio)
-                });
-            }
-        }
 
         private void GenerarEstadoResultados()
         {
@@ -227,7 +178,7 @@ namespace Sistema_contable.ViewModels
         private void GenerarFlujoEfectivo()
         {
             var cuentas = _contabilidadService.ObtenerCuentasContables()
-                .Where(c => c.AceptaMovimiento && c.Codigo.StartsWith("1.1.01"))
+                .Where(c => c.Codigo.StartsWith("1.1.01"))
                 .OrderBy(c => c.Codigo)
                 .ToList();
 
@@ -236,12 +187,34 @@ namespace Sistema_contable.ViewModels
                 new LineaReporte { Nombre = "EFECTIVO Y EQUIVALENTES", EsEncabezado = true }
             };
 
-            decimal total = 0;
+            var saldos = new System.Collections.Generic.Dictionary<string, decimal>();
             foreach (var c in cuentas)
             {
-                var saldo = _contabilidadService.ObtenerSaldoCuentaAFecha(c.Codigo, FechaCorte);
-                resultado.Add(new LineaReporte { Codigo = c.Codigo, Nombre = c.Nombre, Monto = saldo });
-                total += saldo;
+                saldos[c.Codigo] = _contabilidadService.ObtenerSaldoCuentaAFecha(c.Codigo, FechaCorte);
+            }
+
+            foreach (var c in cuentas.OrderByDescending(x => x.Nivel))
+            {
+                if (!string.IsNullOrEmpty(c.CuentaPadre) && saldos.ContainsKey(c.CuentaPadre))
+                {
+                    saldos[c.CuentaPadre] += saldos[c.Codigo];
+                }
+            }
+
+            decimal total = cuentas.Any() ? cuentas.Where(c => c.Nivel == cuentas.Min(x => x.Nivel)).Sum(c => saldos[c.Codigo]) : 0;
+
+            foreach (var c in cuentas)
+            {
+                var saldo = saldos[c.Codigo];
+                if (saldo == 0) continue;
+                resultado.Add(new LineaReporte 
+                { 
+                    Codigo = c.Codigo, 
+                    Nombre = c.Nombre, 
+                    Monto = saldo,
+                    Margen = new System.Windows.Thickness((c.Nivel - 1) * 20, 2, 0, 2),
+                    EsCuentaPadre = !c.AceptaMovimiento
+                });
             }
             resultado.Add(new LineaReporte { Nombre = "Total Efectivo Disponible", Monto = total, EsTotal = true });
             resultado.Add(new LineaReporte { Nombre = "Nota: cálculo simplificado con saldos a la fecha de corte. No incluye clasificación por actividades." });

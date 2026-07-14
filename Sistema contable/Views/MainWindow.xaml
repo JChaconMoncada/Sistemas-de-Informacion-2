@@ -46,6 +46,8 @@
                 <MenuItem Header="Reconversión Monetaria 2021" Click="MenuReconversion2021_Click" />
             </MenuItem>
             <MenuItem Header="_Reportes">
+                <MenuItem Header="Estado Financiero Detallado" Click="MenuEstadoFinanciero_Click" />
+                <Separator />
                 <MenuItem Header="Balance General" Click="MenuInformes_Click" />
                 <MenuItem Header="Estado de Resultados" Click="MenuInformes_Click" />
                 <MenuItem Header="Flujo de Efectivo" Click="MenuInformes_Click" />
@@ -140,6 +142,9 @@
                             <Frame x:Name="FrameLibroMayor" NavigationUIVisibility="Hidden" />
                         </TabItem>
                     </TabControl>
+                </TabItem>
+                <TabItem Header="Estado Financiero">
+                    <Frame x:Name="FrameEstadoFinanciero" NavigationUIVisibility="Hidden" />
                 </TabItem>
                 <TabItem Header="Informes">
                     <Frame x:Name="FrameInformes" NavigationUIVisibility="Hidden" />

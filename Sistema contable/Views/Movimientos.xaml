@@ -68,7 +68,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Button Grid.Row="0" Content="Eliminar Seleccionado" Command="{Binding EliminarMovimientoCommand}" Foreground="Red" HorizontalAlignment="Right" Margin="0,0,0,8" Padding="12,4"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,8">
+                    <Button Content="Refrescar 🔄" Command="{Binding RefrescarCommand}" Margin="0,0,8,0" Padding="12,4"/>
+                    <Button Content="Eliminar Seleccionado" Command="{Binding EliminarMovimientoCommand}" Foreground="Red" Padding="12,4"/>
+                </StackPanel>
                 <DataGrid Grid.Row="1" ItemsSource="{Binding HistorialMovimientos}" SelectedItem="{Binding ComprobanteSeleccionado, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" HeadersVisibility="Column" SelectionMode="Single" SelectionUnit="FullRow">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding IdComprobante}" Width="50" />
