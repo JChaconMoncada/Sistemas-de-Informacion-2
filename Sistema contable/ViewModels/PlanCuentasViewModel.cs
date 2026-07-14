@@ -14,6 +14,7 @@ namespace Sistema_contable.ViewModels
         private readonly ContabilidadService _contabilidadService;
 
         public ObservableCollection<CuentaContable> Cuentas { get; set; }
+        public List<string> TiposDeCuenta { get; } = new List<string> { "Activo", "Pasivo", "Patrimonio", "Ingreso", "Egreso", "Costo" };
 
         public CuentaContable CuentaSeleccionada
         {
