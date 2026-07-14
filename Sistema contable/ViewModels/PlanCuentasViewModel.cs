@@ -86,7 +86,7 @@ namespace Sistema_contable.ViewModels
                 {
                     query = query.Where(c => c.Tipo == CuentaSeleccionada.Tipo);
                 }
-                return query;
+                return query.ToList();
             }
         }
 

@@ -104,7 +104,7 @@
                         <ComboBoxItem Content="Pasivo" />
                         <ComboBoxItem Content="Patrimonio" />
                         <ComboBoxItem Content="Ingreso" />
-                        <ComboBoxItem Content="Gasto" />
+                        <ComboBoxItem Content="Egreso" />
                         <ComboBoxItem Content="Costo" />
                     </ComboBox>
 
