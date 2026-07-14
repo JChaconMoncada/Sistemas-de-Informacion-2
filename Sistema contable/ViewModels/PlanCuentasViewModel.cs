@@ -18,7 +18,27 @@ namespace Sistema_contable.ViewModels
         public CuentaContable CuentaSeleccionada
         {
             get => _cuentaSeleccionada;
-            set => SetProperty(ref _cuentaSeleccionada, value);
+            set
+            {
+                if (_cuentaSeleccionada != null)
+                {
+                    _cuentaSeleccionada.PropertyChanged -= CuentaSeleccionada_PropertyChanged;
+                }
+                SetProperty(ref _cuentaSeleccionada, value);
+                if (_cuentaSeleccionada != null)
+                {
+                    _cuentaSeleccionada.PropertyChanged += CuentaSeleccionada_PropertyChanged;
+                }
+                OnPropertyChanged(nameof(CuentasPadreDisponibles));
+            }
+        }
+
+        private void CuentaSeleccionada_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CuentaContable.Tipo))
+            {
+                OnPropertyChanged(nameof(CuentasPadreDisponibles));
+            }
         }
 
         public ICommand NuevaCuentaCommand { get; }
@@ -57,7 +77,18 @@ namespace Sistema_contable.ViewModels
         }
         public ObservableCollection<CuentaContable> TodasLasCuentasPlanas { get; set; } = new ObservableCollection<CuentaContable>();
 
-        public IEnumerable<CuentaContable> CuentasPadreDisponibles => TodasLasCuentasPlanas.Where(c => !c.AceptaMovimiento);
+        public IEnumerable<CuentaContable> CuentasPadreDisponibles
+        {
+            get
+            {
+                var query = TodasLasCuentasPlanas.Where(c => !c.AceptaMovimiento);
+                if (CuentaSeleccionada != null && !string.IsNullOrEmpty(CuentaSeleccionada.Tipo))
+                {
+                    query = query.Where(c => c.Tipo == CuentaSeleccionada.Tipo);
+                }
+                return query;
+            }
+        }
 
         public void ActualizarListaPlana()
         {

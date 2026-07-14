@@ -7,7 +7,19 @@ public class CuentaContable : INotifyPropertyChanged
     public int Id { get; set; }
     public string Codigo { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
-    public string Tipo { get; set; } = "Activo";
+    private string _tipo = "Activo";
+    public string Tipo
+    {
+        get => _tipo;
+        set
+        {
+            if (_tipo != value)
+            {
+                _tipo = value;
+                OnPropertyChanged();
+            }
+        }
+    }
     public int Nivel { get; set; } = 1;
     public string CuentaPadre { get; set; } = string.Empty;
     public bool AceptaMovimiento { get; set; } = true;
