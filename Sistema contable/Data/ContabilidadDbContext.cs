@@ -23,23 +23,12 @@ namespace Sistema_contable.Data
 
         }
 
-        // Entidades de base de datos (persistencia)
-        public DbSet<Sistema_contable.Models.CuentaContable> CuentasContables { get; set; }
-        public DbSet<Empresa> Empresas { get; set; }
-        public DbSet<Documento> Documentos { get; set; }
-        public DbSet<FacturaInterna> FacturasInternas { get; set; }
-        public DbSet<PartidaReexpresion> PartidasReexpresion { get; set; }
-        public DbSet<ConfiguracionSistema> ConfiguracionSistema { get; set; }
-        public DbSet<BackupInfo> Backups { get; set; }
-        public DbSet<IpcRecord> RegistrosIpc { get; set; }
+        // Entidades de base de datos activas en SQLite
         public DbSet<FacturaCobranza> FacturasCobranza { get; set; }
-        public DbSet<Asiento> Asientos { get; set; }
 
         // Comprobantes / partida doble (namespace Domain)
         public DbSet<ComprobanteContable> ComprobantesContables { get; set; }
         public DbSet<AsientoLinea> LineasAsiento { get; set; }
-        public DbSet<EmpresaCliente> EmpresasCliente { get; set; }
-        public DbSet<Moneda> Monedas { get; set; }
         public DbSet<PeriodoFiscal> PeriodosFiscales { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -63,9 +52,6 @@ namespace Sistema_contable.Data
             modelBuilder.Entity<PeriodoFiscal>()
                 .HasKey(p => new { p.Anio, p.Mes });
 
-            modelBuilder.Entity<Sistema_contable.Models.CuentaContable>()
-                .HasIndex(c => new { c.EmpresaId, c.Codigo })
-                .IsUnique();
         }
 
         public DbSet<ColaSincronizacion> ColaSincronizacion { get; set; }

@@ -18,7 +18,9 @@ namespace SistemaContableZulay.UI.Services
             try
             {
                 QuestPDF.Settings.License = LicenseType.Community;
+#pragma warning disable CS0618
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+#pragma warning restore CS0618
             }
             catch (Exception ex)
             {

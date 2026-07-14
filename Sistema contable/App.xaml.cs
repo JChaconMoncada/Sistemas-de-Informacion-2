@@ -12,6 +12,14 @@ namespace Sistema_contable
         {
             base.OnStartup(e);
 
+            // Manejador global de excepciones para evitar cierres inesperados
+            this.DispatcherUnhandledException += (s, args) =>
+            {
+                MessageBox.Show($"Ha ocurrido un error inesperado:\n\n{args.Exception.Message}",
+                                "Error del Sistema", MessageBoxButton.OK, MessageBoxImage.Error);
+                args.Handled = true; // Prevenir el cierre de la aplicación si es posible
+            };
+
             try
             {
                 using var db = new ContabilidadDbContext();

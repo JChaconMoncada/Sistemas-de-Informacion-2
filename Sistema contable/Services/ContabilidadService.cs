@@ -51,7 +51,6 @@ public class ContabilidadService
     private readonly SupabaseSyncService _syncService = new SupabaseSyncService();
     private System.Timers.Timer _timerSincronizacion;
 
-    private List<ComprobanteContable> _comprobantesGuardados = new();
     private List<CuentaContable> _cuentasGuardadas = new();
     private List<EmpresaCliente> _empresasGuardadas = new();
     private List<Documento> _documentosGuardados = new();
@@ -81,25 +80,9 @@ public class ContabilidadService
     {
         _empresasGuardadas = CargarLista<EmpresaCliente>(_empresasFile) ?? new List<EmpresaCliente>();
         _cuentasGuardadas = CargarLista<CuentaContable>(_cuentasFile) ?? new List<CuentaContable>();
-        _comprobantesGuardados = CargarLista<ComprobanteContable>(_comprobantesFile) ?? new List<ComprobanteContable>();
         _documentosGuardados = CargarLista<Documento>(_documentosFile) ?? new List<Documento>();
         _historialReexpresiones = CargarLista<HistorialReexpresion>(_historialReexpresionesFile) ?? new List<HistorialReexpresion>();
         _configuracion = CargarConfiguracion() ?? new ConfiguracionSistema();
-
-        bool guardadoNecesario = false;
-        foreach (var c in _comprobantesGuardados)
-        {
-            if (c.MontoTotal == 0 && c.Lineas != null && c.Lineas.Count > 0)
-            {
-                c.MontoTotal = c.TotalDebe;
-                guardadoNecesario = true;
-            }
-        }
-        
-        if (guardadoNecesario)
-        {
-            GuardarLista(_comprobantesGuardados, _comprobantesFile);
-        }
 
         SembrarCuentasPorDefecto();
 

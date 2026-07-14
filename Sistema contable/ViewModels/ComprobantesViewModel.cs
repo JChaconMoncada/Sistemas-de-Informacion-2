@@ -11,20 +11,20 @@ namespace Sistema_contable.ViewModels
 {
     public class ComprobantesViewModel : ViewModelBase
     {
-        private Asiento _asientoActual;
+        private ComprobanteContable _asientoActual;
         private decimal _totalDebe;
         private decimal _totalHaber;
         private bool _estaCuadrado;
-        private DetalleAsiento _selectedDetalle;
+        private AsientoLineaViewModel _selectedDetalle;
         private readonly ContabilidadService _contabilidadService;
 
-        public Asiento AsientoActual
+        public ComprobanteContable AsientoActual
         {
             get => _asientoActual;
             set => SetProperty(ref _asientoActual, value);
         }
 
-        public ObservableCollection<DetalleAsiento> Detalles { get; set; }
+        public ObservableCollection<AsientoLineaViewModel> Detalles { get; set; }
 
         public decimal TotalDebe
         {
@@ -44,7 +44,7 @@ namespace Sistema_contable.ViewModels
             set => SetProperty(ref _estaCuadrado, value);
         }
 
-        public DetalleAsiento SelectedDetalle
+        public AsientoLineaViewModel SelectedDetalle
         {
             get => _selectedDetalle;
             set => SetProperty(ref _selectedDetalle, value);
@@ -59,7 +59,7 @@ namespace Sistema_contable.ViewModels
         public ComprobantesViewModel()
         {
             _contabilidadService = ContabilidadService.Instance;
-            Detalles = new ObservableCollection<DetalleAsiento>();
+            Detalles = new ObservableCollection<AsientoLineaViewModel>();
             Detalles.CollectionChanged += Detalles_CollectionChanged;
 
             GuardarCommand = new RelayCommand(() => GuardarComprobante(), () => Detalles.Count > 0);
@@ -75,14 +75,14 @@ namespace Sistema_contable.ViewModels
         {
             if (e.NewItems != null)
             {
-                foreach (DetalleAsiento item in e.NewItems)
+                foreach (AsientoLineaViewModel item in e.NewItems)
                 {
                     item.PropertyChanged += Item_PropertyChanged;
                 }
             }
             if (e.OldItems != null)
             {
-                foreach (DetalleAsiento item in e.OldItems)
+                foreach (AsientoLineaViewModel item in e.OldItems)
                 {
                     item.PropertyChanged -= Item_PropertyChanged;
                 }
@@ -92,7 +92,7 @@ namespace Sistema_contable.ViewModels
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DetalleAsiento.Debe) || e.PropertyName == nameof(DetalleAsiento.Haber))
+            if (e.PropertyName == nameof(AsientoLineaViewModel.Debe) || e.PropertyName == nameof(AsientoLineaViewModel.Haber))
             {
                 RecalcularTotales();
             }
@@ -107,7 +107,7 @@ namespace Sistema_contable.ViewModels
 
         private void AgregarLinea()
         {
-            Detalles.Add(new DetalleAsiento());
+            Detalles.Add(new AsientoLineaViewModel(new AsientoLinea(), RecalcularTotales));
         }
 
         private void EliminarLinea()
@@ -120,11 +120,12 @@ namespace Sistema_contable.ViewModels
 
         private void ReiniciarFormulario()
         {
-            AsientoActual = new Asiento
+            AsientoActual = new ComprobanteContable
             {
                 Fecha = DateTime.Now,
-                Numero = ObtenerSiguienteNumero(),
-                Tipo = "Manual"
+                IdComprobante = ObtenerSiguienteNumero(),
+                TipoComprobante = "Diario",
+                Moneda = "Bs"
             };
             Detalles.Clear();
             AgregarLinea();
@@ -147,20 +148,16 @@ namespace Sistema_contable.ViewModels
 
             var cc = new ComprobanteContable
             {
+                IdComprobante = AsientoActual.IdComprobante,
                 Fecha = AsientoActual.Fecha,
                 Descripcion = AsientoActual.Descripcion ?? "",
-                TipoComprobante = AsientoActual.Tipo ?? ""
+                TipoComprobante = AsientoActual.TipoComprobante ?? "",
+                Moneda = AsientoActual.Moneda ?? "Bs"
             };
 
             foreach (var d in Detalles)
             {
-                cc.Lineas.Add(new AsientoLinea
-                {
-                    CodigoCuenta = d.CodigoCuenta ?? "",
-                    Debe = d.Debe,
-                    Haber = d.Haber,
-                    DescripcionCuenta = d.NombreCuenta ?? d.Descripcion ?? ""
-                });
+                cc.Lineas.Add(d.GetModel());
             }
 
             try

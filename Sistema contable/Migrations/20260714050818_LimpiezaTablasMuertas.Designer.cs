@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sistema_contable.Data;
 
@@ -10,9 +11,11 @@ using Sistema_contable.Data;
 namespace Sistema_contable.Migrations
 {
     [DbContext(typeof(ContabilidadDbContext))]
-    partial class ContabilidadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260714050818_LimpiezaTablasMuertas")]
+    partial class LimpiezaTablasMuertas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");

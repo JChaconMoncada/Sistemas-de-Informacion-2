@@ -41,10 +41,10 @@
                 <DatePicker Grid.Row="0" Grid.Column="1" SelectedDate="{Binding AsientoActual.Fecha, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <Label Grid.Row="0" Grid.Column="3" Content="Número:" VerticalAlignment="Center" />
-                <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding AsientoActual.Numero}" IsReadOnly="True" />
+                <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding AsientoActual.IdComprobante}" IsReadOnly="True" />
 
                 <Label Grid.Row="0" Grid.Column="6" Content="Tipo:" VerticalAlignment="Center" />
-                <ComboBox Grid.Row="0" Grid.Column="7" SelectedValue="{Binding AsientoActual.Tipo, Mode=TwoWay}" SelectedValuePath="Content">
+                <ComboBox Grid.Row="0" Grid.Column="7" SelectedValue="{Binding AsientoActual.TipoComprobante, Mode=TwoWay}" SelectedValuePath="Content">
                     <ComboBoxItem Content="Manual" />
                     <ComboBoxItem Content="Apertura" />
                     <ComboBoxItem Content="Cierre" />
@@ -70,10 +70,9 @@
         <DataGrid Grid.Row="3" ItemsSource="{Binding Detalles}" SelectedItem="{Binding SelectedDetalle, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,12">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Código" Width="100" Binding="{Binding CodigoCuenta}" />
-                <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding NombreCuenta}" />
+                <DataGridTextColumn Header="Cuenta" Width="*" Binding="{Binding DescripcionCuenta}" />
                 <DataGridTextColumn Header="Debe" Width="150" Binding="{Binding Debe, StringFormat=N2}" />
                 <DataGridTextColumn Header="Haber" Width="150" Binding="{Binding Haber, StringFormat=N2}" />
-                <DataGridTextColumn Header="Descripción" Width="250" Binding="{Binding Descripcion}" />
             </DataGrid.Columns>
         </DataGrid>
 
