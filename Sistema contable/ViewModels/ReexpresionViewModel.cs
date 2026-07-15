@@ -164,8 +164,8 @@ namespace Sistema_contable.ViewModels
             
             foreach (var comp in movimientosNoMonetarios)
             {
-                // Buscar la línea que NO es de efectivo (caja/bancos) para obtener la cuenta afectada
-                var lineaNoCaja = comp.Lineas.FirstOrDefault(l => !l.DescripcionCuenta.ToLower().Contains("caja") && !l.DescripcionCuenta.ToLower().Contains("banco"));
+                // Buscar la línea que NO es de efectivo (caja general = 1.1.01.01) para obtener la cuenta afectada
+                var lineaNoCaja = comp.Lineas.FirstOrDefault(l => l.CodigoCuenta != "1.1.01.01");
                 if (lineaNoCaja == null) lineaNoCaja = comp.Lineas.FirstOrDefault();
                 if (lineaNoCaja == null) continue;
 
@@ -251,6 +251,7 @@ namespace Sistema_contable.ViewModels
         {
             if (_contabilidadService.EmpresaActivaId == null)
             {
+                MessageBox.Show("No hay ninguna empresa activa seleccionada.", "Error de Reexpresión", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -258,6 +259,7 @@ namespace Sistema_contable.ViewModels
             var backupPath = _contabilidadService.EjecutarRespaldoAutomatico();
             if (string.IsNullOrEmpty(backupPath))
             {
+                MessageBox.Show("No se pudo crear el respaldo automático antes de aplicar la reexpresión.\nVerifique que la base de datos no esté bloqueada.", "Error de Respaldo", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -267,6 +269,7 @@ namespace Sistema_contable.ViewModels
 
             if (cuentaREI == null)
             {
+                MessageBox.Show($"No se encontró la cuenta REI con el código {codigoREI}. Por favor, créela antes de reexpresar.", "Error de Cuenta", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

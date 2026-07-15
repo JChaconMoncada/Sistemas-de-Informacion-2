@@ -902,7 +902,31 @@ public class ContabilidadService
                 // La base de datos SQLite ahora vive dentro de _datosPath nativamente,
                 // por lo que ZipFile empacará contable.db junto a todos los .xml.
                 Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
-                ZipFile.CreateFromDirectory(_datosPath, backupPath);
+                
+                // Copiar los archivos a un directorio temporal para evitar bloqueos por SQLite
+                string tempDir = Path.Combine(Path.GetTempPath(), $"Backup_{Guid.NewGuid()}");
+                Directory.CreateDirectory(tempDir);
+                
+                foreach (var file in Directory.GetFiles(_datosPath))
+                {
+                    string destFile = Path.Combine(tempDir, Path.GetFileName(file));
+                    try {
+                        using (var sourceStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (var destStream = new FileStream(destFile, FileMode.Create, FileAccess.Write))
+                        {
+                            sourceStream.CopyTo(destStream);
+                        }
+                    } catch {
+                        // Ignorar los archivos que no se puedan copiar del todo (como temporales bloqueados)
+                    }
+                }
+                
+                ZipFile.CreateFromDirectory(tempDir, backupPath);
+                
+                try {
+                    Directory.Delete(tempDir, true);
+                } catch { }
+
                 return backupPath;
             }
             return string.Empty;
@@ -988,7 +1012,8 @@ public class ContabilidadService
 
         // Si es una cuenta de Resultado (Ingreso/Egreso), el saldo es la variación en el periodo.
         // Si es una cuenta de Balance (Activo/Pasivo/Patrimonio), el saldo es el acumulado histórico, por lo que ignoramos la fecha de inicio.
-        if (fechaInicio.HasValue && (cuenta.Tipo == "Ingreso" || cuenta.Tipo == "Egreso"))
+        // ACTUALIZACION: El usuario quiere que todas las cuentas respeten el filtro de fechas (rango estricto).
+        if (fechaInicio.HasValue)
         {
             DateTime inicio = fechaInicio.Value.Date;
             query = query.Where(c => c.Fecha >= inicio);

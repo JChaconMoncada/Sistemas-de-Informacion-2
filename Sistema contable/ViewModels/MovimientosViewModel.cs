@@ -59,7 +59,13 @@ namespace Sistema_contable.ViewModels
         public string TipoTransaccion
         {
             get => _tipoTransaccion;
-            set => SetProperty(ref _tipoTransaccion, value);
+            set
+            {
+                if (SetProperty(ref _tipoTransaccion, value))
+                {
+                    CargarCuentas();
+                }
+            }
         }
 
         public string MonedaSeleccionada
@@ -118,7 +124,8 @@ namespace Sistema_contable.ViewModels
             foreach (var cuenta in cuentas)
             {
                 // Excluimos la cuenta de banco principal para no permitir que la seleccionen directamente como contrapartida en esta vista rápida
-                if (cuenta.Codigo != "1.1.01.01")
+                // Además, filtramos para que solo aparezcan cuentas que coincidan con el TipoTransaccion seleccionado
+                if (cuenta.Codigo != "1.1.01.01" && cuenta.Tipo == _tipoTransaccion)
                 {
                     CuentasDisponibles.Add(cuenta);
                 }
