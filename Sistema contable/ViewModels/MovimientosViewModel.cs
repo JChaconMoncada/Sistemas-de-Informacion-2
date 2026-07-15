@@ -186,9 +186,41 @@ namespace Sistema_contable.ViewModels
             switch (TipoTransaccion)
             {
                 case "Ingreso":
+                    // Aumenta el efectivo (Debe), Ingreso va al Haber
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = cuentaCaja.Codigo,
+                        DescripcionCuenta = cuentaCaja.Nombre,
+                        Debe = this.Monto,
+                        Haber = 0
+                    });
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = this.CuentaSeleccionada.Codigo,
+                        DescripcionCuenta = this.CuentaSeleccionada.Nombre,
+                        Debe = 0,
+                        Haber = this.Monto
+                    });
+                    break;
                 case "Pasivo":
+                    // Aumenta el efectivo (Debe), el Pasivo va al Haber (ej. Préstamo recibido)
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = cuentaCaja.Codigo,
+                        DescripcionCuenta = cuentaCaja.Nombre,
+                        Debe = this.Monto,
+                        Haber = 0
+                    });
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = this.CuentaSeleccionada.Codigo,
+                        DescripcionCuenta = this.CuentaSeleccionada.Nombre,
+                        Debe = 0,
+                        Haber = this.Monto
+                    });
+                    break;
                 case "Patrimonio":
-                    // Aumenta el efectivo (Debe), la contrapartida (Ingreso/Pasivo/Patrimonio) va al Haber
+                    // Aumenta el efectivo (Debe), el Patrimonio va al Haber (ej. Aporte de capital)
                     nuevoComprobante.Lineas.Add(new AsientoLinea
                     {
                         CodigoCuenta = cuentaCaja.Codigo,
@@ -205,8 +237,24 @@ namespace Sistema_contable.ViewModels
                     });
                     break;
                 case "Egreso":
+                    // Aumenta el Gasto (Debe), disminuye el efectivo (Haber)
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = this.CuentaSeleccionada.Codigo,
+                        DescripcionCuenta = this.CuentaSeleccionada.Nombre,
+                        Debe = this.Monto,
+                        Haber = 0
+                    });
+                    nuevoComprobante.Lineas.Add(new AsientoLinea
+                    {
+                        CodigoCuenta = cuentaCaja.Codigo,
+                        DescripcionCuenta = cuentaCaja.Nombre,
+                        Debe = 0,
+                        Haber = this.Monto
+                    });
+                    break;
                 case "Activo":
-                    // Disminuye el efectivo (Haber), la contrapartida (Gasto/Activo) va al Debe
+                    // Compra/ingreso de Activo aumenta el Activo (Debe), disminuye el efectivo (Haber)
                     nuevoComprobante.Lineas.Add(new AsientoLinea
                     {
                         CodigoCuenta = this.CuentaSeleccionada.Codigo,

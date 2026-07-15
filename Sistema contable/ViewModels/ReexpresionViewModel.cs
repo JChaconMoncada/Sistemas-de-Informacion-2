@@ -297,12 +297,15 @@ namespace Sistema_contable.ViewModels
                 };
 
                 // Línea 1: Aumentar la cuenta original (Activo por Debe, Patrimonio por Haber)
+                bool esActivo = partida.Codigo.StartsWith("1");
+                bool esPatrimonio = partida.Codigo.StartsWith("3");
+
                 asiento.Lineas.Add(new AsientoLinea
                 {
                     CodigoCuenta = partida.Codigo,
                     DescripcionCuenta = partida.Nombre,
-                    Debe = partida.Tipo == "Activo" ? partida.Diferencia : 0,
-                    Haber = partida.Tipo == "Patrimonio" ? partida.Diferencia : 0
+                    Debe = esActivo ? partida.Diferencia : 0,
+                    Haber = esPatrimonio ? partida.Diferencia : 0
                 });
 
                 // Línea 2: Contrapartida a la cuenta REI
@@ -310,8 +313,8 @@ namespace Sistema_contable.ViewModels
                 {
                     CodigoCuenta = cuentaREI.Codigo,
                     DescripcionCuenta = cuentaREI.Nombre,
-                    Debe = partida.Tipo == "Patrimonio" ? partida.Diferencia : 0,
-                    Haber = partida.Tipo == "Activo" ? partida.Diferencia : 0
+                    Debe = esPatrimonio ? partida.Diferencia : 0,
+                    Haber = esActivo ? partida.Diferencia : 0
                 });
                 
                 _contabilidadService.GuardarComprobante(asiento);

@@ -252,13 +252,16 @@ namespace Sistema_contable.ViewModels
                 if (c.Codigo == "3.2.01.00") continue; // Ignorar REI a petición del usuario
                 decimal saldoMonto = _contabilidadService.ObtenerSaldoCuentaEntreFechas(c.Codigo, FechaInicio, FechaCorte);
                 
+                // ObtenerSaldoCuentaEntreFechas ya devuelve el saldo con convención contable correcta
+                // (positivo = saldo normal para ese tipo de cuenta). NO aplicar Math.Abs aquí
+                // porque distorsionaría los valores de Gastos y Cuentas por Pagar.
                 if (MonedaSeleccionada.Contains("COP") || MonedaSeleccionada.Contains("Pesos"))
                 {
-                    saldos[c.Codigo] = Math.Abs(saldoMonto * tasa);
+                    saldos[c.Codigo] = saldoMonto * tasa;
                 }
                 else
                 {
-                    saldos[c.Codigo] = Math.Abs(saldoMonto / tasa);
+                    saldos[c.Codigo] = tasa > 0 ? saldoMonto / tasa : saldoMonto;
                 }
             }
 
@@ -289,26 +292,54 @@ namespace Sistema_contable.ViewModels
                 foreach (var hijo in hijos)
                 {
                     decimal saldo = saldos.ContainsKey(hijo.Codigo) ? saldos[hijo.Codigo] : 0;
-                    bool tieneMonto = saldo != 0 || historiales.Any(h => h.CodigoCuenta == hijo.Codigo && h.IdComprobanteAsociado > 0);
-                    if (!tieneMonto && hijo.Nivel > 1) continue;
+
+                    // Detectar historial de reexpresión antes de crear el nodo (lo necesitamos para el nombre)
+                    HistorialReexpresion histAsociado = null;
+                    if (hijo.AceptaMovimiento)
+                    {
+                        histAsociado = historiales.FirstOrDefault(h => h.CodigoCuenta == hijo.Codigo && h.IdComprobanteAsociado > 0);
+                    }
+
+                    bool tieneMonto = saldo != 0 || histAsociado != null;
+
+                    // Filtrar cuentas sin saldo ni historial (sin restricción de nivel)
+                    if (!tieneMonto) continue;
+
+                    // Si tiene reexpresión, el nombre incluye "Reexpresado (fecha)"
+                    string nombreNodo = histAsociado != null
+                        ? $"{hijo.Nombre} Reexpresado ({histAsociado.FechaCalculo:dd/MM/yyyy})"
+                        : hijo.Nombre;
 
                     var nodoHijo = new NodoEstadoFinanciero
                     {
                         Codigo = hijo.Codigo,
-                        Nombre = hijo.Nombre,
+                        Nombre = nombreNodo,
                         Monto = saldo,
                         MontoFormateado = $"{monedaSymbol} {saldo:N2}",
-                        EsCuentaPadre = !hijo.AceptaMovimiento
+                        EsCuentaPadre = !hijo.AceptaMovimiento || histAsociado != null,
+                        TieneHistorial = histAsociado != null,
+                        HistorialAsociado = histAsociado
                     };
 
-                    if (hijo.AceptaMovimiento)
+                    if (histAsociado != null)
                     {
-                        var histAsociado = historiales.FirstOrDefault(h => h.CodigoCuenta == hijo.Codigo && h.IdComprobanteAsociado > 0);
-                        if (histAsociado != null)
+                        nodoHijo.SubNodos.Add(new NodoEstadoFinanciero
                         {
-                            nodoHijo.TieneHistorial = true;
-                            nodoHijo.HistorialAsociado = histAsociado;
-                        }
+                            Codigo = hijo.Codigo,
+                            Nombre = "Valor Original",
+                            Monto = histAsociado.ValorOriginal,
+                            MontoFormateado = $"{monedaSymbol} {histAsociado.ValorOriginal:N2}",
+                            EsDetalleReexpresion = true
+                        });
+
+                        nodoHijo.SubNodos.Add(new NodoEstadoFinanciero
+                        {
+                            Codigo = hijo.Codigo,
+                            Nombre = "Ajuste por Inflación (Reexpresado)",
+                            Monto = histAsociado.MontoAjuste,
+                            MontoFormateado = $"{monedaSymbol} {histAsociado.MontoAjuste:N2}",
+                            EsDetalleReexpresion = true
+                        });
                     }
 
                     ConstruirArbol(nodoHijo, tipo, hijo.Codigo);
